@@ -10,6 +10,7 @@ from flathunter.crawl_immobilienscout import CrawlImmobilienscout
 from flathunter.crawl_wggesucht import CrawlWgGesucht
 from flathunter.idmaintainer import IdMaintainer
 from flathunter.hunter import Hunter
+from flathunter.crawl_ebaykleinanzeigen import CrawlEbayKleinanzeigen
 
 __author__ = "Jan Harrie"
 __version__ = "1.0"
@@ -36,7 +37,7 @@ __log__ = logging.getLogger(__name__)
 
 
 def launch_flat_hunt(config):
-    searchers = [CrawlImmobilienscout(), CrawlWgGesucht()]
+    searchers = [CrawlImmobilienscout(), CrawlWgGesucht(), CrawlEbayKleinanzeigen()]
     id_watch = IdMaintainer('%s/processed_ids.db' % os.path.dirname(os.path.abspath(__file__)))
 
     hunter = Hunter()

@@ -6,11 +6,12 @@ import os
 import logging
 import time
 import yaml
+from flathunter.crawl_ebaykleinanzeigen import CrawlEbayKleinanzeigen
 from flathunter.crawl_immobilienscout import CrawlImmobilienscout
 from flathunter.crawl_wggesucht import CrawlWgGesucht
+from flathunter.crawl_immowelt import CrawlImmowelt
 from flathunter.idmaintainer import IdMaintainer
 from flathunter.hunter import Hunter
-from flathunter.crawl_ebaykleinanzeigen import CrawlEbayKleinanzeigen
 
 __author__ = "Jan Harrie"
 __version__ = "1.0"
@@ -37,14 +38,14 @@ __log__ = logging.getLogger(__name__)
 
 
 def launch_flat_hunt(config):
-    searchers = [CrawlImmobilienscout(), CrawlWgGesucht(), CrawlEbayKleinanzeigen()]
+    searchers = [CrawlImmobilienscout(), CrawlWgGesucht(), CrawlEbayKleinanzeigen(), CrawlImmowelt()]
     id_watch = IdMaintainer('%s/processed_ids.db' % os.path.dirname(os.path.abspath(__file__)))
 
     hunter = Hunter()
     hunter.hunt_flats(config, searchers, id_watch)
 
     while config.get('loop', dict()).get('active', False):
-        time.sleep(config.get('loop', dict()).get('sleeping_time',60*10))
+        time.sleep(config.get('loop', dict()).get('sleeping_time', 60 * 10))
         hunter.hunt_flats(config, searchers, id_watch)
 
 

@@ -66,8 +66,7 @@ message: |
     Zimmer: {rooms}
     Größe: {size}
     Preis: {price}
-    Anfahrt:
-    {durations}
+    Ort: {address}
 
     {url}
 

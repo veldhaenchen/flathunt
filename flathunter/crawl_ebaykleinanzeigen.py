@@ -32,18 +32,24 @@ class CrawlEbayKleinanzeigen:
         entries = []
         soup = soup.find(id="srchrslt-adtable")
         try:
-            title_elements = soup.find_all( lambda e: e.has_attr('class') and 'ellipsis' in e['class'])
+            title_elements = soup.find_all(lambda e: e.has_attr('class') and 'ellipsis' in e['class'])
         except AttributeError:
             return entries
-        expose_ids=soup.find_all("article", class_="aditem")
+        expose_ids = soup.find_all("article", class_="aditem")
 
-
-        #soup.find_all(lambda e: e.has_attr('data-adid'))
-        #print(expose_ids)
-        for idx,title_el in enumerate(title_elements):
+        # soup.find_all(lambda e: e.has_attr('data-adid'))
+        # print(expose_ids)
+        for idx, title_el in enumerate(title_elements):
             price = expose_ids[idx].find("strong").text
             tags = expose_ids[idx].find_all(class_="simpletag tag-small")
-            address = "https://www.ebay-kleinanzeigen.de/" +title_el.get("href")
+            url = "https://www.ebay-kleinanzeigen.de/" + title_el.get("href")
+            address = expose_ids[idx].find("div", {"class": "aditem-details"})
+            address.find("strong").extract()
+            address.find("br").extract()
+            print(address.text.strip())
+            address = address.text.strip()
+            address = address.replace('\n', ' ').replace('\r', '')
+            address = " ".join(address.split())
             try:
                 print(tags[0].text)
                 rooms = tags[0].text
@@ -58,11 +64,11 @@ class CrawlEbayKleinanzeigen:
                 print("Quadratmeter nicht angegeben")
             details = {
                 'id': int(expose_ids[idx].get("data-adid")),
-                'url':  address ,
+                'url': url,
                 'title': title_el.text.strip(),
                 'price': price,
                 'size': size,
-                'rooms': rooms ,
+                'rooms': rooms,
                 'address': address
             }
             entries.append(details)
@@ -78,11 +84,11 @@ class CrawlEbayKleinanzeigen:
         try:
             street_raw = exposeSoup.find(id="street-address").text
         except AttributeError:
-            street_raw=""
+            street_raw = ""
         try:
             address_raw = exposeSoup.find(id="viewad-locality").text
         except AttributeError:
-            address_raw =""
-        address = address_raw.strip().replace("\n","") + " "+street_raw.strip()
+            address_raw = ""
+        address = address_raw.strip().replace("\n", "") + " " + street_raw.strip()
 
         return address

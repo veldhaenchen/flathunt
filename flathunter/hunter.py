@@ -1,11 +1,9 @@
-import datetime
 import logging
-import re
-import time
-import urllib
-
 import requests
-
+import re
+import urllib
+import datetime
+import time
 from flathunter.sender_telegram import SenderTelegram
 
 
@@ -14,7 +12,6 @@ class Hunter:
     GM_MODE_TRANSIT = 'transit'
     GM_MODE_BICYCLE = 'bicycling'
     GM_MODE_DRIVING = 'driving'
-    GM_MODE_WALKING = 'walking'
 
     def hunt_flats(self, config, searchers, id_watch):
         sender = SenderTelegram(config)
@@ -54,10 +51,6 @@ class Hunter:
                             self.__log__.debug("Loaded address %s for url %s" % (address, url))
                             break
 
-                # filter districts
-                blacklist = config.get('blacklist', list())
-                address = ' '.join(filter(lambda x: x not in blacklist, address.split()))
-
                 # calculdate durations
                 message = config.get('message', "").format(
                     title=expose['title'],
@@ -65,7 +58,10 @@ class Hunter:
                     size=expose['size'],
                     price=expose['price'],
                     url=expose['url'],
-                    durations=self.get_formatted_durations(config, address)).strip()
+                    address=address,
+                    durations="").strip()
+                # UNCOMMENT below and COMMENT Above to enable duration feature
+                # durations=self.get_formatted_durations(config, address)).strip()
 
                 # send message to all receivers
                 sender.send_msg(message)
@@ -124,10 +120,10 @@ class Hunter:
                     self.__log__.warning("For address %s we got the status message: %s" % (address, element['status']))
                     self.__log__.debug("We got this result: %s" % repr(result))
                     continue
-                self.__log__.debug("Got distance and duration: %s / %s (%i seconds)"
-                                   % (element['distance']['text'], element['duration']['text'],
-                                      element['duration']['value'])
-                                   )
+                    self.__log__.debug("Got distance and duration: %s / %s (%i seconds)"
+                                       % (element['distance']['text'], element['duration']['text'],
+                                          element['duration']['value'])
+                                       )
                 distances[element['duration']['value']] = '%s (%s)' % \
                                                           (element['duration']['text'], element['distance']['text'])
         return distances[min(distances.keys())] if distances else None

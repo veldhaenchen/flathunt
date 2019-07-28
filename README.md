@@ -36,22 +36,30 @@ optional arguments:
 
 ### Configuration
 
+#### Links
+
+Currently, ebay-kleinanzeigen and immowelt only crawl the first page, so make sure to **sort by newest offers**.
+
 #### Bot registration
 A new bot can registered with the telegram chat with the [BotFather](https://telegram.me/BotFather).
 
 #### Chat-Ids
-To get the chat id, the [REST-Api](https://core.telegram.org/bots/api) of telegram can be used to fetch the received messages of the Bot.
+To get the chat id (receiver ID), the [REST-Api](https://core.telegram.org/bots/api) of telegram can be used to fetch the received messages of the Bot.
 ```
 $ curl https://api.telegram.org/bot[BOT-TOKEN]/getUpdates
 ```
 
 #### Google API
-To use the distance calculation feature a [Google API-Key](https://developers.google.com/maps/documentation/javascript/get-api-key) is needed.
+To use the distance calculation feature a [Google API-Key](https://developers.google.com/maps/documentation/javascript/get-api-key) is needed and requires the Distance Matrix API to be enabled. (This is NOT free)
+Since this feature is not free, I "disabled" it. Read line 62 in hunter.py to re-enable it.
 
 
 ## Contributers
 - [@NodyHub](https://github.com/NodyHub)
 - Bene
+- [@tschuehly](https://github.com/tschuehly)
 - [@Cugu](https://github.com/Cugu)
+- [@GerRudi](https://github.com/GerRudi)
+- [@xMordax](https://github.com/xMordax)
 
 

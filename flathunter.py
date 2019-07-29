@@ -64,6 +64,7 @@ def main():
     # load config
     config_handle = args.config
     __log__.info("Using config %s" % config_handle.name)
+    print(config_handle.name)
     config = yaml.load(config_handle.read())
 
     # check config

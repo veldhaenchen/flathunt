@@ -33,7 +33,7 @@ else:
 logging.basicConfig(
     format=format,
     datefmt='%Y/%m/%d %H:%M:%S',
-    level=logging.DEBUG)
+    level=logging.INFO)
 __log__ = logging.getLogger(__name__)
 
 

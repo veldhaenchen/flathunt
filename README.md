@@ -7,8 +7,8 @@ To keep you python environment and site-packages clean, it is recommended
 to run the project in a virtual environment. Install ```virtualenv```,
 create a venv and activate.
 ```
-$ pip install virtualenv
-$ virtualenv -p /usr/bin/python3.6 venv
+$ pip3 install virtualenv
+$ virtualenv -p /usr/bin/python3.7 venv
 $ source venv/bin/activate
 ```
 

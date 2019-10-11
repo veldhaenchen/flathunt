@@ -1,7 +1,9 @@
 import logging
 import requests
 import re
-import urllib
+import urllib.request
+import urllib.parse
+import urllib.error
 import datetime
 import time
 from flathunter.sender_telegram import SenderTelegram

@@ -29,7 +29,7 @@ class CrawlEbayKleinanzeigen:
         return BeautifulSoup(resp.content, 'html5lib')
 
     def extract_data(self, soup):
-        entries = []
+        entries = list()
         soup = soup.find(id="srchrslt-adtable")
         try:
             title_elements = soup.find_all(lambda e: e.has_attr('class') and 'ellipsis' in e['class'])
@@ -46,7 +46,7 @@ class CrawlEbayKleinanzeigen:
             address = expose_ids[idx].find("div", {"class": "aditem-details"})
             address.find("strong").extract()
             address.find("br").extract()
-            print(address.text.strip())
+            print((address.text.strip()))
             address = address.text.strip()
             address = address.replace('\n', ' ').replace('\r', '')
             address = " ".join(address.split())
@@ -77,16 +77,17 @@ class CrawlEbayKleinanzeigen:
 
         return entries
 
-    def load_address(self, url):
+    @staticmethod
+    def load_address(url):
         # extract address from expose itself
-        exposeHTML = requests.get(url).content
-        exposeSoup = BeautifulSoup(exposeHTML, 'html.parser')
+        expose_html = requests.get(url).content
+        expose_soup = BeautifulSoup(expose_html, 'html.parser')
         try:
-            street_raw = exposeSoup.find(id="street-address").text
+            street_raw = expose_soup.find(id="street-address").text
         except AttributeError:
             street_raw = ""
         try:
-            address_raw = exposeSoup.find(id="viewad-locality").text
+            address_raw = expose_soup.find(id="viewad-locality").text
         except AttributeError:
             address_raw = ""
         address = address_raw.strip().replace("\n", "") + " " + street_raw.strip()

@@ -44,11 +44,11 @@ class CrawlImmobilienscout:
         return BeautifulSoup(resp.content, 'html.parser')
 
     def extract_data(self, soup):
-        entries = []
+        entries = list()
 
         title_elements = soup.find_all(lambda e: e.has_attr('class') and 'result-list-entry__brand-title' in e['class'])
-        expose_ids = list(map(lambda e: int(e.parent['href'].split('/')[-1].replace('.html', '')), title_elements))
-        expose_urls = list(map(lambda id: 'https://www.immobilienscout24.de/expose/' + str(id), expose_ids))
+        expose_ids = list([int(e.parent['href'].split('/')[-1].replace('.html', '')) for e in title_elements])
+        expose_urls = list(['https://www.immobilienscout24.de/expose/' + str(ids) for ids in expose_ids])
         attr_container_els = soup.find_all(lambda e: e.has_attr('data-is24-qa') and e['data-is24-qa'] == "attributes")
         address_fields = soup.find_all(lambda e: e.has_attr('class') and 'result-list-entry__address' in e['class'])
 
@@ -56,7 +56,7 @@ class CrawlImmobilienscout:
             try:
                 attr_els = attr_container_els[idx].find_all('dd')
                 address = address_fields[idx].text.strip().replace(',', '')
-                if(len(attr_els)>2) :
+                if len(attr_els) > 2:
                     details = {
                         'id': expose_ids[idx],
                         'url': expose_urls[idx],

@@ -29,24 +29,23 @@ class CrawlImmowelt:
         return BeautifulSoup(resp.content, 'html.parser')
 
     def extract_data(self, soup):
-        entries = []
+        entries = list()
         soup = soup.find(id="listItemWrapperFixed")
         try:
             title_elements = soup.find_all("h2")
         except AttributeError:
             return entries
-        expose_ids=soup.find_all("div", class_="listitem_wrap")
+        expose_ids = soup.find_all("div", class_="listitem_wrap")
 
-
-        #soup.find_all(lambda e: e.has_attr('data-adid'))
-        #print(expose_ids)
-        for idx,title_el in enumerate(title_elements):
+        # soup.find_all(lambda e: e.has_attr('data-adid'))
+        # print(expose_ids)
+        for idx, title_el in enumerate(title_elements):
 
             tags = expose_ids[idx].find_all(class_="hardfact")
-            url = "https://www.immowelt.de/" +expose_ids[idx].find("a").get("href")
+            url = "https://www.immowelt.de/" + expose_ids[idx].find("a").get("href")
             address = expose_ids[idx].find(class_="listlocation")
             address.find("span").extract()
-            print(address.text.strip())
+            print((address.text.strip()))
             address = address.text.strip()
 
             try:
@@ -58,7 +57,7 @@ class CrawlImmowelt:
 
             try:
                 tags[1].find("div").extract()
-                print(tags[1].text.strip())
+                print((tags[1].text.strip()))
                 size = tags[1].text.strip()
             except IndexError:
                 size = "Nicht gegeben"
@@ -66,7 +65,7 @@ class CrawlImmowelt:
 
             try:
                 tags[2].find("div").extract()
-                print(tags[2].text.strip())
+                print((tags[2].text.strip()))
                 rooms = tags[2].text.strip()
             except IndexError:
                 print("Keine Zimmeranzahl gegeben")
@@ -74,11 +73,11 @@ class CrawlImmowelt:
 
             details = {
                 'id': int(expose_ids[idx].get("data-estateid")),
-                'url':  url ,
+                'url': url,
                 'title': title_el.text.strip(),
                 'price': price,
                 'size': size,
-                'rooms': rooms ,
+                'rooms': rooms,
                 'address': address
 
             }
@@ -88,18 +87,19 @@ class CrawlImmowelt:
 
         return entries
 
-    def load_address(self, url):
+    @staticmethod
+    def load_address(url):
         # extract address from expose itself
-        exposeHTML = requests.get(url).content
-        exposeSoup = BeautifulSoup(exposeHTML, 'html.parser')
+        expose_html = requests.get(url).content
+        expose_soup = BeautifulSoup(expose_html, 'html.parser')
         try:
-            street_raw = exposeSoup.find(id="street-address").text
+            street_raw = expose_soup.find(id="street-address").text
         except AttributeError:
-            street_raw=""
+            street_raw = ""
         try:
-            address_raw = exposeSoup.find(id="viewad-locality").text
+            address_raw = expose_soup.find(id="viewad-locality").text
         except AttributeError:
-            address_raw =""
-        address = address_raw.strip().replace("\n","") + " "+street_raw.strip()
+            address_raw = ""
+        address = address_raw.strip().replace("\n", "") + " " + street_raw.strip()
 
         return address

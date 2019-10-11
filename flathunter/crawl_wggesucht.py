@@ -42,11 +42,11 @@ class CrawlWgGesucht:
         return BeautifulSoup(resp.content, 'lxml')
 
     def extract_data(self, soup):
-        entries = []
+        entries = list()
 
         findings = soup.find_all(lambda e: e.has_attr('id') and e['id'].startswith('liste-'))
         existingFindings = list(
-            filter(lambda e: e.has_attr('class') and not 'display-none' in e['class'], findings))
+            [e for e in findings if e.has_attr('class') and not 'display-none' in e['class']])
 
         baseurl = 'https://www.wg-gesucht.de/'
         for row in existingFindings:
@@ -77,7 +77,8 @@ class CrawlWgGesucht:
 
         return entries
 
-    def load_address(self, url):
+    @staticmethod
+    def load_address(url):
         # extract address from expose itself
         r = requests.get(url)
         flat = BeautifulSoup(r.content, 'lxml')

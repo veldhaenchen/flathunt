@@ -16,7 +16,7 @@ $ source venv/bin/activate
 ### Requirements
 Install requirements from ```requirements.txt``` to run execute flathunter properly.
 ```
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 ## Usage
@@ -38,7 +38,8 @@ optional arguments:
 
 #### Links
 
-Currently, ebay-kleinanzeigen and immowelt only crawl the first page, so make sure to **sort by newest offers**.
+ * Currently, ebay-kleinanzeigen and immowelt only crawl the first page, so make sure to **sort by newest offers**.
+ * Your links should point to the German version of the websites, since it is tested only there. Otherwise you might have problems.
 
 #### Bot registration
 A new bot can registered with the telegram chat with the [BotFather](https://telegram.me/BotFather).

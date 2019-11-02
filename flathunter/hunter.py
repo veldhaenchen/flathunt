@@ -34,7 +34,8 @@ class Hunter:
 
             # on error, stop execution
             if not results:
-                break
+                self.__log__.debug('No results for: ' + url)
+                continue
 
             for expose in results:
                 # check if already processed

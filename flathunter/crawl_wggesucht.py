@@ -50,17 +50,16 @@ class CrawlWgGesucht:
 
         baseurl = 'https://www.wg-gesucht.de/'
         for row in existingFindings:
-            infostring = row.find(
-                lambda e: e.name == "div" and e.has_attr('class') and 'list-details-panel-inner' in e[
-                    'class']).p.text.strip()
-            rooms = re.findall(r'\d[-]Zimmer[-]Wohnung', infostring)[0][:1]
-            date = re.findall(r'\d{2}.\d{2}.\d{4}', infostring)[0]
-            detail = row.find_all(lambda e: e.name == "a" and e.has_attr('class') and 'detailansicht' in e['class']);
-            title = detail[2].text.strip()
-            url = baseurl + detail[0]["href"]
-            size_price = detail[0].text.strip()
-            price = re.findall(r'\d{2,4}\s€', size_price)[0]
-            size = re.findall(r'\d{2,4}\sm²', size_price)[0]
+            titlerow = row.find('h3', {"class": "truncate_title"})
+            title = titlerow.text.strip()
+            url = baseurl + titlerow.find('a')['href']
+            detailstring = row.find("div", { "class": "col-xs-11" }).text.strip().split("|")
+            details_array = list(map(lambda s: re.sub(' +', ' ', re.sub('\W', ' ', s.strip())), detailstring))
+            numbers_row = row.find("div", { "class": "middle" })
+            price = numbers_row.find("div", { "class": "col-xs-3" }).text.strip()
+            rooms = re.findall(r'\d Zimmer', details_array[0])[0][:1]
+            date = re.findall(r'\d{2}.\d{2}.\d{4}', numbers_row.find("div", { "class": "text-center" }).text)[0]
+            size = re.findall(r'\d{2,4}\sm²', numbers_row.find("div", { "class": "text-right" }).text)[0]
 
             details = {
                 'id': int(url.split('.')[-2]),

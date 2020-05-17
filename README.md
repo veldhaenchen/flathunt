@@ -34,6 +34,16 @@ optional arguments:
 
 ```
 
+## Testing
+
+The `unittest`-based test suite can be run with:
+
+```
+python -m unittest discover -s test
+```
+
+from the project root.
+
 ### Configuration
 
 #### Links
@@ -62,5 +72,4 @@ Since this feature is not free, it is "disabled". Read line 62 in hunter.py to r
 - [@Cugu](https://github.com/Cugu)
 - [@GerRudi](https://github.com/GerRudi)
 - [@xMordax](https://github.com/xMordax)
-
-
+- [@codders](https://github.com/codders)

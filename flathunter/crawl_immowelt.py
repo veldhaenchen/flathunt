@@ -42,33 +42,29 @@ class CrawlImmowelt:
         for idx, title_el in enumerate(title_elements):
 
             tags = expose_ids[idx].find_all(class_="hardfact")
-            url = "https://www.immowelt.de/" + expose_ids[idx].find("a").get("href")
+            url = "https://www.immowelt.de" + expose_ids[idx].find("a").get("href")
             address = expose_ids[idx].find(class_="listlocation")
             address.find("span").extract()
-            print((address.text.strip()))
             address = address.text.strip()
 
             try:
-                print(tags[0].find("strong").text)
                 price = tags[0].find("strong").text.strip()
             except IndexError:
-                print("Kein Preis angegeben")
+                self.__log__.error("Kein Preis angegeben")
                 price = "Auf Anfrage"
 
             try:
                 tags[1].find("div").extract()
-                print((tags[1].text.strip()))
                 size = tags[1].text.strip()
             except IndexError:
                 size = "Nicht gegeben"
-                print("Quadratmeter nicht angegeben")
+                self.__log__.error("Quadratmeter nicht angegeben")
 
             try:
                 tags[2].find("div").extract()
-                print((tags[2].text.strip()))
                 rooms = tags[2].text.strip()
             except IndexError:
-                print("Keine Zimmeranzahl gegeben")
+                self.__log__.error("Keine Zimmeranzahl gegeben")
                 rooms = "Nicht gegeben"
 
             details = {

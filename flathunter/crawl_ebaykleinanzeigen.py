@@ -42,26 +42,26 @@ class CrawlEbayKleinanzeigen:
         for idx, title_el in enumerate(title_elements):
             price = expose_ids[idx].find("strong").text
             tags = expose_ids[idx].find_all(class_="simpletag tag-small")
-            url = "https://www.ebay-kleinanzeigen.de/" + title_el.get("href")
+            url = "https://www.ebay-kleinanzeigen.de" + title_el.get("href")
             address = expose_ids[idx].find("div", {"class": "aditem-details"})
             address.find("strong").extract()
             address.find("br").extract()
-            print((address.text.strip()))
+            self.__log__.debug(address.text.strip())
             address = address.text.strip()
             address = address.replace('\n', ' ').replace('\r', '')
             address = " ".join(address.split())
             try:
-                print(tags[0].text)
+                self.__log__.debug(tags[0].text)
                 rooms = tags[0].text
             except IndexError:
-                print("Keine Zimmeranzahl gegeben")
+                self.__log__.debug("Keine Zimmeranzahl gegeben")
                 rooms = "Nicht gegeben"
             try:
-                print(tags[1].text)
+                self.__log__.debug(tags[1].text)
                 size = tags[1].text
             except IndexError:
                 size = "Nicht gegeben"
-                print("Quadratmeter nicht angegeben")
+                self.__log__.debug("Quadratmeter nicht angegeben")
             details = {
                 'id': int(expose_ids[idx].get("data-adid")),
                 'url': url,

@@ -8,6 +8,6 @@ install:
   - pip install pipenv
   - pipenv install
 script:
-  - python -m unittest discover -s test
+  - coverage run
 after_success:
   - codecov

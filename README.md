@@ -1,23 +1,62 @@
-# Python Flathunter-Helper
+# Flathunter
 
-## Setup
+[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
-### Virtual Environment (Optional)
-To keep you python environment and site-packages clean, it is recommended
-to run the project in a virtual environment. Install ```virtualenv```,
-create a venv and activate.
-```
-$ pip3 install virtualenv
-$ virtualenv -p /usr/bin/python3.7 venv
-$ source venv/bin/activate
+A Telegram bot to help people with their flat search
+
+## Description
+
+Flathunter is a Python application with periodically [scrapes](https://en.wikipedia.org/wiki/Web_scraping) property listings sites that the user has configured to find new apartment listings, and sends notifications of the new apartment to the user via [Telegram](https://en.wikipedia.org/wiki/Telegram_%28software%29).
+
+## Background
+
+There are at least four different rental property marketplace sites that are widely used in Germany - [ImmoScout24](https://www.immobilienscout24.de/), [immowelt](https://www.immowelt.de/), [WG-Gesucht](https://www.wg-gesucht.de/) and [ebay Kleinanzeigen](https://www.wg-gesucht.de/). Most people end up searching through listings on all four sites on an almost daily basis during their flat search.
+
+With Flathunter, instead of visiting the same pages on the same four sites every day, you can set the system up to scan every site, filtering by your search criteria, and notify you when new flats become available that meet your criteria.
+
+## Install
+
+Flathunter is a Python3 project - you will need Python3 installed to run the code. We recommend using [pipenv](https://pipenv-fork.readthedocs.io/en/latest/) to setup and configure your project. Install `pipenv` according to the instructions on the `pipenv` site, then run:
+
+```sh
+$ pipenv install
 ```
 
+from the project directory to install the dependencies. Once the dependencies are installed, and every time you come back to the project in a new shell, run:
 
-### Requirements
-Install requirements from ```requirements.txt``` to run execute flathunter properly.
+```sh
+$ pipenv shell
 ```
-pip3 install -r requirements.txt
+
+to launch a Python environment with the dependencies that your project requires.
+
+### Configuration
+
+Before running the project for the first time, copy `config.yaml.dist` to `config.yaml`. The `urls` and `telegram` sections of the config file must be configured according to your requirements before the project will run. 
+
+#### URLs
+
+ * Currently, ebay-kleinanzeigen and immowelt only crawl the first page, so make sure to **sort by newest offers**.
+ * Your links should point to the German version of the websites, since it is tested only there. Otherwise you might have problems.
+
+#### Telegram
+
+To be able to send messages to you over Telegram, you need to register a new bot with the [BotFather](https://telegram.me/BotFather) for `flathunter` to use. Through this process, a "Bot Token" will be created for you, which should be configured under `bot_token` in the config file.
+
+To know who should Telegram messages should be sent to, the "Chat IDs" of the recipients must be added to the config file under `receiver_ids`. To work out your own Chat ID, send a message to your new bot, then run:
+
+
 ```
+$ curl https://api.telegram.org/bot[BOT-TOKEN]/getUpdates
+```
+
+to get list of messages the Bot has received. You will see your Chat ID in there.
+
+#### Google API
+
+To use the distance calculation feature a [Google API-Key](https://developers.google.com/maps/documentation/javascript/get-api-key) is needed and requires the Distance Matrix API to be enabled. (This is NOT free)
+
+Since this feature is not free, it is "disabled". Read line 62 in hunter.py to re-enable it.
 
 ## Usage
 ```
@@ -38,32 +77,11 @@ optional arguments:
 
 The `unittest`-based test suite can be run with:
 
-```
-python -m unittest discover -s test
+```sh
+$ python -m unittest discover -s test
 ```
 
 from the project root.
-
-### Configuration
-
-#### Links
-
- * Currently, ebay-kleinanzeigen and immowelt only crawl the first page, so make sure to **sort by newest offers**.
- * Your links should point to the German version of the websites, since it is tested only there. Otherwise you might have problems.
-
-#### Bot registration
-A new bot can registered with the telegram chat with the [BotFather](https://telegram.me/BotFather).
-
-#### Chat-Ids
-To get the chat id (receiver ID), the [REST-Api](https://core.telegram.org/bots/api) of telegram can be used to fetch the received messages of the Bot.
-```
-$ curl https://api.telegram.org/bot[BOT-TOKEN]/getUpdates
-```
-
-#### Google API
-To use the distance calculation feature a [Google API-Key](https://developers.google.com/maps/documentation/javascript/get-api-key) is needed and requires the Distance Matrix API to be enabled. (This is NOT free)
-Since this feature is not free, it is "disabled". Read line 62 in hunter.py to re-enable it.
-
 
 ## Contributers
 - [@NodyHub](https://github.com/NodyHub)

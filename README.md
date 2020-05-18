@@ -1,6 +1,7 @@
 # Flathunter
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
+[![travis build status](https://travis-ci.org/flathunters/flathunter.svg?branch=master)](https://travis-ci.org/github/flathunters/flathunter)
 
 A Telegram bot to help people with their flat search
 
@@ -16,7 +17,7 @@ With Flathunter, instead of visiting the same pages on the same four sites every
 
 ## Install
 
-Flathunter is a Python3 project - you will need Python3 installed to run the code. We recommend using [pipenv](https://pipenv-fork.readthedocs.io/en/latest/) to setup and configure your project. Install `pipenv` according to the instructions on the `pipenv` site, then run:
+Flathunter is a Python (v3.5+) project - you will need Python3 installed to run the code. We recommend using [pipenv](https://pipenv-fork.readthedocs.io/en/latest/) to setup and configure your project. Install `pipenv` according to the instructions on the `pipenv` site, then run:
 
 ```sh
 $ pipenv install

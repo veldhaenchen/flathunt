@@ -9,3 +9,5 @@ install:
   - pipenv install
 script:
   - python -m unittest discover -s test
+after_success:
+  - codecov

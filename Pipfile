@@ -16,6 +16,7 @@ lxml = "==4.4.1"
 html5lib = "==1.0.1"
 coverage = "*"
 codecov = "*"
+requests-mock = "*"
 
 [dev-packages]
 

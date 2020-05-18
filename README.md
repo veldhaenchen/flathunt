@@ -36,6 +36,8 @@ Before running the project for the first time, copy `config.yaml.dist` to `confi
 
 #### URLs
 
+To configure the searches, simply visit the property portal of your choice (e.g. ImmoScout), configure the search on the website to match your search criteria, then copy the URL of the results page into the config file. You can add as many URLs as you like, also multiple from the same website if you have multiple different criteria (e.g. running the same search in multiple different Bezirke).
+
  * Currently, ebay-kleinanzeigen and immowelt only crawl the first page, so make sure to **sort by newest offers**.
  * Your links should point to the German version of the websites, since it is tested only there. Otherwise you might have problems.
 
@@ -59,6 +61,9 @@ To use the distance calculation feature a [Google API-Key](https://developers.go
 Since this feature is not free, it is "disabled". Read line 62 in hunter.py to re-enable it.
 
 ## Usage
+
+By default, the application runs on the commandline and outputs logs to `stdout`. It will poll in a loop and send updates after each run. The `processed_ids.db` file contains details of which listings have already been sent to the Telegram bot - if you delete that, it will be recreated, and you may receive duplicate listings.
+
 ```
 usage: flathunter.py [-h] [--config CONFIG]
 
@@ -83,11 +88,25 @@ $ python -m unittest discover -s test
 
 from the project root.
 
-## Contributers
-- [@NodyHub](https://github.com/NodyHub)
+## Maintainers
+
+This project is maintained by the members of the [Flat Hunters](https://github.com/flathunters) Github organisation, which is a collection of individual unpaid volunteers who have all had their own processes with flat-hunting in Germany. If you want to join, just ping one of us a message!
+
+## Credits
+
+The original code was contributed by [@NodyHub](https://github.com/NodyHub), whose original idea this project was.
+
+### Contributers
+
+Other contributions were made along the way by
+
 - Bene
 - [@tschuehly](https://github.com/tschuehly)
 - [@Cugu](https://github.com/Cugu)
 - [@GerRudi](https://github.com/GerRudi)
 - [@xMordax](https://github.com/xMordax)
 - [@codders](https://github.com/codders)
+
+## Contributing
+
+If you want to make a contribution, please check out the contributor code of conduct ([en](CODE_OF_CONDUCT.en.md)/[de](CODE_OF_CONDUCT.de.md)) first. Pull requests are very welcome, as are [issues](issues). If you file an issue, please include as much information as possible about how to reproduce the issue.

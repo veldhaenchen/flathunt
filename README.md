@@ -109,4 +109,4 @@ Other contributions were made along the way by
 
 ## Contributing
 
-If you want to make a contribution, please check out the contributor code of conduct ([en](CODE_OF_CONDUCT.en.md)/[de](CODE_OF_CONDUCT.de.md)) first. Pull requests are very welcome, as are [issues](issues). If you file an issue, please include as much information as possible about how to reproduce the issue.
+If you want to make a contribution, please check out the contributor code of conduct ([en](CODE_OF_CONDUCT.en.md)/[de](CODE_OF_CONDUCT.de.md)) first. Pull requests are very welcome, as are [issues](https://github.com/flathunters/flathunter/issues). If you file an issue, please include as much information as possible about how to reproduce the issue.

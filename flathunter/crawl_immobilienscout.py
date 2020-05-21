@@ -1,4 +1,6 @@
-import logging, requests, re
+import logging
+import requests
+import re
 from bs4 import BeautifulSoup
 
 
@@ -41,10 +43,9 @@ class CrawlImmobilienscout:
             page_no += 1
             soup = self.get_page(search_url, page_no)
             cur_entry = self.extract_data(soup)
-            if cur_entry == list():
+            if cur_entry is list():
                 break
             entries.extend(cur_entry)
-
         return entries
 
     def get_page(self, search_url, page_no):
@@ -54,7 +55,7 @@ class CrawlImmobilienscout:
         return BeautifulSoup(resp.content, 'html.parser')
 
     def extract_data(self, soup):
-        entries = []
+        entries = list()
 
         title_elements = soup.find_all(
             lambda e: e.name == 'a' and e.has_attr('class') and 'result-list-entry__brand-title-container' in e[

@@ -2,6 +2,7 @@ import urllib.request, urllib.parse, urllib.error
 import requests
 import logging
 
+
 class SenderTelegram():
     __log__ = logging.getLogger(__name__)
 

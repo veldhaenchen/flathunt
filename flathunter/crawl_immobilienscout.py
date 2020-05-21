@@ -26,19 +26,22 @@ class CrawlImmobilienscout:
         page_no = 1
         soup = self.get_page(search_url, page_no)
         try:
-            no_of_results = int(soup.find_all(lambda e: e.has_attr('data-is24-qa') and e['data-is24-qa'] == 'resultlist-resultCount')[0].text)
+            no_of_results = int(
+                soup.find_all(lambda e: e.has_attr('data-is24-qa') and e['data-is24-qa'] == 'resultlist-resultCount')[
+                    0].text)
         except IndexError:
-            self.__log__.debug('Index Error occured')
+            self.__log__.debug('Index Error occurred')
         # get data from first page
         entries = self.extract_data(soup)
 
         # iterate over all remaining pages
         while len(entries) < min(no_of_results, self.RESULT_LIMIT):
-            self.__log__.debug('Next Page, Number of entries : ' + str(len(entries)) + "no of resulst: " + str(no_of_results))
+            self.__log__.debug(
+                'Next Page, Number of entries : ' + str(len(entries)) + "no of resulst: " + str(no_of_results))
             page_no += 1
             soup = self.get_page(search_url, page_no)
             cur_entry = self.extract_data(soup)
-            if cur_entry == []:
+            if cur_entry == list():
                 break
             entries.extend(cur_entry)
 
@@ -53,13 +56,15 @@ class CrawlImmobilienscout:
     def extract_data(self, soup):
         entries = []
 
-        title_elements = soup.find_all(lambda e: e.name == 'a' and e.has_attr('class') and 'result-list-entry__brand-title-container' in e['class'])
-        expose_ids = []
-        expose_urls = []
+        title_elements = soup.find_all(
+            lambda e: e.name == 'a' and e.has_attr('class') and 'result-list-entry__brand-title-container' in e[
+                'class'])
+        expose_ids = list()
+        expose_urls = list()
         for link in title_elements:
             expose_id = int(link.get('href').split('/')[-1].replace('.html', ''))
             expose_ids.append(expose_id)
-            if(len(str(expose_id)) > 5):
+            if len(str(expose_id)) > 5:
                 expose_urls.append('https://www.immobilienscout24.de/expose/' + str(expose_id))
             else:
                 expose_urls.append(link.get('href'))
@@ -73,7 +78,7 @@ class CrawlImmobilienscout:
                 address = address_fields[idx].text.strip()
             except:
                 address = "No address given"
-            if(len(attr_els)>2) :
+            if len(attr_els) > 2:
                 details = {
                     'id': expose_ids[idx],
                     'url': expose_urls[idx],
@@ -83,17 +88,16 @@ class CrawlImmobilienscout:
                     'rooms': attr_els[2].text + " Zi.",
                     'address': address
                 }
-            #print entries
+            # print entries
             exist = False
             for x in entries:
-                if(expose_id == x["id"]):
+                if expose_id == x["id"]:
                     exist = True
                     break
                 else:
                     continue
-            if(exist == False):
+            if not exist:
                 entries.append(details)
-
 
         self.__log__.debug('extracted: ' + str(entries))
         return entries

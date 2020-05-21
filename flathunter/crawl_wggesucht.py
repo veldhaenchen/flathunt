@@ -45,16 +45,16 @@ class CrawlWgGesucht:
         entries = list()
 
         findings = soup.find_all(lambda e: e.has_attr('id') and e['id'].startswith('liste-'))
-        existingFindings = list(
+        existing_findings = list(
             [e for e in findings if e.has_attr('class') and not 'display-none' in e['class']])
 
-        baseurl = 'https://www.wg-gesucht.de/'
-        for row in existingFindings:
-            titlerow = row.find('h3', {"class": "truncate_title"})
-            title = titlerow.text.strip()
-            url = baseurl + titlerow.find('a')['href']
-            detailstring = row.find("div", { "class": "col-xs-11" }).text.strip().split("|")
-            details_array = list(map(lambda s: re.sub(' +', ' ', re.sub('\W', ' ', s.strip())), detailstring))
+        base_url = 'https://www.wg-gesucht.de/'
+        for row in existing_findings:
+            title_row = row.find('h3', {"class": "truncate_title"})
+            title = title_row.text.strip()
+            url = base_url + title_row.find('a')['href']
+            detail_string = row.find("div", { "class": "col-xs-11" }).text.strip().split("|")
+            details_array = list(map(lambda s: re.sub(' +', ' ', re.sub('\W', ' ', s.strip())), detail_string))
             numbers_row = row.find("div", { "class": "middle" })
             price = numbers_row.find("div", { "class": "col-xs-3" }).text.strip()
             rooms = re.findall(r'\d Zimmer', details_array[0])[0][:1]

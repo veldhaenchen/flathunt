@@ -41,7 +41,7 @@ def launch_flat_hunt(config):
     searchers = [CrawlImmobilienscout(), CrawlWgGesucht(), CrawlEbayKleinanzeigen(), CrawlImmowelt()]
     id_watch = IdMaintainer('%s/processed_ids.db' % os.path.dirname(os.path.abspath(__file__)))
 
-    hunter = Hunter()
+    hunter = Hunter(config)
     hunter.hunt_flats(config, searchers, id_watch)
 
     while config.get('loop', dict()).get('active', False):

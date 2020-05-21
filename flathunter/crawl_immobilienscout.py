@@ -1,4 +1,6 @@
-import logging, requests, re
+import logging
+import requests
+import re
 from bs4 import BeautifulSoup
 
 
@@ -17,9 +19,9 @@ class CrawlImmobilienscout:
         # else:
         #     search_url = re.sub(r"/Suche/(.+?)/", r"/Suche/\1/P-{0}/", search_url)
         if '&pagenumber' in search_url:
-            search_url = re.sub(r"&pagenumber=1", "&pagenumber={0}", search_url)
+            search_url = re.sub(r"&pagenumber=[0-9]", "&pagenumber={0}", search_url)
         else:
-            search_url = search_url + '?pagenumber={0}'
+            search_url = search_url + '&pagenumber={0}'
         self.__log__.debug("Got search URL %s" % search_url)
 
         # load first page to get number of entries
@@ -41,10 +43,9 @@ class CrawlImmobilienscout:
             page_no += 1
             soup = self.get_page(search_url, page_no)
             cur_entry = self.extract_data(soup)
-            if cur_entry == list():
+            if cur_entry is list():
                 break
             entries.extend(cur_entry)
-
         return entries
 
     def get_page(self, search_url, page_no):
@@ -54,7 +55,7 @@ class CrawlImmobilienscout:
         return BeautifulSoup(resp.content, 'html.parser')
 
     def extract_data(self, soup):
-        entries = []
+        entries = list()
 
         title_elements = soup.find_all(
             lambda e: e.name == 'a' and e.has_attr('class') and 'result-list-entry__brand-title-container' in e[
@@ -85,7 +86,7 @@ class CrawlImmobilienscout:
                     'title': title_el.text.strip().replace('NEU', ''),
                     'price': attr_els[0].text.strip().split(' ')[0].strip(),
                     'size': attr_els[1].text.strip().split(' ')[0].strip() + " qm",
-                    'rooms': attr_els[2].text + " Zi.",
+                    'rooms': attr_els[2].text.strip().split(' ')[0].strip() + " Zi.",
                     'address': address
                 }
             # print entries

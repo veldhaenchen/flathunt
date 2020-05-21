@@ -19,9 +19,9 @@ class CrawlImmobilienscout:
         # else:
         #     search_url = re.sub(r"/Suche/(.+?)/", r"/Suche/\1/P-{0}/", search_url)
         if '&pagenumber' in search_url:
-            search_url = re.sub(r"&pagenumber=1", "&pagenumber={0}", search_url)
+            search_url = re.sub(r"&pagenumber=[0-9]", "&pagenumber={0}", search_url)
         else:
-            search_url = search_url + '?pagenumber={0}'
+            search_url = search_url + '&pagenumber={0}'
         self.__log__.debug("Got search URL %s" % search_url)
 
         # load first page to get number of entries

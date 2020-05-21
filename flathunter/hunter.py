@@ -15,16 +15,16 @@ class Hunter:
     GM_MODE_BICYCLE = 'bicycling'
     GM_MODE_DRIVING = 'driving'
 
-    def __init__(self, cfg):
-        self.cfg = cfg
-        self.excluded_titles = self.cfg.get('excluded_titles', list())
+    def __init__(self, config):
+        self.config = config
+        self.excluded_titles = self.config.get('excluded_titles', list())
 
-    def hunt_flats(self, config, searchers, id_watch):
-        sender = SenderTelegram(config)
-        new_links = 0
+    def hunt_flats(self, searchers, id_watch):
+        sender = SenderTelegram(self.config)
+        new_exposes = []
         processed = id_watch.get()
 
-        for url in config.get('urls', list()):
+        for url in self.config.get('urls', list()):
             self.__log__.debug('Processing URL: ' + url)
 
             try:
@@ -59,7 +59,7 @@ class Hunter:
                             break
 
                 # calculdate durations
-                message = config.get('message', "").format(
+                message = self.config.get('message', "").format(
                     title=expose['title'],
                     rooms=expose['rooms'],
                     size=expose['size'],
@@ -71,10 +71,10 @@ class Hunter:
                 # durations=self.get_formatted_durations(config, address)).strip()
 
                 # if no excludes, send messages
-                if self.excluded_titles is None:
+                if len(self.excluded_titles) == 0:
                     # send message to all receivers
                     sender.send_msg(message)
-                    new_links += 1
+                    new_exposes.append(expose)
                     id_watch.add(expose['id'])
                     continue
 
@@ -85,10 +85,11 @@ class Hunter:
                 if not found_objects:
                     # send message to all receivers
                     sender.send_msg(message)
-                    new_links += 1
+                    new_exposes.append(expose)
                     id_watch.add(expose['id'])
 
-        self.__log__.info(str(new_links) + ' new offer found')
+        self.__log__.info(str(len(new_exposes)) + ' new offers found')
+        return new_exposes
 
     def get_formatted_durations(self, config, address):
         out = ""

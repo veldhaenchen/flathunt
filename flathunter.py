@@ -42,11 +42,11 @@ def launch_flat_hunt(config):
     id_watch = IdMaintainer('%s/processed_ids.db' % os.path.dirname(os.path.abspath(__file__)))
 
     hunter = Hunter(config)
-    hunter.hunt_flats(config, searchers, id_watch)
+    hunter.hunt_flats(searchers, id_watch)
 
     while config.get('loop', dict()).get('active', False):
         time.sleep(config.get('loop', dict()).get('sleeping_time', 60 * 10))
-        hunter.hunt_flats(config, searchers, id_watch)
+        hunter.hunt_flats(searchers, id_watch)
 
 
 def main():

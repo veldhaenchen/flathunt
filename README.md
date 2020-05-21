@@ -10,6 +10,18 @@ A Telegram bot to help people with their flat search
 
 Flathunter is a Python application which periodically [scrapes](https://en.wikipedia.org/wiki/Web_scraping) property listings sites that the user has configured to find new apartment listings, and sends notifications of the new apartment to the user via [Telegram](https://en.wikipedia.org/wiki/Telegram_%28software%29).
 
+## Table of Contents
+
+- [Background](#background)
+- [Install](#install)
+- [Usage](#usage)
+	- [Command-line Interface](#command-line-interface)
+	- [Web Interface](#web-interface)
+- [Testing](#testing)
+- [Credits](#credits)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Background
 
 There are at least four different rental property marketplace sites that are widely used in Germany - [ImmoScout24](https://www.immobilienscout24.de/), [immowelt](https://www.immowelt.de/), [WG-Gesucht](https://www.wg-gesucht.de/) and [ebay Kleinanzeigen](https://www.ebay-kleinanzeigen.de/). Most people end up searching through listings on all four sites on an almost daily basis during their flat search.
@@ -31,6 +43,8 @@ $ pipenv shell
 ```
 
 to launch a Python environment with the dependencies that your project requires.
+
+Note that a `requirements.txt` file is included in this repository for compatibilty with Google Cloud. It should not be treated as canonical.
 
 ### Configuration
 
@@ -62,7 +76,34 @@ To use the distance calculation feature a [Google API-Key](https://developers.go
 
 Since this feature is not free, it is "disabled". Read line 62 in hunter.py to re-enable it.
 
+### Google Cloud Deployment
+
+You can run `flathunter` on Google's App Engine, in the free tier, at no cost. To get started, first install the [Google Cloud SDK](https://cloud.google.com/sdk/docs) on your machine, and run:
+
+```
+$ gcloud init
+```
+
+to setup the SDK. You will need to create a new cloud project (or connect to an existing project). The Flathunters organisation uses the `flathunters` project ID to deploy the application. If you need access to deploy to that project, contact the maintainers.
+
+```
+$ gcloud config set project flathunters
+```
+
+Google Cloud [doesn't currently support Pipfiles](https://stackoverflow.com/questions/58546089/does-google-app-engine-flex-support-pipfile). To work around this restriction, the `Pipfile` and `Pipfile.lock` have been added to `.gcloudignore`, and a `requirements.txt` file has been generated using `pip freeze`. You may need to update the `requirements.txt` if the Pipfile has been updated. You will need to remove the line `pkg-resources==0.0.0` from `requirements.txt` for a successful deploy.
+
+To deploy the app, run:
+
+```
+$ gcloud app deploy
+```
+
+Your project will need to have the [Cloud Build API](https://console.developers.google.com/apis/api/cloudbuild.googleapis.com/overview) enabled, which requires it to be linked to a billing-enabled account.
+
+
 ## Usage
+
+### Command-line Interface
 
 By default, the application runs on the commandline and outputs logs to `stdout`. It will poll in a loop and send updates after each run. The `processed_ids.db` file contains details of which listings have already been sent to the Telegram bot - if you delete that, it will be recreated, and you may receive duplicate listings.
 
@@ -77,8 +118,17 @@ optional arguments:
   --config CONFIG, -c CONFIG
                         Config file to use. If not set, try to use
                         '~git-clone-dir/config.yaml'
+```
+
+### Web Interface
+
+You can alternatively launch the web interface by running the `main.py` application:
 
 ```
+$ python main.py
+```
+
+This uses the same config file as the Command-line Interface, and launches a web page at [http://localhost:8080](http://localhost:8080).
 
 ## Testing
 

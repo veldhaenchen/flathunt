@@ -1,1 +1,23 @@
 {% extends 'layout.html' %}
+
+{% block content %}
+<p>Current time: {{ config.HUNTER.last_run }}</p>
+<button type="submit" onclick="hunt_flats()">Run</button>
+
+<script>
+
+function hunt_flats() {
+  var xhr = new XMLHttpRequest();
+  xhr.addEventListener("load", function() {
+    if (xhr.status != 201) {
+      console.log("Error starting hunt: " + xhr.status);
+    } else {
+      console.log("Hunting...");
+    }
+  });
+  xhr.open("POST", "/hunt");
+  xhr.send();
+}
+
+</script>
+{% endblock %}

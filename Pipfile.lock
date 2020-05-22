@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "1cb52c9c600b325ca7519ed5c4c9b37b5c2d72bc34c38e6ba63720c8a3b7840b"
+            "sha256": "4a07e542cb07a235dc7f1cc51fb96994f8ba52829157b38dd9f9ec2c4116ea16"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -57,10 +57,11 @@
         },
         "codecov": {
             "hashes": [
-                "sha256:520ab0ef447d695a9f71e83f9fa65eedbd2d6d1022ff88836e27b9eb82fbdc7b"
+                "sha256:2ebd639d8f621aabcce399e475b0302e436cb7e00e7724d1b2224bbf3f215a0c",
+                "sha256:e20e9fd7e530da14a22245862beb43a9fce9a6b998d9bf196c44d0207817b236"
             ],
             "index": "pypi",
-            "version": "==2.1.1"
+            "version": "==2.1.3"
         },
         "coverage": {
             "hashes": [
@@ -107,13 +108,13 @@
             "index": "pypi",
             "version": "==1.1.2"
         },
-        "html5lib": {
+        "flask-api": {
             "hashes": [
-                "sha256:20b159aa3badc9d5ee8f5c647e5efd02ed2a66ab8d354930bd9ff139fc1dc0a3",
-                "sha256:66cb0dcfdbbc4f9c3ba1a63fdb511ffdbd4f513b2b6d81b80cd26ce6b3fb3736"
+                "sha256:3d4cfb2ff214af9957f61455f660b5cfa181d6112e56cda526011bbe7af2a09e",
+                "sha256:6986642e5b25b7def710ca9489ed2b88c94006bfc06eca01c78da7cf447e66e5"
             ],
             "index": "pypi",
-            "version": "==1.0.1"
+            "version": "==2.0"
         },
         "idna": {
             "hashes": [
@@ -244,10 +245,10 @@
         },
         "six": {
             "hashes": [
-                "sha256:236bdbdce46e6e6a3d61a337c0f8b763ca1e8717c03b369e87a7ec7ce1319c0a",
-                "sha256:8f3cd2e254d8f793e7f3d6d9df77b92252b52637291d0f0da013c76ea2724b6c"
+                "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259",
+                "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"
             ],
-            "version": "==1.14.0"
+            "version": "==1.15.0"
         },
         "soupsieve": {
             "hashes": [
@@ -263,13 +264,6 @@
             ],
             "index": "pypi",
             "version": "==1.25.6"
-        },
-        "webencodings": {
-            "hashes": [
-                "sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78",
-                "sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923"
-            ],
-            "version": "==0.5.1"
         },
         "werkzeug": {
             "hashes": [

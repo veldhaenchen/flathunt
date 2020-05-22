@@ -12,10 +12,8 @@ urls:
     """
 
     def setUp(self):
-        self.hunter = Hunter(yaml.safe_load(self.DUMMY_CONFIG))
-        self.searchers = [CrawlImmowelt()]
-        self.id_watch = IdMaintainer(":memory:")
+        self.hunter = Hunter(yaml.safe_load(self.DUMMY_CONFIG), [CrawlImmowelt()], IdMaintainer(":memory:"))
 
     def test_hunt_flats(self):
-        exposes = self.hunter.hunt_flats(self.searchers, self.id_watch)
+        exposes = self.hunter.hunt_flats()
         self.assertTrue(len(exposes) > 0, "Expected to find exposes")

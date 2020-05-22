@@ -1,14 +1,9 @@
-# Simple Flask Webserver to control / configure flathunter
+##
+# Startup file for Google Cloud deployment
+##
 
-from flask import Flask
-from flask import render_template
-
-app = Flask(__name__)
-
-@app.route("/index")
-@app.route('/')
-def index():
-    return render_template("index.html", title="Home")
+from flathunter.web import app
 
 if __name__ == '__main__':
+    # This is only used when running locally
     app.run(host='127.0.0.1', port=8080, debug=True)

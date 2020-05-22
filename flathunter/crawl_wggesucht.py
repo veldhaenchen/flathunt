@@ -54,7 +54,7 @@ class CrawlWgGesucht:
             title = title_row.text.strip()
             url = base_url + title_row.find('a')['href']
             detail_string = row.find("div", { "class": "col-xs-11" }).text.strip().split("|")
-            details_array = list(map(lambda s: re.sub(' +', ' ', re.sub('\W', ' ', s.strip())), detail_string))
+            details_array = list(map(lambda s: re.sub(' +', ' ', re.sub(r'\W', ' ', s.strip())), detail_string))
             numbers_row = row.find("div", { "class": "middle" })
             price = numbers_row.find("div", { "class": "col-xs-3" }).text.strip()
             rooms = re.findall(r'\d Zimmer', details_array[0])[0][:1]

@@ -46,6 +46,12 @@ to launch a Python environment with the dependencies that your project requires.
 
 Note that a `requirements.txt` file is included in this repository for compatibilty with Google Cloud. It should not be treated as canonical.
 
+For development purposes, you need to install the flathunter module in your current environment. Simply run:
+
+```sh
+pip install -e .
+```
+
 ### Configuration
 
 Before running the project for the first time, copy `config.yaml.dist` to `config.yaml`. The `urls` and `telegram` sections of the config file must be configured according to your requirements before the project will run. 
@@ -130,15 +136,27 @@ $ python main.py
 
 This uses the same config file as the Command-line Interface, and launches a web page at [http://localhost:8080](http://localhost:8080).
 
-## Testing
+Alternatively, run the server directly with Flask:
 
-The `unittest`-based test suite can be run with:
-
-```sh
-$ python -m unittest discover -s test
+```
+$ FLASK_APP=flathunter.web flask run
 ```
 
-from the project root.
+## Testing
+
+The test suite can be run with `pytest`:
+
+```sh
+$ pytest
+```
+
+from the project root. If you encounter the error `ModuleNotFoundError: No module named 'flathunter'`, run:
+
+```sh
+pip install -e .
+```
+
+to make the current project visible to your pip environment.
 
 ## Maintainers
 

@@ -19,3 +19,6 @@ __pycache__/
 /setup.cfg
 /Pipfile
 /Pipfile.lock
+
+# Don't upload the database
+processed_ids.db

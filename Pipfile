@@ -18,6 +18,7 @@ codecov = "*"
 requests-mock = "*"
 Flask = "*"
 Flask-API = "*"
+firebase-admin = "*"
 
 [dev-packages]
 

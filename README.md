@@ -96,6 +96,8 @@ to setup the SDK. You will need to create a new cloud project (or connect to an 
 $ gcloud config set project flathunters
 ```
 
+You will need to add the project ID to `config.yaml` under the key `google_cloud_project_id`.
+
 Google Cloud [doesn't currently support Pipfiles](https://stackoverflow.com/questions/58546089/does-google-app-engine-flex-support-pipfile). To work around this restriction, the `Pipfile` and `Pipfile.lock` have been added to `.gcloudignore`, and a `requirements.txt` file has been generated using `pip freeze`. You may need to update the `requirements.txt` if the Pipfile has been updated. You will need to remove the line `pkg-resources==0.0.0` from `requirements.txt` for a successful deploy.
 
 To deploy the app, run:
@@ -104,8 +106,7 @@ To deploy the app, run:
 $ gcloud app deploy
 ```
 
-Your project will need to have the [Cloud Build API](https://console.developers.google.com/apis/api/cloudbuild.googleapis.com/overview) enabled, which requires it to be linked to a billing-enabled account.
-
+Your project will need to have the [Cloud Build API](https://console.developers.google.com/apis/api/cloudbuild.googleapis.com/overview) enabled, which requires it to be linked to a billing-enabled account. It also needs [Cloud Firestore API](https://console.cloud.google.com/apis/library/firestore.googleapis.com) to be enabled for the project. Firestore needs to be configured in [Native mode](https://cloud.google.com/datastore/docs/upgrade-to-firestore).
 
 ## Usage
 

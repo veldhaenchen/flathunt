@@ -12,6 +12,7 @@ from flathunter.crawl_wggesucht import CrawlWgGesucht
 from flathunter.crawl_immowelt import CrawlImmowelt
 from flathunter.idmaintainer import IdMaintainer
 from flathunter.hunter import Hunter
+from flathunter.config import Config
 
 __author__ = "Jan Harrie"
 __version__ = "1.0"
@@ -46,7 +47,7 @@ def launch_flat_hunt(config):
 
     while config.get('loop', dict()).get('active', False):
         time.sleep(config.get('loop', dict()).get('sleeping_time', 60 * 10))
-        hunter.hunt_flats(searchers, id_watch)
+        hunter.hunt_flats()
 
 
 def main():
@@ -63,9 +64,7 @@ def main():
 
     # load config
     config_handle = args.config
-    __log__.info("Using config %s" % config_handle.name)
-    print(config_handle.name)
-    config = yaml.safe_load(config_handle.read())
+    config = Config(config_handle.name)
 
     # check config
     if not config.get('telegram', dict()).get('bot_token'):

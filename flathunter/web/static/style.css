@@ -24,18 +24,12 @@ a:visited {
   color: white;
 }
 
-#select-group {
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-}
-
-.headline {
+.intro {
   text-align: center;
   width: 680px;
 }
 
-.headline p {
+.intro p {
   display: inherit;
   color: #fff;
   font-size: 1rem;
@@ -44,77 +38,38 @@ a:visited {
   margin-bottom: 20px;
 }
 
-.info {
-  text-align: center;
-  width: 680px;
-}
-
-.info p {
-  display: inherit;
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 24px;
-  margin-bottom: 20px;
-}
-
-#loading {
+.button-holder {
   width: 100%;
-  height: 100vh;
   display: flex;
+  justify-content: center;
   align-items: center;
   flex-direction: column;
 }
 
-/**
- * Start Screen
- */
-
-.start {
-  background-color: white;
-  background-image: none;
-  opacity: 1;
-  padding: 25px 30px;
-  margin: 2rem;
-  width: 680px;
-  display: flex;
-  align-items: center;
+.status-text {
+  display: inherit;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 400;
+  line-height: 24px;
+  margin: 3px;
 }
 
-.start-input-container {
-  border-width: 0 0 2px;
-  border-style: solid;
-  border-image: linear-gradient(to right, #dee1e6, #fff) 1;
-  width: 100%;
-  align-items: center;
-}
-
-.start-input-container input {
-  border: none;
-  display: inline-block;
-  width: 100%;
-  font-size: 14px; 
-}
-
-.start-input-container input:focus {
-  outline: none;
-}
-
-div .title {
-  font-size: 18px;
-  font-weight: 700;
-  padding-bottom: 5px;
-}
-
-.start-button {
-  width: 51px;
+.hunt-button {
   height: 35px;
-  font-size: 14px;
-  background: #0074e0;
-  border-radius: 4px;
-  color: white;
+  background: #003f80;
+  font-size: 20px;
   text-align: center;
-  line-height: 35px;
   cursor: pointer;
   vertical-align: middle;
+  line-height: 35px;
+  border-radius: 4px;
+  width: 50%;
+  color: white;
 }
+
+.hunt-button.disabled {
+  background: #aaaaaa;
+  cursor: not-allowed;
+}
+

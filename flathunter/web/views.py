@@ -2,6 +2,7 @@ from flathunter.web import app
 from flask import render_template
 from flask import jsonify
 from flask_api import status
+import datetime
 
 @app.route('/index')
 @app.route('/')
@@ -13,4 +14,4 @@ def index():
 def hunt():
     with app.config["HUNTER"].id_watch.connect() as connection:
         app.config["HUNTER"].hunt_flats(connection)
-        return jsonify(status="Success"), status.HTTP_201_CREATED
+        return jsonify(status="Success", completedAt=str(datetime.datetime.now())), status.HTTP_201_CREATED

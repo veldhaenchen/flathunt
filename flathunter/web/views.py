@@ -8,7 +8,8 @@ from flask_api import status
 def index():
     return render_template("index.html", title="Home")
 
-@app.route('/hunt', methods=['POST'])
+# Accept GET requests here to support Google Cloud Cron calls
+@app.route('/hunt', methods=['GET','POST'])
 def hunt():
     with app.config["HUNTER"].id_watch.connect() as connection:
         app.config["HUNTER"].hunt_flats(connection)

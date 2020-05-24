@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "8ec52e6aeba20718dc670816a1905583247bc21f50bdd7eeacd01aeaa918c09f"
+            "sha256": "a20bffb1e866f580c41018292b22451aff349fc2a2bba81512ce9692c50c85b1"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -336,6 +336,13 @@
                 "sha256:e8313f01ba26fbbe36c7be1966a7b7424942f670f38e666995b88d012765b9be"
             ],
             "version": "==1.1.1"
+        },
+        "mock-firestore": {
+            "hashes": [
+                "sha256:024dc7b6e38feb9ab71acfc7af2f2f93e3df7941090ec81fc77d70bcea3f0755"
+            ],
+            "index": "pypi",
+            "version": "==0.7.1"
         },
         "msgpack": {
             "hashes": [

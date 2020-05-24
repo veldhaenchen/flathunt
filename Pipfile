@@ -19,6 +19,7 @@ requests-mock = "*"
 Flask = "*"
 Flask-API = "*"
 firebase-admin = "*"
+mock-firestore = "*"
 
 [dev-packages]
 

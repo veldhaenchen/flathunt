@@ -1,4 +1,5 @@
 import sqlite3 as lite
+import datetime
 import sys
 
 # ~ Logging KungFoo
@@ -21,6 +22,7 @@ class IdMaintainer:
             self.default_connection = self.connect()
             cur = self.default_connection.cursor()
             cur.execute('CREATE TABLE IF NOT EXISTS processed (ID INTEGER)')
+            cur.execute('CREATE TABLE IF NOT EXISTS executions (timestamp timestamp)')
             self.default_connection.commit()
 
         except lite.Error as e:
@@ -53,3 +55,22 @@ class IdMaintainer:
         self.__log__.info('already processed: ' + str(len(res)))
         self.__log__.debug(str(res))
         return res
+
+    def get_last_run_time(self, connection=None):
+        if connection is None:
+            connection = self.default_connection
+        cur = connection.cursor()
+        cur.execute("SELECT * FROM executions ORDER BY timestamp DESC LIMIT 1")
+        row = cur.fetchone()
+        if row == None:
+            return None
+        return datetime.datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S.%f')
+
+    def update_last_run_time(self, connection=None):
+        if connection is None:
+            connection = self.default_connection
+        cur = connection.cursor()
+        result = datetime.datetime.now()
+        cur.execute('INSERT INTO executions VALUES(?);', (result,))
+        connection.commit()
+        return result

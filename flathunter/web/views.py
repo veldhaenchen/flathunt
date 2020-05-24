@@ -7,11 +7,12 @@ import datetime
 @app.route('/index')
 @app.route('/')
 def index():
-    return render_template("index.html", title="Home")
+    with app.config["HUNTER"].id_watch.connect() as connection:
+        return render_template("index.html", title="Home", connection=connection)
 
 # Accept GET requests here to support Google Cloud Cron calls
 @app.route('/hunt', methods=['GET','POST'])
 def hunt():
     with app.config["HUNTER"].id_watch.connect() as connection:
         app.config["HUNTER"].hunt_flats(connection)
-        return jsonify(status="Success", completedAt=str(datetime.datetime.now())), status.HTTP_201_CREATED
+        return jsonify(status="Success", completedAt=str(app.config["HUNTER"].get_last_run_time(connection))), status.HTTP_201_CREATED

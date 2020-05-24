@@ -19,7 +19,6 @@ class Hunter:
         self.config = config
         self.searchers = searchers
         self.id_watch = id_watch
-        self.last_run = None
         self.excluded_titles = self.config.get('excluded_titles', list())
 
     def hunt_flats(self, connection=None):
@@ -94,8 +93,11 @@ class Hunter:
                     self.id_watch.add(expose['id'], connection)
 
         self.__log__.info(str(len(new_exposes)) + ' new offers found')
-        self.last_run = datetime.datetime.now()
+        self.id_watch.update_last_run_time(connection)
         return new_exposes
+
+    def get_last_run_time(self, connection=None):
+        return self.id_watch.get_last_run_time(connection)
 
     def get_formatted_durations(self, config, address):
         out = ""

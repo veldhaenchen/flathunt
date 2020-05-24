@@ -1,6 +1,7 @@
 import logging
 import firebase_admin
 import traceback
+import datetime
 from firebase_admin import credentials
 from firebase_admin import firestore
 
@@ -48,3 +49,12 @@ class GoogleCloudIdMaintainer:
         self.__log__.info('already processed: ' + str(len(res)))
         self.__log__.debug(str(res))
         return res
+
+    def get_last_run_time(self, connection=None):
+        for doc in self.db.collection(u'executions').order_by(u'timestamp', direction=firestore.Query.DESCENDING).limit(1).stream():
+            return doc.to_dict()[u'timestamp']
+
+    def update_last_run_time(self, connection=None):
+        time = datetime.datetime.now()
+        self.db.collection(u'executions').add({ u'timestamp': time })
+        return time

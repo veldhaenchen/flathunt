@@ -1,4 +1,5 @@
 import pytest
+import tempfile
 import yaml
 
 from flathunter.web import app
@@ -14,10 +15,11 @@ urls:
 @pytest.fixture
 def client():
     app.config['TESTING'] = True
-    app.config['HUNTER'] = Hunter(yaml.safe_load(DUMMY_CONFIG), [CrawlImmowelt()], IdMaintainer(":memory:"))
+    with tempfile.NamedTemporaryFile(mode='w+') as temp_db:
+        app.config['HUNTER'] = Hunter(yaml.safe_load(DUMMY_CONFIG), [CrawlImmowelt()], IdMaintainer(temp_db.name))
 
-    with app.test_client() as client:
-        yield client
+        with app.test_client() as client:
+            yield client
 
 
 def test_get_index(client):

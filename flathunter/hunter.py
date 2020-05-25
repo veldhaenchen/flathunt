@@ -59,7 +59,8 @@ class Hunter:
                             break
 
                 # calculate durations if enabled
-                if self.config["google_maps_api"]["enable"]:
+                durations_enabled = "google_maps_api" in self.config and self.config["google_maps_api"]["enable"]
+                if durations_enabled:
                     durations = self.get_formatted_durations(self.config, address).strip()
 
                 message = self.config.get('message', "").format(
@@ -69,7 +70,7 @@ class Hunter:
                     price=expose['price'],
                     url=expose['url'],
                     address=address,
-                    durations="" if not self.config["google_maps_api"]["enable"] else durations).strip()
+                    durations="" if not durations_enabled else durations).strip()
 
                 # if no excludes, send messages
                 if len(self.excluded_titles) == 0:

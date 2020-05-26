@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 
 class CrawlEbayKleinanzeigen:
     __log__ = logging.getLogger(__name__)
+    USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0'
     URL_PATTERN = re.compile(r'https://www\.ebay-kleinanzeigen\.de')
 
     def __init__(self):
@@ -23,7 +24,7 @@ class CrawlEbayKleinanzeigen:
         return entries
 
     def get_page(self, search_url):
-        resp = requests.get(search_url)  # TODO add page_no in url
+        resp = requests.get(search_url, headers={'User-Agent': self.USER_AGENT})  # TODO add page_no in url
         if resp.status_code != 200:
             self.__log__.error("Got response (%i): %s" % (resp.status_code, resp.content))
         return BeautifulSoup(resp.content, 'html5lib')
@@ -80,7 +81,7 @@ class CrawlEbayKleinanzeigen:
     @staticmethod
     def load_address(url):
         # extract address from expose itself
-        expose_html = requests.get(url).content
+        expose_html = requests.get(url, headers={'User-Agent': CrawlEbayKleinanzeigen.USER_AGENT}).content
         expose_soup = BeautifulSoup(expose_html, 'html.parser')
         try:
             street_raw = expose_soup.find(id="street-address").text

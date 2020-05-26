@@ -7,6 +7,7 @@ import urllib.error
 import datetime
 import time
 from flathunter.sender_telegram import SenderTelegram
+from flathunter.config import Config
 
 
 class Hunter:
@@ -17,6 +18,8 @@ class Hunter:
 
     def __init__(self, config, searchers, id_watch):
         self.config = config
+        if not isinstance(self.config, Config):
+            raise Exception("Invalid config for hunter - should be a 'Config' object")
         self.searchers = searchers
         self.id_watch = id_watch
         self.excluded_titles = self.config.get('excluded_titles', list())

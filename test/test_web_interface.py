@@ -6,6 +6,7 @@ from flathunter.web import app
 from flathunter.hunter import Hunter
 from flathunter.idmaintainer import IdMaintainer
 from flathunter.crawl_immowelt import CrawlImmowelt
+from flathunter.config import Config
 
 DUMMY_CONFIG = """
 urls:
@@ -16,7 +17,7 @@ urls:
 def client():
     app.config['TESTING'] = True
     with tempfile.NamedTemporaryFile(mode='w+') as temp_db:
-        app.config['HUNTER'] = Hunter(yaml.safe_load(DUMMY_CONFIG), [CrawlImmowelt()], IdMaintainer(temp_db.name))
+        app.config['HUNTER'] = Hunter(Config(string=DUMMY_CONFIG), [CrawlImmowelt()], IdMaintainer(temp_db.name))
 
         with app.test_client() as client:
             yield client

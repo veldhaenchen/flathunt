@@ -2,6 +2,7 @@ import unittest
 import yaml
 from flathunter.crawl_immowelt import CrawlImmowelt
 from flathunter.hunter import Hunter 
+from flathunter.config import Config
 from flathunter.idmaintainer import IdMaintainer
 
 class HunterTest(unittest.TestCase):
@@ -12,7 +13,7 @@ urls:
     """
 
     def setUp(self):
-        self.hunter = Hunter(yaml.safe_load(self.DUMMY_CONFIG), [CrawlImmowelt()], IdMaintainer(":memory:"))
+        self.hunter = Hunter(Config(string=self.DUMMY_CONFIG), [CrawlImmowelt()], IdMaintainer(":memory:"))
 
     def test_hunt_flats(self):
         exposes = self.hunter.hunt_flats()

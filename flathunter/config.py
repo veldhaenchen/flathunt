@@ -19,5 +19,8 @@ class Config:
     def __iter__(self):
         return self.config.__iter__()
 
+    def __getitem__(self, value):
+        return self.config[value]
+
     def get(self, key, value=None):
         return self.config.get(key, value)

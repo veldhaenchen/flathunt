@@ -27,7 +27,7 @@ class CrawlEbayKleinanzeigen:
         resp = requests.get(search_url, headers={'User-Agent': self.USER_AGENT})  # TODO add page_no in url
         if resp.status_code != 200:
             self.__log__.error("Got response (%i): %s" % (resp.status_code, resp.content))
-        return BeautifulSoup(resp.content, 'html5lib')
+        return BeautifulSoup(resp.content, 'html.parser')
 
     def extract_data(self, soup):
         entries = list()

@@ -7,6 +7,7 @@ import urllib.error
 import datetime
 import time
 from flathunter.sender_telegram import SenderTelegram
+from flathunter.config import Config
 
 
 class Hunter:
@@ -15,20 +16,24 @@ class Hunter:
     GM_MODE_BICYCLE = 'bicycling'
     GM_MODE_DRIVING = 'driving'
 
-    def __init__(self, config):
+    def __init__(self, config, searchers, id_watch):
         self.config = config
+        if not isinstance(self.config, Config):
+            raise Exception("Invalid config for hunter - should be a 'Config' object")
+        self.searchers = searchers
+        self.id_watch = id_watch
         self.excluded_titles = self.config.get('excluded_titles', list())
 
-    def hunt_flats(self, searchers, id_watch):
+    def hunt_flats(self, connection=None):
         sender = SenderTelegram(self.config)
         new_exposes = []
-        processed = id_watch.get()
+        processed = self.id_watch.get(connection)
 
         for url in self.config.get('urls', list()):
             self.__log__.debug('Processing URL: ' + url)
 
             try:
-                for searcher in searchers:
+                for searcher in self.searchers:
                     if re.search(searcher.URL_PATTERN, url):
                         results = searcher.get_results(url)
                         break
@@ -52,7 +57,7 @@ class Hunter:
                 address = expose['address']
                 if address.startswith('http'):
                     url = address
-                    for searcher in searchers:
+                    for searcher in self.searchers:
                         if re.search(searcher.URL_PATTERN, url):
                             address = searcher.load_address(url)
                             self.__log__.debug("Loaded address %s for url %s" % (address, url))
@@ -77,7 +82,7 @@ class Hunter:
                     # send message to all receivers
                     sender.send_msg(message)
                     new_exposes.append(expose)
-                    id_watch.add(expose['id'])
+                    self.id_watch.add(expose['id'], connection)
                     continue
 
                 # combine all the regex patterns into one
@@ -88,10 +93,14 @@ class Hunter:
                     # send message to all receivers
                     sender.send_msg(message)
                     new_exposes.append(expose)
-                    id_watch.add(expose['id'])
+                    self.id_watch.add(expose['id'], connection)
 
         self.__log__.info(str(len(new_exposes)) + ' new offers found')
+        self.id_watch.update_last_run_time(connection)
         return new_exposes
+
+    def get_last_run_time(self, connection=None):
+        return self.id_watch.get_last_run_time(connection)
 
     def get_formatted_durations(self, config, address):
         out = ""

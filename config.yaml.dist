@@ -12,15 +12,24 @@ loop:
 # 	- https://www.wg-gesucht.de/...
 urls:
 
-# List of regex patterns that match with the title of the
-# flat and will be excluded. This is specially good if you
-# do not want to live in a WG or move in just temporary.
+# Define filters to exclude flats that don't meet your critera.
+# Supported filters include 'max_rooms', 'min_rooms', 'max_size', 'min_size',
+#   'max_price', 'min_price', and 'excluded_titles'.
+#
+# 'excluded_titles' takes a list of regex patterns that match against
+# the title of the flat. Any matching titles will be excluded.
 # More to Python regex here: https://docs.python.org/3/library/re.html
+#
 # Example:
-# excluded_titles:
-#   - "wg"
-#   - "zwischenmiete"
-excluded_titles:
+# filters:
+#   excluded_titles:
+#     - "wg"
+#     - "zwischenmiete"
+#   min_price: 700
+#   max_price: 1000
+#   min_size: 50
+#   max_size: 80
+filters:
 
 # There are often city districts in the address which
 # Google Maps does not like. Use this blacklist to remove

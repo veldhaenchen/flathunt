@@ -9,7 +9,7 @@ class DummyCrawler:
     __log__ = logging.getLogger(__name__)
     URL_PATTERN = re.compile(r'https://www\.example\.com')
 
-    def __init__(self, titlewords):
+    def __init__(self, titlewords=[ "wg", "tausch", "flat", "ruhig", "gruen" ]):
         seed(1)
         self.titlewords = titlewords
 

@@ -2,6 +2,8 @@ import os
 import yaml
 import logging
 
+from flathunter.filter import Filter
+
 class Config:
 
     __log__ = logging.getLogger(__name__)
@@ -24,3 +26,9 @@ class Config:
 
     def get(self, key, value=None):
         return self.config.get(key, value)
+
+    def get_filter(self):
+        builder = Filter.builder()
+        if "excluded_titles" in self.config:
+            builder.title_filter(self.config["excluded_titles"])
+        return builder.build()

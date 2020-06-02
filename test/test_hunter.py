@@ -64,6 +64,22 @@ filters:
   max_size: 80
 """
 
+    FILTER_MIN_ROOMS_CONFIG = """
+urls:
+  - https://www.example.com/search/flats-in-berlin
+
+filters:
+  min_rooms: 2
+"""
+
+    FILTER_MAX_ROOMS_CONFIG = """
+urls:
+  - https://www.example.com/search/flats-in-berlin
+
+filters:
+  max_rooms: 3
+"""
+
     FILTER_TITLES_LEGACY_CONFIG = """
 urls:
   - https://www.example.com/search/flats-in-berlin
@@ -154,3 +170,25 @@ excluded_titles:
             for expose in unfiltered:
                 print("Got unfiltered expose: ", expose)
         self.assertTrue(len(unfiltered) == 0, "Expected small flats to be filtered")
+
+    def test_filter_max_rooms(self):
+        max_rooms = 3
+        hunter = Hunter(Config(string=self.FILTER_MAX_ROOMS_CONFIG), [DummyCrawler()], IdMaintainer(":memory:"))
+        exposes = hunter.hunt_flats()
+        self.assertTrue(len(exposes) > 4, "Expected to find exposes")
+        unfiltered = list(filter(lambda expose: float(re.search(r'\d+([\.,]\d+)?', expose['rooms'])[0]) > max_rooms, exposes))
+        if len(unfiltered) > 0:
+            for expose in unfiltered:
+                print("Got unfiltered expose: ", expose)
+        self.assertTrue(len(unfiltered) == 0, "Expected flats with too many rooms to be filtered")
+
+    def test_filter_min_rooms(self):
+        min_rooms = 2
+        hunter = Hunter(Config(string=self.FILTER_MIN_ROOMS_CONFIG), [DummyCrawler()], IdMaintainer(":memory:"))
+        exposes = hunter.hunt_flats()
+        self.assertTrue(len(exposes) > 4, "Expected to find exposes")
+        unfiltered = list(filter(lambda expose: float(re.search(r'\d+([\.,]\d+)?', expose['rooms'])[0]) < min_rooms, exposes))
+        if len(unfiltered) > 0:
+            for expose in unfiltered:
+                print("Got unfiltered expose: ", expose)
+        self.assertTrue(len(unfiltered) == 0, "Expected flats with too few rooms to be filtered")

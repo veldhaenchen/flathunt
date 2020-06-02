@@ -17,6 +17,13 @@ class ExposeHelper:
             return None
         return float(size_match[0].replace(",", "."))
 
+    @staticmethod
+    def get_rooms(expose):
+        rooms_match = re.search(r'\d+([\.,]\d+)?', expose['rooms'])
+        if rooms_match is None:
+            return None
+        return float(rooms_match[0].replace(",", "."))
+
 class MaxPriceFilter:
 
     def __init__(self, max_price):
@@ -61,6 +68,28 @@ class MinSizeFilter:
             return True
         return size >= self.min_size
 
+class MaxRoomsFilter:
+
+    def __init__(self, max_rooms):
+        self.max_rooms = max_rooms
+
+    def is_interesting(self, expose):
+        rooms = ExposeHelper.get_rooms(expose)
+        if rooms is None:
+            return True
+        return rooms <= self.max_rooms
+
+class MinRoomsFilter:
+
+    def __init__(self, min_rooms):
+        self.min_rooms = min_rooms
+
+    def is_interesting(self, expose):
+        rooms = ExposeHelper.get_rooms(expose)
+        if rooms is None:
+            return True
+        return rooms >= self.min_rooms
+
 class TitleFilter:
 
     def __init__(self, filtered_titles):
@@ -97,6 +126,14 @@ class FilterBuilder:
 
     def max_size_filter(self, max_size):
         self.filters.append(MaxSizeFilter(max_size))
+        return self
+
+    def min_rooms_filter(self, min_rooms):
+        self.filters.append(MinRoomsFilter(min_rooms))
+        return self
+
+    def max_rooms_filter(self, max_rooms):
+        self.filters.append(MaxRoomsFilter(max_rooms))
         return self
 
     def build(self):

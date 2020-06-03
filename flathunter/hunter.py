@@ -8,6 +8,8 @@ import datetime
 import time
 from flathunter.sender_telegram import SenderTelegram
 from flathunter.config import Config
+from flathunter.filter import Filter
+from flathunter.processor import ProcessorChain
 
 
 class Hunter:
@@ -16,11 +18,10 @@ class Hunter:
     GM_MODE_BICYCLE = 'bicycling'
     GM_MODE_DRIVING = 'driving'
 
-    def __init__(self, config, searchers, id_watch):
+    def __init__(self, config, id_watch):
         self.config = config
         if not isinstance(self.config, Config):
             raise Exception("Invalid config for hunter - should be a 'Config' object")
-        self.searchers = searchers
         self.id_watch = id_watch
         self.excluded_titles = self.config.get('excluded_titles', list())
 
@@ -31,9 +32,10 @@ class Hunter:
 
         for url in self.config.get('urls', list()):
             self.__log__.debug('Processing URL: ' + url)
+            results = None
 
             try:
-                for searcher in self.searchers:
+                for searcher in self.config.searchers():
                     if re.search(searcher.URL_PATTERN, url):
                         results = searcher.get_results(url)
                         break
@@ -46,27 +48,23 @@ class Hunter:
                 self.__log__.debug('No results for: ' + url)
                 continue
 
-            for expose in self.config.get_filter().filter(results):
-                # check if already processed
-                if expose['id'] in processed:
-                    continue
+            filter = Filter.builder() \
+                           .read_config(self.config) \
+                           .predicate_filter(lambda e: e['id'] not in processed) \
+                           .build()
 
+            processor_chain = ProcessorChain.builder(self.config) \
+                                            .resolve_addresses() \
+                                            .apply_filter(filter) \
+                                            .build()
+
+            for expose in processor_chain.process(results):
                 self.__log__.info('New offer: ' + expose['title'])
-
-                # to reduce traffic, some addresses need to be loaded on demand
-                address = expose['address']
-                if address.startswith('http'):
-                    url = address
-                    for searcher in self.searchers:
-                        if re.search(searcher.URL_PATTERN, url):
-                            address = searcher.load_address(url)
-                            self.__log__.debug("Loaded address %s for url %s" % (address, url))
-                            break
 
                 # calculate durations if enabled
                 durations_enabled = "google_maps_api" in self.config and self.config["google_maps_api"]["enable"]
                 if durations_enabled:
-                    durations = self.get_formatted_durations(self.config, address).strip()
+                    durations = self.get_formatted_durations(self.config, expose['address']).strip()
 
                 message = self.config.get('message', "").format(
                     title=expose['title'],
@@ -74,7 +72,7 @@ class Hunter:
                     size=expose['size'],
                     price=expose['price'],
                     url=expose['url'],
-                    address=address,
+                    address=expose['address'],
                     durations="" if not durations_enabled else durations).strip()
 
                 sender.send_msg(message)

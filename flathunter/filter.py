@@ -103,37 +103,42 @@ class TitleFilter:
             return True
         return False
 
+class PredicateFilter:
+
+    def __init__(self, predicate):
+        self.predicate = predicate
+
+    def is_interesting(self, expose):
+        return self.predicate(expose)
+
 class FilterBuilder:
 
     def __init__(self):
         self.filters = []
 
-    def title_filter(self, filtered_titles):
-        self.filters.append(TitleFilter(filtered_titles))
+    def read_config(self, config):
+        if "excluded_titles" in config:
+            self.filters.append(TitleFilter(config["excluded_titles"]))
+        if "filters" in config:
+            filters_config = config["filters"]
+            if "excluded_titles" in filters_config:
+                self.filters.append(TitleFilter(filters_config["excluded_titles"]))
+            if "min_price" in filters_config:
+                self.filters.append(MinPriceFilter(filters_config["min_price"]))
+            if "max_price" in filters_config:
+                self.filters.append(MaxPriceFilter(filters_config["max_price"]))
+            if "min_size" in filters_config:
+                self.filters.append(MinSizeFilter(filters_config["min_size"]))
+            if "max_size" in filters_config:
+                self.filters.append(MaxSizeFilter(filters_config["max_size"]))
+            if "min_rooms" in filters_config:
+                self.filters.append(MinRoomsFilter(filters_config["min_rooms"]))
+            if "max_rooms" in filters_config:
+                self.filters.append(MaxRoomsFilter(filters_config["max_rooms"]))
         return self
 
-    def min_price_filter(self, min_price):
-        self.filters.append(MinPriceFilter(min_price))
-        return self
-
-    def max_price_filter(self, max_price):
-        self.filters.append(MaxPriceFilter(max_price))
-        return self
-
-    def min_size_filter(self, min_size):
-        self.filters.append(MinSizeFilter(min_size))
-        return self
-
-    def max_size_filter(self, max_size):
-        self.filters.append(MaxSizeFilter(max_size))
-        return self
-
-    def min_rooms_filter(self, min_rooms):
-        self.filters.append(MinRoomsFilter(min_rooms))
-        return self
-
-    def max_rooms_filter(self, max_rooms):
-        self.filters.append(MaxRoomsFilter(max_rooms))
+    def predicate_filter(self, predicate):
+        self.filters.append(PredicateFilter(predicate))
         return self
 
     def build(self):

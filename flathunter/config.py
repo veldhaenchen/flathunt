@@ -2,11 +2,16 @@ import os
 import yaml
 import logging
 
+from flathunter.crawl_ebaykleinanzeigen import CrawlEbayKleinanzeigen
+from flathunter.crawl_immobilienscout import CrawlImmobilienscout
+from flathunter.crawl_wggesucht import CrawlWgGesucht
+from flathunter.crawl_immowelt import CrawlImmowelt
 from flathunter.filter import Filter
 
 class Config:
 
     __log__ = logging.getLogger(__name__)
+    __searchers__ = [CrawlImmobilienscout(), CrawlWgGesucht(), CrawlEbayKleinanzeigen(), CrawlImmowelt()]
 
     def __init__(self, filename=None, string=None):
         if string is not None:
@@ -27,24 +32,10 @@ class Config:
     def get(self, key, value=None):
         return self.config.get(key, value)
 
-    def get_filter(self):
-        builder = Filter.builder()
-        if "excluded_titles" in self.config:
-            builder.title_filter(self.config["excluded_titles"])
-        if "filters" in self.config:
-            filters_config = self.config["filters"]
-            if "excluded_titles" in filters_config:
-                builder.title_filter(filters_config["excluded_titles"])
-            if "min_price" in filters_config:
-                builder.min_price_filter(filters_config["min_price"])
-            if "max_price" in filters_config:
-                builder.max_price_filter(filters_config["max_price"])
-            if "min_size" in filters_config:
-                builder.min_size_filter(filters_config["min_size"])
-            if "max_size" in filters_config:
-                builder.max_size_filter(filters_config["max_size"])
-            if "min_rooms" in filters_config:
-                builder.min_rooms_filter(filters_config["min_rooms"])
-            if "max_rooms" in filters_config:
-                builder.max_rooms_filter(filters_config["max_rooms"])
-        return builder.build()
+    @staticmethod
+    def set_searchers(searchers):
+        Config.__searchers__ = searchers
+
+    @staticmethod
+    def searchers():
+        return Config.__searchers__

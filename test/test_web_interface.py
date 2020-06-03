@@ -17,7 +17,9 @@ urls:
 def client():
     app.config['TESTING'] = True
     with tempfile.NamedTemporaryFile(mode='w+') as temp_db:
-        app.config['HUNTER'] = Hunter(Config(string=DUMMY_CONFIG), [CrawlImmowelt()], IdMaintainer(temp_db.name))
+        config = Config(string=DUMMY_CONFIG)
+        config.set_searchers([CrawlImmowelt()])
+        app.config['HUNTER'] = Hunter(config, IdMaintainer(temp_db.name))
 
         with app.test_client() as client:
             yield client

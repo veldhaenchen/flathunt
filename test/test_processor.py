@@ -7,6 +7,7 @@ from flathunter.config import Config
 from flathunter.idmaintainer import IdMaintainer
 from flathunter.processor import ProcessorChain
 from dummy_crawler import DummyCrawler
+from test_util import count
 
 class ProcessorTest(unittest.TestCase):
 
@@ -25,7 +26,7 @@ google_maps_api:
         config.set_searchers([DummyCrawler(addresses_as_links=True)])
         hunter = Hunter(Config(string=self.DUMMY_CONFIG), IdMaintainer(":memory:"))
         exposes = hunter.hunt_flats()
-        self.assertTrue(len(exposes) > 4, "Expected to find exposes")
+        self.assertTrue(count(exposes) > 4, "Expected to find exposes")
         for expose in exposes:
             self.assertFalse(expose['address'].startswith('http'), "Expected addresses to be processed by default")
 

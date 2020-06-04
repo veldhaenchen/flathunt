@@ -2,9 +2,9 @@ import logging
 import requests
 import re
 from bs4 import BeautifulSoup
+from flathunter.abstract_crawler import Crawler
 
-
-class CrawlEbayKleinanzeigen:
+class CrawlEbayKleinanzeigen(Crawler):
     __log__ = logging.getLogger(__name__)
     USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0'
     URL_PATTERN = re.compile(r'https://www\.ebay-kleinanzeigen\.de')

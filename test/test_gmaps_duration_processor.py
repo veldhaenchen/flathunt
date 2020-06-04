@@ -6,6 +6,7 @@ from flathunter.hunter import Hunter
 from flathunter.config import Config
 from flathunter.idmaintainer import IdMaintainer
 from dummy_crawler import DummyCrawler
+from test_util import count
 
 class GMapsDurationProcessorTest(unittest.TestCase):
 
@@ -41,7 +42,7 @@ durations:
         matcher = re.compile('maps.googleapis.com/maps/api/distancematrix/json')
         m.get(matcher, text='{"status": "OK", "rows": [ { "elements": [ { "distance": { "text": "far", "value": 123 }, "duration": { "text": "days", "value": 123 } } ] } ]}')
         exposes = hunter.hunt_flats()
-        self.assertTrue(len(exposes) > 4, "Expected to find exposes")
+        self.assertTrue(count(exposes) > 4, "Expected to find exposes")
         without_durations = list(filter(lambda expose: 'durations' not in expose, exposes))
         if len(without_durations) > 0:
             for expose in without_durations:

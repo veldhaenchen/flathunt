@@ -5,7 +5,9 @@ from random import random
 from random import randint
 from random import choice
 
-class DummyCrawler:
+from flathunter.abstract_crawler import Crawler
+
+class DummyCrawler(Crawler):
     __log__ = logging.getLogger(__name__)
     URL_PATTERN = re.compile(r'https://www\.example\.com')
 

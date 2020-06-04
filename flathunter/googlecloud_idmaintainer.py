@@ -7,21 +7,6 @@ from firebase_admin import firestore
 
 from flathunter.config import Config
 
-class ConnectionWrapper:
-
-    def __init__(self, db):
-        self.db = db
-
-    def __enter__(self):
-        # Return a new client for this thread
-        return firestore.client()
-
-    def __exit__(self, exc_type, exc_value, tb):
-        if exc_type is not None:
-            traceback.print_exception(exc_type, exc_value, tb)
-            return False
-        return True
-
 class GoogleCloudIdMaintainer:
     __log__ = logging.getLogger(__name__)
 
@@ -34,14 +19,11 @@ class GoogleCloudIdMaintainer:
         })
         self.db = firestore.client()
 
-    def connect(self):
-        return ConnectionWrapper(self.db)
-
-    def add(self, expose_id, connection=None):
+    def add(self, expose_id):
         self.__log__.debug('add(' + str(expose_id) + ')')
         self.db.collection(u'exposes').document(str(expose_id)).set({ u'id': expose_id })
 
-    def get(self, connection=None):
+    def get(self):
         res = []
         for doc in self.db.collection(u'exposes').stream():
             res.append(doc.to_dict()[u'id'])
@@ -50,11 +32,11 @@ class GoogleCloudIdMaintainer:
         self.__log__.debug(str(res))
         return res
 
-    def get_last_run_time(self, connection=None):
+    def get_last_run_time(self):
         for doc in self.db.collection(u'executions').order_by(u'timestamp', direction=firestore.Query.DESCENDING).limit(1).stream():
             return doc.to_dict()[u'timestamp']
 
-    def update_last_run_time(self, connection=None):
+    def update_last_run_time(self):
         time = datetime.datetime.now()
         self.db.collection(u'executions').add({ u'timestamp': time })
         return time

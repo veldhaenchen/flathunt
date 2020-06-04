@@ -3,9 +3,9 @@ import re
 
 import requests
 from bs4 import BeautifulSoup
+from flathunter.abstract_crawler import Crawler
 
-
-class CrawlWgGesucht:
+class CrawlWgGesucht(Crawler):
     __log__ = logging.getLogger(__name__)
     URL_PATTERN = re.compile(r'https://www\.wg-gesucht\.de')
 

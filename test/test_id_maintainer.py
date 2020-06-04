@@ -3,6 +3,7 @@ from flathunter.idmaintainer import IdMaintainer
 from flathunter.config import Config
 from flathunter.hunter import Hunter
 from dummy_crawler import DummyCrawler
+from test_util import count
 
 class IdMaintainerTest(unittest.TestCase):
 
@@ -38,5 +39,5 @@ def test_ids_are_added_to_maintainer(mocker):
     spy = mocker.spy(id_watch, "add")
     hunter = Hunter(config, id_watch)
     exposes = hunter.hunt_flats()
-    assert len(exposes) > 4
+    assert count(exposes) > 4
     assert spy.call_count == 24

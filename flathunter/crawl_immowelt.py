@@ -2,9 +2,9 @@ import logging
 import requests
 import re
 from bs4 import BeautifulSoup
+from flathunter.abstract_crawler import Crawler
 
-
-class CrawlImmowelt:
+class CrawlImmowelt(Crawler):
     __log__ = logging.getLogger(__name__)
     URL_PATTERN = re.compile(r'https://www\.immowelt\.de')
 

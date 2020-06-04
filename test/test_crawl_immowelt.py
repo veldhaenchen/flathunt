@@ -1,5 +1,6 @@
 import unittest
 from flathunter.crawl_immowelt import CrawlImmowelt
+from test_util import count
 
 class ImmoweltCrawlerTest(unittest.TestCase):
 
@@ -19,3 +20,6 @@ class ImmoweltCrawlerTest(unittest.TestCase):
         for attr in [ 'title', 'price', 'size', 'rooms', 'address' ]:
             self.assertIsNotNone(entries[0][attr], attr + " should be set")
 
+def test_dont_crawl_other_urls():
+    exposes = CrawlImmowelt().crawl("https://www.example.com")
+    assert count(exposes) == 0

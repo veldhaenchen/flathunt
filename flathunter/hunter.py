@@ -46,7 +46,7 @@ class Hunter:
                 self.__log__.debug('No results for: ' + url)
                 continue
 
-            for expose in results:
+            for expose in self.config.get_filter().filter(results):
                 # check if already processed
                 if expose['id'] in processed:
                     continue
@@ -77,23 +77,9 @@ class Hunter:
                     address=address,
                     durations="" if not durations_enabled else durations).strip()
 
-                # if no excludes, send messages
-                if len(self.excluded_titles) == 0:
-                    # send message to all receivers
-                    sender.send_msg(message)
-                    new_exposes.append(expose)
-                    self.id_watch.add(expose['id'], connection)
-                    continue
-
-                # combine all the regex patterns into one
-                combined_excludes = "(" + ")|(".join(self.excluded_titles) + ")"
-                found_objects = re.search(combined_excludes, expose['title'].lower())
-                # send all non matching regex patterns
-                if not found_objects:
-                    # send message to all receivers
-                    sender.send_msg(message)
-                    new_exposes.append(expose)
-                    self.id_watch.add(expose['id'], connection)
+                sender.send_msg(message)
+                new_exposes.append(expose)
+                self.id_watch.add(expose['id'], connection)
 
         self.__log__.info(str(len(new_exposes)) + ' new offers found')
         self.id_watch.update_last_run_time(connection)

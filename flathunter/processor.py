@@ -7,6 +7,7 @@ from flathunter.default_processors import Filter
 from flathunter.default_processors import LambdaProcessor
 from flathunter.sender_telegram import SenderTelegram
 from flathunter.gmaps_duration_processor import GMapsDurationProcessor
+from flathunter.idmaintainer import SaveAllExposesProcessor
 
 class ProcessorChainBuilder:
     
@@ -35,6 +36,10 @@ class ProcessorChainBuilder:
     
     def apply_filter(self, filter):
         self.processors.append(Filter(self.config, filter))
+        return self
+
+    def save_all_exposes(self, id_watch):
+        self.processors.append(SaveAllExposesProcessor(self.config, id_watch))
         return self
         
     def build(self):

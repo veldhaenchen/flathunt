@@ -27,7 +27,8 @@ class DummyCrawler(Crawler):
                 'title': "Great flat %s terrible landlord" % (choice(self.titlewords)),
                 'price': "%d EUR" % (randint(300, 3000)),
                 'size': "%d m^2" % (randint(15, 150)),
-                'rooms': "%d" % (randint(1, 5))
+                'rooms': "%d" % (randint(1, 5)),
+                'crawler': self.get_name()
             }
             if self.addresses_as_links:
                 details['address'] = "https://www.example.com/expose/" + str(expose_id)

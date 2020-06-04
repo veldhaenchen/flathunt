@@ -23,8 +23,8 @@ class Hunter:
                        .build()
 
         processor_chain = ProcessorChain.builder(self.config) \
+                                        .save_all_exposes(self.id_watch) \
                                         .apply_filter(filter) \
-                                        .map(lambda e: self.__log__.info('New offer: ' + e['title'])) \
                                         .resolve_addresses() \
                                         .calculate_durations() \
                                         .send_telegram_messages() \
@@ -34,8 +34,10 @@ class Hunter:
                                 for searcher in self.config.searchers()
                                 for url in self.config.get('urls', list()) ])
 
-        self.id_watch.update_last_run_time()
-        return new_exposes
+        result = []
+        # We need to iterate over this list to force the evaluation of the pipeline
+        for expose in new_exposes:
+            self.__log__.info('New offer: ' + expose['title'])
+            result.append(expose)
 
-    def get_last_run_time(self):
-        return self.id_watch.get_last_run_time()
+        return result

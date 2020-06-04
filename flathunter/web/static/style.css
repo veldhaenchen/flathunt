@@ -73,3 +73,26 @@ a:visited {
   cursor: not-allowed;
 }
 
+.exposes {
+  width: 680px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.expose {
+  width: 186px;
+  margin: 20px;
+  background-color: blue;
+}
+
+.expose h3 {
+  font-size: 1rem;
+  font-weight: 300;
+  margin: 10px;
+  color: white;
+}
+
+.expose h3 a {
+  text-decoration: none;
+}

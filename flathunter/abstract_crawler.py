@@ -14,3 +14,6 @@ class Crawler:
                 self.__log__.warning("Connection to %s failed. Retrying. " % url.split('/')[2])
                 return []
         return []
+
+    def get_name(self):
+        return type(self).__name__

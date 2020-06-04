@@ -19,13 +19,32 @@ class GoogleCloudIdMaintainer:
         })
         self.db = firestore.client()
 
-    def add(self, expose_id):
-        self.__log__.debug('add(' + str(expose_id) + ')')
-        self.db.collection(u'exposes').document(str(expose_id)).set({ u'id': expose_id })
+    def mark_processed(self, expose_id):
+        self.__log__.debug('mark_processed(' + str(expose_id) + ')')
+        self.db.collection(u'processed').document(str(expose_id)).set({ u'id': expose_id })
+
+    def save_expose(self, expose):
+        record = expose.copy()
+        record.update({ 'created_at': datetime.datetime.now(), 'created_sort': (0 - datetime.datetime.now().timestamp()) })
+        self.db.collection(u'exposes').document(str(expose[u'id'])).set(record)
+
+    def get_exposes_since(self, min_datetime):
+        res = []
+        for doc in self.db.collection(u'exposes').order_by('created_sort').stream():
+            if doc.to_dict()[u'created_at'] < min_datetime:
+                break
+            res.append(doc.to_dict())
+        return res
+
+    def get_recent_exposes(self, count):
+        res = []
+        for doc in self.db.collection(u'exposes').order_by('created_sort').limit(count).stream():
+            res.append(doc.to_dict())
+        return res
 
     def get(self):
         res = []
-        for doc in self.db.collection(u'exposes').stream():
+        for doc in self.db.collection(u'processed').stream():
             res.append(doc.to_dict()[u'id'])
 
         self.__log__.info('already processed: ' + str(len(res)))

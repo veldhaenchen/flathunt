@@ -5,7 +5,7 @@ import os
 
 from flathunter.idmaintainer import IdMaintainer
 from flathunter.googlecloud_idmaintainer import GoogleCloudIdMaintainer
-from flathunter.hunter import Hunter
+from flathunter.web_hunter import WebHunter
 from flathunter.config import Config
 
 from flathunter.web import app
@@ -17,7 +17,7 @@ else:
     # Use Google Cloud DB if we run on the cloud
     id_watch = GoogleCloudIdMaintainer()
 
-hunter = Hunter(Config(), id_watch)
+hunter = WebHunter(Config(), id_watch)
 
 app.config["HUNTER"] = hunter
 

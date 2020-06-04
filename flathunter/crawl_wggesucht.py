@@ -68,7 +68,8 @@ class CrawlWgGesucht(Crawler):
                 'price': price,
                 'size': size,
                 'rooms': rooms + " Zi.",
-                'address': url
+                'address': url,
+                'crawler': self.get_name()
             }
             entries.append(details)
 

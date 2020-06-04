@@ -70,7 +70,8 @@ class CrawlEbayKleinanzeigen(Crawler):
                 'price': price,
                 'size': size,
                 'rooms': rooms,
-                'address': address
+                'address': address,
+                'crawler': self.get_name()
             }
             entries.append(details)
 

@@ -25,6 +25,8 @@ class SenderTelegram(Processor):
         return expose
 
     def send_msg(self, message):
+        if self.receiver_ids is None:
+            return
         for chat_id in self.receiver_ids:
             url = 'https://api.telegram.org/bot%s/sendMessage?chat_id=%i&text=%s'
             text = urllib.parse.quote_plus(message.encode('utf-8'))

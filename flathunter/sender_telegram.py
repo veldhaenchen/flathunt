@@ -2,14 +2,27 @@ import urllib.request, urllib.parse, urllib.error
 import requests
 import logging
 
+from flathunter.abstract_processor import Processor
 
-class SenderTelegram():
+class SenderTelegram(Processor):
     __log__ = logging.getLogger(__name__)
 
-    def __init__(self, cfg):
-        self.cfg = cfg
-        self.bot_token = self.cfg.get('telegram', dict()).get('bot_token', '')
-        self.receiver_ids = self.cfg.get('telegram', dict()).get('receiver_ids', list())
+    def __init__(self, config):
+        self.config = config
+        self.bot_token = self.config.get('telegram', dict()).get('bot_token', '')
+        self.receiver_ids = self.config.get('telegram', dict()).get('receiver_ids', list())
+
+    def process_expose(self, expose):
+        message = self.config.get('message', "").format(
+            title=expose['title'],
+            rooms=expose['rooms'],
+            size=expose['size'],
+            price=expose['price'],
+            url=expose['url'],
+            address=expose['address'],
+            durations="" if 'durations' not in expose else expose['durations']).strip()
+        self.send_msg(message)
+        return expose
 
     def send_msg(self, message):
         for chat_id in self.receiver_ids:

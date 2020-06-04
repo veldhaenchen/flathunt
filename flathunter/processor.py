@@ -1,44 +1,12 @@
 import logging
 import re
+from functools import reduce
 
-class Processor:
-    
-    def process_exposes(self, exposes):
-        return map(lambda e: self.process_expose(e), exposes)
-
-class Filter(Processor):
-    
-    def __init__(self, config, filter):
-        self.config = config
-        self.filter = filter
-    
-    def process_exposes(self, exposes):
-        return self.filter.filter(exposes)
-
-class AddressResolver(Processor):
-    __log__ = logging.getLogger(__name__)
-    
-    def __init__(self, config):
-        self.config = config
-    
-    def process_expose(self, expose):
-        if expose['address'].startswith('http'):
-            url = expose['address']
-            for searcher in self.config.searchers():
-                print("Comparing %s with %s", (searcher.URL_PATTERN, url))
-                if re.search(searcher.URL_PATTERN, url):
-                    expose['address'] = searcher.load_address(url)
-                    self.__log__.debug("Loaded address %s for url %s" % (expose['address'], url))
-                    break
-        return expose
-    
-class DurationResolver:
-    
-    pass
-
-class TelegramNotifier:
-    
-    pass
+from flathunter.default_processors import AddressResolver
+from flathunter.default_processors import Filter
+from flathunter.default_processors import LambdaProcessor
+from flathunter.sender_telegram import SenderTelegram
+from flathunter.gmaps_duration_processor import GMapsDurationProcessor
 
 class ProcessorChainBuilder:
     
@@ -46,12 +14,23 @@ class ProcessorChainBuilder:
         self.processors = []
         self.config = config
         
-    def telegram_notifier(self):
-        self.processors.append(TelegramNotifier(self.config))
+    def send_telegram_messages(self):
+        self.processors.append(SenderTelegram(self.config))
         return self
         
     def resolve_addresses(self):
         self.processors.append(AddressResolver(self.config))
+        return self
+    
+    def calculate_durations(self):
+        # calculate durations if enabled
+        durations_enabled = "google_maps_api" in self.config and self.config["google_maps_api"]["enable"]
+        if durations_enabled:
+            self.processors.append(GMapsDurationProcessor(self.config))
+        return self
+
+    def map(self, func):
+        self.processors.append(LambdaProcessor(self.config, func))
         return self
     
     def apply_filter(self, filter):
@@ -67,9 +46,7 @@ class ProcessorChain:
         self.processors = processors
     
     def process(self, exposes):
-        for processor in self.processors:
-            exposes = processor.process_exposes(exposes)
-        return exposes
+        return reduce((lambda exposes, processor: processor.process_exposes(exposes)), self.processors, exposes)
             
     @staticmethod
     def builder(config):

@@ -16,7 +16,7 @@ class DummyCrawler(Crawler):
         self.titlewords = titlewords
         self.addresses_as_links = addresses_as_links
 
-    def get_results(self, search_url):
+    def get_results(self, search_url, max_pages=None):
         self.__log__.debug("Generating dummy results")
         entries = []
         for _ in range(randint(20, 40)):

@@ -12,7 +12,7 @@ class CrawlEbayKleinanzeigen(Crawler):
     def __init__(self):
         logging.getLogger("requests").setLevel(logging.WARNING)
 
-    def get_results(self, search_url):
+    def get_results(self, search_url, max_pages=None):
         self.__log__.debug("Got search URL %s" % search_url)
 
         soup = self.get_page(search_url)
@@ -47,6 +47,11 @@ class CrawlEbayKleinanzeigen(Crawler):
             address = expose_ids[idx].find("div", {"class": "aditem-details"})
             address.find("strong").extract()
             address.find("br").extract()
+            image_element = expose_ids[idx].find("div", {"class": "srpimagebox"})
+            if image_element is not None:
+                image = image_element["data-imgsrc"]
+            else:
+                image = None
             self.__log__.debug(address.text.strip())
             address = address.text.strip()
             address = address.replace('\n', ' ').replace('\r', '')
@@ -65,6 +70,7 @@ class CrawlEbayKleinanzeigen(Crawler):
                 self.__log__.debug("Quadratmeter nicht angegeben")
             details = {
                 'id': int(expose_ids[idx].get("data-adid")),
+                'image': image,
                 'url': url,
                 'title': title_el.text.strip(),
                 'price': price,

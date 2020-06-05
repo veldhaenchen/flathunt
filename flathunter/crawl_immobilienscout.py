@@ -12,7 +12,7 @@ class CrawlImmobilienscout(Crawler):
     def __init__(self):
         logging.getLogger("requests").setLevel(logging.WARNING)
 
-    def get_results(self, search_url):
+    def get_results(self, search_url, max_pages=None):
         # convert to paged URL
         # if '/P-' in search_url:
         #     search_url = re.sub(r"/Suche/(.+?)/P-\d+", "/Suche/\1/P-{0}", search_url)
@@ -29,15 +29,14 @@ class CrawlImmobilienscout(Crawler):
         soup = self.get_page(search_url, page_no)
         try:
             no_of_results = int(
-                soup.find_all(lambda e: e.has_attr('data-is24-qa') and e['data-is24-qa'] == 'resultlist-resultCount')[
-                    0].text)
+                soup.find_all(lambda e: e.has_attr('data-is24-qa') and e['data-is24-qa'] == 'resultlist-resultCount')[0].text.replace('.',''))
         except IndexError:
             self.__log__.debug('Index Error occurred')
         # get data from first page
         entries = self.extract_data(soup)
 
         # iterate over all remaining pages
-        while len(entries) < min(no_of_results, self.RESULT_LIMIT):
+        while len(entries) < min(no_of_results, self.RESULT_LIMIT) and (max_pages is None or page_no < max_pages):
             self.__log__.debug(
                 'Next Page, Number of entries : ' + str(len(entries)) + "no of resulst: " + str(no_of_results))
             page_no += 1
@@ -73,16 +72,25 @@ class CrawlImmobilienscout(Crawler):
 
         attr_container_els = soup.find_all(lambda e: e.has_attr('data-is24-qa') and e['data-is24-qa'] == "attributes")
         address_fields = soup.find_all(lambda e: e.has_attr('class') and 'result-list-entry__address' in e['class'])
+        gallery_elements = soup.find_all(lambda e: e.has_attr('class') and 'result-list-entry__gallery-container' in e['class'])
         for idx, title_el in enumerate(title_elements):
             attr_els = attr_container_els[idx].find_all('dd')
             try:
                 address = address_fields[idx].text.strip()
             except:
                 address = "No address given"
+
+            image_tag = gallery_elements[idx].find("div", {"class": "gallery-container"}).find("img")
+            try:
+                image = image_tag["src"]
+            except KeyError as e:
+                image = image_tag["data-lazy-src"]
+
             if len(attr_els) > 2:
                 details = {
                     'id': expose_ids[idx],
                     'url': expose_urls[idx],
+                    'image': image,
                     'title': title_el.text.strip().replace('NEU', ''),
                     'price': attr_els[0].text.strip().split(' ')[0].strip(),
                     'size': attr_els[1].text.strip().split(' ')[0].strip() + " qm",

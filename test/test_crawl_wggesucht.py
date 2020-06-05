@@ -16,6 +16,6 @@ class WgGesuchtCrawlerTest(unittest.TestCase):
         self.assertTrue(len(entries) > 0, "Should have at least one entry")
         self.assertTrue(entries[0]['id'] > 0, "Id should be parsed")
         self.assertTrue(entries[0]['url'].startswith("https://www.wg-gesucht.de/wohnungen"), u"URL should be an apartment link")
-        for attr in [ 'title', 'price', 'size', 'rooms', 'address' ]:
+        for attr in [ 'title', 'price', 'size', 'rooms', 'address', 'image' ]:
             self.assertIsNotNone(entries[0][attr], attr + " should be set")
 

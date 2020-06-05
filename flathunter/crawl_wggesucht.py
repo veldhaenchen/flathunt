@@ -12,7 +12,7 @@ class CrawlWgGesucht(Crawler):
     def __init__(self):
         logging.getLogger("requests").setLevel(logging.WARNING)
 
-    def get_results(self, search_url):
+    def get_results(self, search_url, max_pages=None):
         self.__log__.debug("Got search URL %s" % search_url)
 
         # load first page
@@ -53,6 +53,7 @@ class CrawlWgGesucht(Crawler):
             title_row = row.find('h3', {"class": "truncate_title"})
             title = title_row.text.strip()
             url = base_url + title_row.find('a')['href']
+            image = re.match(r'background-image: url\((.*)\);', row.find('div', {"class": "card_image"}).find('a')['style'])[1]
             detail_string = row.find("div", { "class": "col-xs-11" }).text.strip().split("|")
             details_array = list(map(lambda s: re.sub(' +', ' ', re.sub(r'\W', ' ', s.strip())), detail_string))
             numbers_row = row.find("div", { "class": "middle" })
@@ -63,6 +64,7 @@ class CrawlWgGesucht(Crawler):
 
             details = {
                 'id': int(url.split('.')[-2]),
+                'image': image,
                 'url': url,
                 'title': "%s ab dem %s" % (title, date),
                 'price': price,

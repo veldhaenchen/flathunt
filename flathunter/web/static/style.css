@@ -83,7 +83,14 @@ a:visited {
 .expose {
   width: 186px;
   margin: 20px;
-  background-color: blue;
+  background-color: #bdbdf847;
+}
+
+.expose img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  padding: 16px;
 }
 
 .expose h3 {

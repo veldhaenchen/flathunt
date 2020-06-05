@@ -11,7 +11,7 @@ class CrawlImmowelt(Crawler):
     def __init__(self):
         logging.getLogger("requests").setLevel(logging.WARNING)
 
-    def get_results(self, search_url):
+    def get_results(self, search_url, max_pages=None):
         self.__log__.debug("Got search URL %s" % search_url)
 
         soup = self.get_page(search_url)
@@ -43,6 +43,7 @@ class CrawlImmowelt(Crawler):
 
             tags = expose_ids[idx].find_all(class_="hardfact")
             url = "https://www.immowelt.de" + expose_ids[idx].find("a").get("href")
+            image = expose_ids[idx].find("picture").find("img")['src']
             address = expose_ids[idx].find(class_="listlocation")
             address.find("span").extract()
             address = address.text.strip()
@@ -69,6 +70,7 @@ class CrawlImmowelt(Crawler):
 
             details = {
                 'id': int(expose_ids[idx].get("data-estateid")),
+                'image': image,
                 'url': url,
                 'title': title_el.text.strip(),
                 'price': price,

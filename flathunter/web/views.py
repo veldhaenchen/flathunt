@@ -15,4 +15,4 @@ def index():
 def hunt():
     hunter = app.config["HUNTER"]
     hunter.hunt_flats()
-    return jsonify(status="Success", completedAt=str(hunter.get_last_run_time())), status.HTTP_201_CREATED
+    return jsonify(status="Success", completedAt=str(hunter.get_last_run_time()), body=render_template("exposes.html", exposes=hunter.get_recent_exposes())), status.HTTP_201_CREATED

@@ -7,7 +7,7 @@ class WebHunter(Hunter):
     __log__ = logging.getLogger(__name__)
 
     def hunt_flats(self):
-        new_exposes = super().hunt_flats()
+        new_exposes = super().hunt_flats(max_pages=1)
                 
         self.id_watch.update_last_run_time()
         return new_exposes

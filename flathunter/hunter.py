@@ -16,7 +16,7 @@ class Hunter:
             raise Exception("Invalid config for hunter - should be a 'Config' object")
         self.id_watch = id_watch
 
-    def hunt_flats(self):
+    def hunt_flats(self, max_pages=None):
         filter = Filter.builder() \
                        .read_config(self.config) \
                        .filter_already_seen(self.id_watch) \
@@ -30,7 +30,7 @@ class Hunter:
                                         .send_telegram_messages() \
                                         .build()
 
-        new_exposes = chain(*[ processor_chain.process(searcher.crawl(url))
+        new_exposes = chain(*[ processor_chain.process(searcher.crawl(url, max_pages))
                                 for searcher in self.config.searchers()
                                 for url in self.config.get('urls', list()) ])
 

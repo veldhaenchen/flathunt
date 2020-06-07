@@ -24,7 +24,10 @@ class WebHunter(Hunter):
 
         for (user_id, filters) in self.id_watch.get_user_filters():
             filter = Filter.builder().read_config({ 'filters': filters }).build()
-            processor_chain = ProcessorChain.builder(self.config).send_telegram_messages([ user_id ]).build()
+            processor_chain = ProcessorChain.builder(self.config) \
+                                            .apply_filter(filter) \
+                                            .send_telegram_messages([ user_id ]) \
+                                            .build()
             for message in processor_chain.process(new_exposes):
                 self.__log__.debug("Sent expose " + str(message['id']) + " to user " + str(user_id))
 

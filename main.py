@@ -17,9 +17,17 @@ else:
     # Use Google Cloud DB if we run on the cloud
     id_watch = GoogleCloudIdMaintainer()
 
-hunter = WebHunter(Config(), id_watch)
+config = Config()
+hunter = WebHunter(config, id_watch)
 
 app.config["HUNTER"] = hunter
+if 'website' in config:
+    app.secret_key = config['website']['session_key']
+    app.config["DOMAIN"] = config['website']['domain']
+    app.config["BOT_NAME"] = config['website']['bot_name']
+else:
+    app.secret_key = b'Not a secret'
+app.config["BOT_TOKEN"] = config['telegram']['bot_token']
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)

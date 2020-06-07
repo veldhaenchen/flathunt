@@ -7,10 +7,13 @@ from flathunter.abstract_processor import Processor
 class SenderTelegram(Processor):
     __log__ = logging.getLogger(__name__)
 
-    def __init__(self, config):
+    def __init__(self, config, receivers=None):
         self.config = config
         self.bot_token = self.config.get('telegram', dict()).get('bot_token', '')
-        self.receiver_ids = self.config.get('telegram', dict()).get('receiver_ids', list())
+        if receivers is None:
+            self.receiver_ids = self.config.get('telegram', dict()).get('receiver_ids', list())
+        else:
+            self.receiver_ids = receivers
 
     def process_expose(self, expose):
         message = self.config.get('message', "").format(

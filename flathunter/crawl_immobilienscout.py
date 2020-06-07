@@ -80,11 +80,15 @@ class CrawlImmobilienscout(Crawler):
             except:
                 address = "No address given"
 
-            image_tag = gallery_elements[idx].find("div", {"class": "gallery-container"}).find("img")
-            try:
-                image = image_tag["src"]
-            except KeyError as e:
-                image = image_tag["data-lazy-src"]
+            gallery_tag = gallery_elements[idx].find("div", {"class": "gallery-container"})
+            if gallery_tag is not None:
+                image_tag = gallery_tag.find("img")
+                try:
+                    image = image_tag["src"]
+                except KeyError as e:
+                    image = image_tag["data-lazy-src"]
+            else:
+                image = None
 
             if len(attr_els) > 2:
                 details = {

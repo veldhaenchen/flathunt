@@ -16,6 +16,11 @@ class Hunter:
             raise Exception("Invalid config for hunter - should be a 'Config' object")
         self.id_watch = id_watch
 
+    def crawl_for_exposes(self, max_pages=None):
+        return chain(*[ searcher.crawl(url, max_pages)
+                        for searcher in self.config.searchers()
+                        for url in self.config.get('urls', list()) ])
+
     def hunt_flats(self, max_pages=None):
         filter = Filter.builder() \
                        .read_config(self.config) \
@@ -30,13 +35,9 @@ class Hunter:
                                         .send_telegram_messages() \
                                         .build()
 
-        new_exposes = chain(*[ processor_chain.process(searcher.crawl(url, max_pages))
-                                for searcher in self.config.searchers()
-                                for url in self.config.get('urls', list()) ])
-
         result = []
         # We need to iterate over this list to force the evaluation of the pipeline
-        for expose in new_exposes:
+        for expose in processor_chain.process(self.crawl_for_exposes(max_pages)):
             self.__log__.info('New offer: ' + expose['title'])
             result.append(expose)
 

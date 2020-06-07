@@ -10,7 +10,7 @@ class ExposeHelper:
         price_match = re.search(r'\d+([\.,]\d+)?', expose['price'])
         if price_match is None:
             return None
-        return float(price_match[0].replace(",", "."))
+        return float(price_match[0].replace(".", "").replace(",", "."))
 
     @staticmethod
     def get_size(expose):
@@ -137,6 +137,10 @@ class FilterBuilder:
                 self.filters.append(MinRoomsFilter(filters_config["min_rooms"]))
             if "max_rooms" in filters_config:
                 self.filters.append(MaxRoomsFilter(filters_config["max_rooms"]))
+        return self
+
+    def max_size_filter(self, size):
+        self.filters.append(MaxSizeFilter(size))
         return self
 
     def predicate_filter(self, predicate):

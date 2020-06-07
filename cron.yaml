@@ -1,4 +1,4 @@
 cron:
 - description: "Hunt for flats"
   url: /hunt
-  schedule: every 30 minutes synchronized
+  schedule: every 10 minutes synchronized

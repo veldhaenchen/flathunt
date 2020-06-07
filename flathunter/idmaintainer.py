@@ -51,7 +51,8 @@ class IdMaintainer:
                 cur = self.threadlocal.connection.cursor()
                 cur.execute('CREATE TABLE IF NOT EXISTS processed (ID INTEGER)')
                 cur.execute('CREATE TABLE IF NOT EXISTS executions (timestamp timestamp)')
-                cur.execute('CREATE TABLE IF NOT EXISTS exposes (created TIMESTAMP, crawler STRING, details BLOB)')
+                cur.execute('CREATE TABLE IF NOT EXISTS exposes (id INTEGER, created TIMESTAMP, crawler STRING, details BLOB, PRIMARY KEY (id, crawler))')
+                cur.execute('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, settings BLOB)')
                 self.threadlocal.connection.commit()
             except lite.Error as e:
                 self.__log__.error("Error %s:" % e.args[0])
@@ -66,7 +67,7 @@ class IdMaintainer:
 
     def save_expose(self, expose):
         cur = self.get_connection().cursor()
-        cur.execute('INSERT INTO exposes(created, crawler, details) VALUES (?, ?, ?)', (datetime.datetime.now(), expose['crawler'], json.dumps(expose)))
+        cur.execute('INSERT OR REPLACE INTO exposes(id, created, crawler, details) VALUES (?, ?, ?, ?)', (int(expose['id']), datetime.datetime.now(), expose['crawler'], json.dumps(expose)))
         self.get_connection().commit()
 
     def get_exposes_since(self, min_datetime):
@@ -74,10 +75,41 @@ class IdMaintainer:
         cur.execute('SELECT created, crawler, details FROM exposes WHERE created >= ? ORDER BY created DESC', (min_datetime,))
         return list(map(lambda t: json.loads(t[2]), cur.fetchall()))
 
-    def get_recent_exposes(self, count):
+    def get_recent_exposes(self, count, filter=None):
         cur = self.get_connection().cursor()
-        cur.execute('SELECT details FROM exposes ORDER BY created DESC LIMIT ?', (count,))
-        return list(map(lambda t: json.loads(t[0]), cur.fetchall()))
+        cur.execute('SELECT details FROM exposes ORDER BY created DESC')
+        res = []
+        next = []
+        while (len(res) < count):
+            if len(next) == 0:
+                next = cur.fetchmany()
+                if len(next) == 0:
+                    break
+            expose = json.loads(next.pop()[0])
+            if filter is None or filter.is_interesting_expose(expose):
+                res.append(expose)
+        return res
+
+    def set_filters_for_user(self, user_id, filters):
+        cur = self.get_connection().cursor()
+        cur.execute('INSERT OR REPLACE INTO users VALUES (?, ?)', (user_id, json.dumps({ 'filters': filters })))
+        self.get_connection().commit()
+
+    def get_filters_for_user(self, user_id):
+        cur = self.get_connection().cursor()
+        cur.execute('SELECT settings FROM users WHERE id = ?', (user_id,))
+        row = cur.fetchone()
+        if row == None:
+            return None
+        return json.loads(row[0])['filters']
+
+    def get_user_filters(self):
+        cur = self.get_connection().cursor()
+        cur.execute('SELECT id, settings FROM users')
+        res = []
+        for row in cur.fetchall():
+            res.append((row[0], json.loads(row[1])['filters']))
+        return res
 
     def get(self):
         res = []

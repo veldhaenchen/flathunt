@@ -36,10 +36,32 @@ class GoogleCloudIdMaintainer:
             res.append(doc.to_dict())
         return res
 
-    def get_recent_exposes(self, count):
+    def get_recent_exposes(self, count, filter=None):
         res = []
         for doc in self.db.collection(u'exposes').order_by('created_sort').limit(count).stream():
-            res.append(doc.to_dict())
+            expose = doc.to_dict()
+            if filter is None or filter.is_interesting_expose(expose):
+                res.append(expose)
+        return res
+
+    def set_filters_for_user(self, user_id, filters):
+        self.db.collection(u'users').document(str(user_id)).set({ 'filters' : filters })
+
+    def get_filters_for_user(self, user_id):
+        doc = self.db.collection(u'users').document(str(user_id)).get()
+        settings = doc.to_dict()
+        if settings is None:
+            return None
+        if 'filters' in settings:
+            return settings['filters']
+        return None
+
+    def get_user_filters(self):
+        res = []
+        for doc in self.db.collection(u'users').stream():
+            settings = doc.to_dict()
+            if 'filters' in settings:
+                res.append((int(doc.id), settings['filters']))
         return res
 
     def get(self):

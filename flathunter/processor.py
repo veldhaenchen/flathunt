@@ -15,8 +15,8 @@ class ProcessorChainBuilder:
         self.processors = []
         self.config = config
         
-    def send_telegram_messages(self):
-        self.processors.append(SenderTelegram(self.config))
+    def send_telegram_messages(self, receivers=None):
+        self.processors.append(SenderTelegram(self.config, receivers=receivers))
         return self
         
     def resolve_addresses(self):

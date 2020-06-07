@@ -115,3 +115,12 @@ google_maps_api:
 telegram:
     bot_token: 
     receiver_ids:
+
+# If you are running the web interface, you can configure Login with Telegram support
+# Follow the instructions here to register your domain with the Telegram bot:
+# https://core.telegram.org/widgets/login
+#
+# website:
+#    bot_name: bot_name_xxx
+#    domain: flathunter.example.com
+#    session_key: SomeSecretValue

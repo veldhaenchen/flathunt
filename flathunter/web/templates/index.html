@@ -1,13 +1,74 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<div class="intro">
-<p>Flathunter helps you find somewhere to live in Germany, by periodically fetching apartment listings from the major property portals (ImmoScout, ImmoWelt, Ebay Kleinanzeigen and WG Gesucht) and sending the details of apartments that match your criteria to you in a Telegram message.</p>
-</div>
+{% if session['user'] %}
+  <div class="search_form">
+    <form method="post" action="/filter">
+      <div class="form_holder">
+        <div class="form_column">
+          <div class="form_input">
+            <p>Max price</p>
+            <input type="text" name="max_price" value="{{ filters['max_price'] }}"></input>
+          </div>
+          <div class="form_input">
+            <p>Min price</p>
+            <input type="text" name="min_price" value="{{ filters['min_price'] }}"></input>
+          </div>
+        </div>
+        <div class="form_column">
+          <div class="form_input">
+            <p>Max size</p>
+            <input type="text" name="max_size" value="{{ filters['max_size'] }}"></input>
+          </div>
+          <div class="form_input">
+            <p>Min size</p>
+            <input type="text" name="min_size" value="{{ filters['min_size'] }}"></input>
+          </div>
+        </div>
+        <div class="form_column">
+          <div class="form_input">
+            <p>Max rooms</p>
+            <input type="text" name="max_rooms" value="{{ filters['max_rooms'] }}"></input>
+          </div>
+          <div class="form_input">
+            <p>Min rooms</p>
+            <input type="text" name="min_rooms" value="{{ filters['min_rooms'] }}"></input>
+          </div>
+        </div>
+      </div>
+      <div class="center_button">
+        <button class="set_search_criteria">Set search criteria</button>
+      </div>
+    </form>
+  </div>
+{% else %}
+  <div class="intro">
+  <p>Flathunter helps you find somewhere to live in Germany, by periodically fetching apartment listings from the major property portals (ImmoScout, ImmoWelt, Ebay Kleinanzeigen and WG Gesucht) and sending the details of apartments that match your criteria to you in a Telegram message.</p>
+  </div>
+{% endif %}
 
 <div id="expose_partial">
 {% include "exposes.html" %}
 </div>
+
+{% if session['user'] %}
+  <div class="logout_div center_button">
+    <button class="login_telegram" onclick="document.location='/logout'">
+      Logout
+    </button>
+  </div>
+{% else %}
+  <div class="login_div center_button">
+    {% if bot_name %}
+      <script async src="https://telegram.org/js/telegram-widget.js?9" data-telegram-login="{{ bot_name }}" data-size="large" data-userpic="false" data-auth-url="https://{{ domain }}/login_with_telegram" data-request-access="write"></script>
+    {% else %}
+      <button class="login_telegram" onclick="document.location='{{ login_url }}'">
+        <i class="telegram_icon"></i>
+        Login as Dummy User
+      </button>
+    {% endif %}
+  </div>
+{% endif %}
 
 <div class="button-holder">
   <div onclick="hunt_flats()" class="hunt-button">Trigger Appartment Search</div>

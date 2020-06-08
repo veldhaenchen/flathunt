@@ -20,6 +20,7 @@ Flask = "*"
 Flask-API = "*"
 firebase-admin = "*"
 mock-firestore = "*"
+pytest = "*"
 
 [dev-packages]
 

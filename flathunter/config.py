@@ -31,7 +31,7 @@ class Config:
         builder = Filter.builder()
         if "excluded_titles" in self.config:
             builder.title_filter(self.config["excluded_titles"])
-        if "filters" in self.config:
+        if "filters" in self.config and self.config["filters"] is not None:
             filters_config = self.config["filters"]
             if "excluded_titles" in filters_config:
                 builder.title_filter(filters_config["excluded_titles"])

@@ -43,7 +43,11 @@ class CrawlImmowelt(Crawler):
 
             tags = expose_ids[idx].find_all(class_="hardfact")
             url = "https://www.immowelt.de" + expose_ids[idx].find("a").get("href")
-            image = expose_ids[idx].find("picture").find("img")['src']
+            picture = expose_ids[idx].find("picture")
+            if picture is not None:
+                image = picture.find("img")['src']
+            else:
+                image = None
             address = expose_ids[idx].find(class_="listlocation")
             address.find("span").extract()
             address = address.text.strip()

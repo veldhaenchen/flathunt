@@ -77,8 +77,10 @@ def test_exposes_are_returned_filtered(id_watch):
     config.set_searchers([DummyCrawler()])
     hunter = Hunter(config, id_watch)
     hunter.hunt_flats()
+    hunter.hunt_flats()
     filter = Filter.builder().max_size_filter(70).build()
     saved = id_watch.get_recent_exposes(10, filter=filter)
+    assert len(saved) == 10
     for expose in saved:
         assert int(re.match(r'\d+', expose['size'])[0]) <= 70
 

@@ -38,10 +38,12 @@ class GoogleCloudIdMaintainer:
 
     def get_recent_exposes(self, count, filter=None):
         res = []
-        for doc in self.db.collection(u'exposes').order_by('created_sort').limit(count).stream():
+        for doc in self.db.collection(u'exposes').order_by('created_sort').stream():
             expose = doc.to_dict()
             if filter is None or filter.is_interesting_expose(expose):
                 res.append(expose)
+                if len(res) == count:
+                    break
         return res
 
     def set_filters_for_user(self, user_id, filters):

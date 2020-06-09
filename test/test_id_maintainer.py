@@ -29,12 +29,9 @@ filters:
     def setUp(self):
         self.maintainer = IdMaintainer(":memory:")
 
-    def test_read_from_empty_db(self):
-        self.assertEqual(0, len(self.maintainer.get()), "Expected empty db to return empty array")
-
     def test_read_after_write(self):
         self.maintainer.mark_processed(12345)
-        self.assertEqual(12345, self.maintainer.get()[0], "Expected ID to be saved")
+        self.assertTrue(self.maintainer.is_processed(12345), "Expected ID to be saved")
 
     def test_get_last_run_time_none_by_default(self):
         self.assertIsNone(self.maintainer.get_last_run_time(), "Expected last run time to be none")
@@ -43,6 +40,16 @@ filters:
         time = self.maintainer.update_last_run_time()
         self.assertIsNotNone(time, "Expected time not to be none")
         self.assertEqual(time, self.maintainer.get_last_run_time(), "Expected last run time to be updated")
+
+def test_is_processed_works(mocker):
+    config = Config(string=IdMaintainerTest.DUMMY_CONFIG)
+    config.set_searchers([DummyCrawler()])
+    id_watch = IdMaintainer(":memory:")
+    hunter = Hunter(config, id_watch)
+    exposes = hunter.hunt_flats()
+    assert count(exposes) > 4
+    for expose in exposes:
+        assert id_watch.is_processed(expose['id'])
 
 def test_ids_are_added_to_maintainer(mocker):
     config = Config(string=IdMaintainerTest.DUMMY_CONFIG)

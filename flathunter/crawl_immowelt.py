@@ -39,7 +39,10 @@ class CrawlImmowelt(Crawler):
                 if detail.find("div", { "class": "iw_left" }) is None:
                     continue
                 if detail.find("div", { "class": "iw_left" }).text.strip() == 'Die Wohnung':
-                    description = detail.find("div", { "class": "iw_right" }).find("p").text
+                    description_element = detail.find("div", { "class": "iw_right" })
+                    if description_element is None:
+                        continue
+                    description = description_element.find("p").text
                     if re.match(r'.*sofort.*', description, re.MULTILINE|re.DOTALL):
                         expose['from'] = datetime.datetime.now().strftime("%2d.%2d.%Y")
                     date_string = re.match(r'.*(\d{2}.\d{2}.\d{4}).*', description, re.MULTILINE|re.DOTALL)

@@ -27,12 +27,9 @@ filters:
 def id_watch():
     return MockGoogleCloudIdMaintainer()
     
-def test_read_from_empty_db(id_watch):
-    assert id_watch.get() == []
-
 def test_read_after_write(id_watch):
     id_watch.mark_processed(12345)
-    assert id_watch.get() == [12345]
+    assert id_watch.is_processed(12345)
 
 def test_get_last_run_time_none_by_default(id_watch):
     assert id_watch.get_last_run_time() == None
@@ -41,6 +38,15 @@ def test_get_list_run_time_is_updated(id_watch):
     time = id_watch.update_last_run_time()
     assert time != None
     assert time == id_watch.get_last_run_time()
+
+def test_is_processed_works(id_watch):
+    config = Config(string=CONFIG_WITH_FILTERS)
+    config.set_searchers([DummyCrawler()])
+    hunter = Hunter(config, id_watch)
+    exposes = hunter.hunt_flats()
+    assert count(exposes) > 4
+    for expose in exposes:
+        assert id_watch.is_processed(expose['id'])
 
 def test_exposes_are_saved_to_maintainer(id_watch):
     config = Config(string=CONFIG_WITH_FILTERS)

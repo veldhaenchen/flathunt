@@ -1,7 +1,7 @@
 <div class="exposes">
   {% for expose in exposes %}
     <div class="expose">
-      <p>{{ expose['price'] }}, {{expose['rooms']}} rooms, {{expose['size']}}</p>
+      <p>{{ expose['price'] }}, {{expose['rooms']}} rooms, {{expose['size']}} from {{expose['from']}}</p>
       <a href="{{ expose['url'] }}" target="_blank">
         {% if expose['image'] %}
           <img src="{{ expose['image'] }}">

@@ -69,7 +69,7 @@ class CrawlWgGesucht(Crawler):
                 'title': "%s ab dem %s" % (title, dates[0]),
                 'price': price,
                 'size': size,
-                'rooms': rooms + " Zi.",
+                'rooms': rooms,
                 'address': url,
                 'crawler': self.get_name()
             }

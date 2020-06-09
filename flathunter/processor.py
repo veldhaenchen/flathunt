@@ -5,6 +5,7 @@ from functools import reduce
 from flathunter.default_processors import AddressResolver
 from flathunter.default_processors import Filter
 from flathunter.default_processors import LambdaProcessor
+from flathunter.default_processors import CrawlExposeDetails
 from flathunter.sender_telegram import SenderTelegram
 from flathunter.gmaps_duration_processor import GMapsDurationProcessor
 from flathunter.idmaintainer import SaveAllExposesProcessor
@@ -28,6 +29,10 @@ class ProcessorChainBuilder:
         durations_enabled = "google_maps_api" in self.config and self.config["google_maps_api"]["enable"]
         if durations_enabled:
             self.processors.append(GMapsDurationProcessor(self.config))
+        return self
+
+    def crawl_expose_details(self):
+        self.processors.append(CrawlExposeDetails(self.config))
         return self
 
     def map(self, func):

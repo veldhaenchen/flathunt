@@ -1,7 +1,9 @@
 import logging
 import requests
 import re
+import datetime
 from bs4 import BeautifulSoup
+
 from flathunter.abstract_crawler import Crawler
 
 class CrawlImmobilienscout(Crawler):
@@ -47,11 +49,23 @@ class CrawlImmobilienscout(Crawler):
             entries.extend(cur_entry)
         return entries
 
-    def get_page(self, search_url, page_no):
-        resp = requests.get(search_url.format(page_no))
+    def get_soup_from_url(self, url):
+        resp = requests.get(url)
         if resp.status_code != 200:
             self.__log__.error("Got response (%i): %s" % (resp.status_code, resp.content))
         return BeautifulSoup(resp.content, 'html.parser')
+
+    def get_page(self, search_url, page_no):
+        return self.get_soup_from_url(search_url.format(page_no))
+
+    def get_expose_details(self, expose):
+        soup = self.get_soup_from_url(expose['url'])
+        date = soup.find('dd', { "class": "is24qa-bezugsfrei-ab" })
+        expose['from'] = datetime.datetime.now().strftime("%2d.%2d.%Y")
+        if date is not None:
+            if not re.match(r'.*sofort.*', date.text):
+                expose['from'] = date.text.strip()
+        return expose
 
     def extract_data(self, soup):
         entries = list()

@@ -18,6 +18,7 @@ class WebHunter(Hunter):
                                         .apply_filter(filter) \
                                         .resolve_addresses() \
                                         .calculate_durations() \
+                                        .crawl_expose_details() \
                                         .build()
 
         new_exposes = processor_chain.process(self.crawl_for_exposes(max_pages=1))

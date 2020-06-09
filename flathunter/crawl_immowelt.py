@@ -1,7 +1,9 @@
 import logging
 import requests
 import re
+import datetime
 from bs4 import BeautifulSoup
+
 from flathunter.abstract_crawler import Crawler
 
 class CrawlImmowelt(Crawler):
@@ -27,6 +29,25 @@ class CrawlImmowelt(Crawler):
         if resp.status_code != 200:
             self.__log__.error("Got response (%i): %s" % (resp.status_code, resp.content))
         return BeautifulSoup(resp.content, 'html.parser')
+
+    def get_expose_details(self, expose):
+        soup = self.get_page(expose['url'])
+        immo_div = soup.find("div", { "id": "divImmobilie" })
+        if immo_div is not None:
+            details = immo_div.find_all("div", { "class": "clear" })
+            for detail in details:
+                if detail.find("div", { "class": "iw_left" }) is None:
+                    continue
+                if detail.find("div", { "class": "iw_left" }).text.strip() == 'Die Wohnung':
+                    description = detail.find("div", { "class": "iw_right" }).find("p").text
+                    if re.match(r'.*sofort.*', description, re.MULTILINE|re.DOTALL):
+                        expose['from'] = datetime.datetime.now().strftime("%2d.%2d.%Y")
+                    date_string = re.match(r'.*(\d{2}.\d{2}.\d{4}).*', description, re.MULTILINE|re.DOTALL)
+                    if date_string is not None:
+                        expose['from'] = date_string[1]
+            if 'from' not in expose:
+                expose['from'] = datetime.datetime.now().strftime("%2d.%2d.%Y")
+        return expose
 
     def extract_data(self, soup):
         entries = list()

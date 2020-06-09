@@ -17,3 +17,7 @@ class Crawler:
 
     def get_name(self):
         return type(self).__name__
+
+    def get_expose_details(self, expose):
+        # Implement in subclass - extract additional data by processing the expose URL
+        return expose

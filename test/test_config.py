@@ -11,6 +11,14 @@ urls:
   - https://www.immowelt.de/liste/berlin/wohnungen/mieten?roomi=2&prima=1500&wflmi=70&sort=createdate%2Bdesc
     """
 
+    FILTERS_CONFIG = """
+urls:
+  - https://www.immowelt.de/liste/berlin/wohnungen/mieten?roomi=2&prima=1500&wflmi=70&sort=createdate%2Bdesc
+
+filters:
+
+"""
+
     def test_loads_config(self):
         created = False
         if not os.path.isfile("config.yaml"):
@@ -30,3 +38,9 @@ urls:
           temp.flush()
           config = Config(temp.name) 
        self.assertTrue(len(config.get('urls')) > 0, "Expected URLs in config file")
+
+    def test_loads_config_from_string(self):
+       config = Config(string=self.FILTERS_CONFIG)
+       self.assertIsNotNone(config)
+       my_filter = config.get_filter()
+       self.assertIsNotNone(my_filter)

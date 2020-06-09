@@ -93,20 +93,24 @@ excluded_titles:
 """
 
     def test_hunt_flats(self):
-        hunter = Hunter(Config(string=self.DUMMY_CONFIG), [CrawlImmowelt()], IdMaintainer(":memory:"))
+        config = Config(string=self.DUMMY_CONFIG)
+        config.set_searchers([CrawlImmowelt()])
+        hunter = Hunter(config, IdMaintainer(":memory:"))
         exposes = hunter.hunt_flats()
         self.assertTrue(len(exposes) > 0, "Expected to find exposes")
 
     def test_invalid_config(self):
         with self.assertRaises(Exception) as context:
-            Hunter(dict(), [CrawlImmowelt()], IdMaintainer(":memory:"))
+            Hunter(dict(), IdMaintainer(":memory:"))
 
         self.assertTrue('Invalid config' in str(context.exception))
 
     def test_filter_titles_legacy(self):
         titlewords = [ "wg", "tausch", "flat", "ruhig", "gruen" ]
         filteredwords = [ "wg", "tausch", "wochenendheimfahrer", "pendler", "zwischenmiete" ]
-        hunter = Hunter(Config(string=self.FILTER_TITLES_LEGACY_CONFIG), [DummyCrawler(titlewords)], IdMaintainer(":memory:"))
+        config = Config(string=self.FILTER_TITLES_LEGACY_CONFIG)
+        config.set_searchers([DummyCrawler(titlewords)])
+        hunter = Hunter(config, IdMaintainer(":memory:"))
         exposes = hunter.hunt_flats()
         self.assertTrue(len(exposes) > 4, "Expected to find exposes")
         unfiltered = list(filter(lambda expose: any(word in expose['title'] for word in filteredwords), exposes))
@@ -118,7 +122,9 @@ excluded_titles:
     def test_filter_titles(self):
         titlewords = [ "wg", "tausch", "flat", "ruhig", "gruen" ]
         filteredwords = [ "wg", "tausch", "wochenendheimfahrer", "pendler", "zwischenmiete" ]
-        hunter = Hunter(Config(string=self.FILTER_TITLES_CONFIG), [DummyCrawler(titlewords)], IdMaintainer(":memory:"))
+        config = Config(string=self.FILTER_TITLES_CONFIG)
+        config.set_searchers([DummyCrawler(titlewords)])
+        hunter = Hunter(config, IdMaintainer(":memory:"))
         exposes = hunter.hunt_flats()
         self.assertTrue(len(exposes) > 4, "Expected to find exposes")
         unfiltered = list(filter(lambda expose: any(word in expose['title'] for word in filteredwords), exposes))
@@ -129,7 +135,9 @@ excluded_titles:
 
     def test_filter_min_price(self):
         min_price = 700
-        hunter = Hunter(Config(string=self.FILTER_MIN_PRICE_CONFIG), [DummyCrawler()], IdMaintainer(":memory:"))
+        config = Config(string=self.FILTER_MIN_PRICE_CONFIG)
+        config.set_searchers([DummyCrawler()])
+        hunter = Hunter(config, IdMaintainer(":memory:"))
         exposes = hunter.hunt_flats()
         self.assertTrue(len(exposes) > 4, "Expected to find exposes")
         unfiltered = list(filter(lambda expose: float(re.search(r'\d+([\.,]\d+)?', expose['price'])[0]) < min_price, exposes))
@@ -140,7 +148,9 @@ excluded_titles:
 
     def test_filter_max_price(self):
         max_price = 1000
-        hunter = Hunter(Config(string=self.FILTER_MAX_PRICE_CONFIG), [DummyCrawler()], IdMaintainer(":memory:"))
+        config = Config(string=self.FILTER_MAX_PRICE_CONFIG)
+        config.set_searchers([DummyCrawler()])
+        hunter = Hunter(config, IdMaintainer(":memory:"))
         exposes = hunter.hunt_flats()
         self.assertTrue(len(exposes) > 4, "Expected to find exposes")
         unfiltered = list(filter(lambda expose: float(re.search(r'\d+([\.,]\d+)?', expose['price'])[0]) > max_price, exposes))
@@ -151,7 +161,9 @@ excluded_titles:
 
     def test_filter_max_size(self):
         max_size = 80
-        hunter = Hunter(Config(string=self.FILTER_MAX_SIZE_CONFIG), [DummyCrawler()], IdMaintainer(":memory:"))
+        config = Config(string=self.FILTER_MAX_SIZE_CONFIG)
+        config.set_searchers([DummyCrawler()])
+        hunter = Hunter(config, IdMaintainer(":memory:"))
         exposes = hunter.hunt_flats()
         self.assertTrue(len(exposes) > 4, "Expected to find exposes")
         unfiltered = list(filter(lambda expose: float(re.search(r'\d+([\.,]\d+)?', expose['size'])[0]) > max_size, exposes))
@@ -162,7 +174,9 @@ excluded_titles:
 
     def test_filter_min_size(self):
         min_size = 80
-        hunter = Hunter(Config(string=self.FILTER_MIN_SIZE_CONFIG), [DummyCrawler()], IdMaintainer(":memory:"))
+        config = Config(string=self.FILTER_MIN_SIZE_CONFIG)
+        config.set_searchers([DummyCrawler()])
+        hunter = Hunter(config, IdMaintainer(":memory:"))
         exposes = hunter.hunt_flats()
         self.assertTrue(len(exposes) > 4, "Expected to find exposes")
         unfiltered = list(filter(lambda expose: float(re.search(r'\d+([\.,]\d+)?', expose['size'])[0]) < min_size, exposes))
@@ -173,7 +187,9 @@ excluded_titles:
 
     def test_filter_max_rooms(self):
         max_rooms = 3
-        hunter = Hunter(Config(string=self.FILTER_MAX_ROOMS_CONFIG), [DummyCrawler()], IdMaintainer(":memory:"))
+        config = Config(string=self.FILTER_MAX_ROOMS_CONFIG)
+        config.set_searchers([DummyCrawler()])
+        hunter = Hunter(config, IdMaintainer(":memory:"))
         exposes = hunter.hunt_flats()
         self.assertTrue(len(exposes) > 4, "Expected to find exposes")
         unfiltered = list(filter(lambda expose: float(re.search(r'\d+([\.,]\d+)?', expose['rooms'])[0]) > max_rooms, exposes))
@@ -184,7 +200,9 @@ excluded_titles:
 
     def test_filter_min_rooms(self):
         min_rooms = 2
-        hunter = Hunter(Config(string=self.FILTER_MIN_ROOMS_CONFIG), [DummyCrawler()], IdMaintainer(":memory:"))
+        config = Config(string=self.FILTER_MIN_ROOMS_CONFIG)
+        config.set_searchers([DummyCrawler()])
+        hunter = Hunter(config, IdMaintainer(":memory:"))
         exposes = hunter.hunt_flats()
         self.assertTrue(len(exposes) > 4, "Expected to find exposes")
         unfiltered = list(filter(lambda expose: float(re.search(r'\d+([\.,]\d+)?', expose['rooms'])[0]) < min_rooms, exposes))

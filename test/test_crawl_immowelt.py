@@ -1,5 +1,6 @@
 import unittest
 from flathunter.crawl_immowelt import CrawlImmowelt
+from test_util import count
 
 class ImmoweltCrawlerTest(unittest.TestCase):
 
@@ -16,6 +17,9 @@ class ImmoweltCrawlerTest(unittest.TestCase):
         self.assertTrue(len(entries) > 0, "Should have at least one entry")
         self.assertTrue(entries[0]['id'] > 0, "Id should be parsed")
         self.assertTrue(entries[0]['url'].startswith("https://www.immowelt.de/expose"), u"URL should be an exposé link")
-        for attr in [ 'title', 'price', 'size', 'rooms', 'address' ]:
+        for attr in [ 'title', 'price', 'size', 'rooms', 'address', 'image' ]:
             self.assertIsNotNone(entries[0][attr], attr + " should be set")
 
+def test_dont_crawl_other_urls():
+    exposes = CrawlImmowelt().crawl("https://www.example.com")
+    assert count(exposes) == 0

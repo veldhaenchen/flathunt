@@ -66,8 +66,7 @@ def main():
         __log__.error("No telegram bot token configured. Starting like this would be meaningless...")
         return
     if not config.get('telegram', dict()).get('receiver_ids'):
-        __log__.error("No telegram receivers configured. Starting like this would be meaningless...")
-        return
+        __log__.warn("No telegram receivers configured - nobody will get notifications.")
     if not config.get('urls'):
         __log__.error("No urls configured. Starting like this would be meaningless...")
         return

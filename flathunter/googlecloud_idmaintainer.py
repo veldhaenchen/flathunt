@@ -7,21 +7,6 @@ from firebase_admin import firestore
 
 from flathunter.config import Config
 
-class ConnectionWrapper:
-
-    def __init__(self, db):
-        self.db = db
-
-    def __enter__(self):
-        # Return a new client for this thread
-        return firestore.client()
-
-    def __exit__(self, exc_type, exc_value, tb):
-        if exc_type is not None:
-            traceback.print_exception(exc_type, exc_value, tb)
-            return False
-        return True
-
 class GoogleCloudIdMaintainer:
     __log__ = logging.getLogger(__name__)
 
@@ -34,27 +19,67 @@ class GoogleCloudIdMaintainer:
         })
         self.db = firestore.client()
 
-    def connect(self):
-        return ConnectionWrapper(self.db)
+    def mark_processed(self, expose_id):
+        self.__log__.debug('mark_processed(' + str(expose_id) + ')')
+        self.db.collection(u'processed').document(str(expose_id)).set({ u'id': expose_id })
 
-    def add(self, expose_id, connection=None):
-        self.__log__.debug('add(' + str(expose_id) + ')')
-        self.db.collection(u'exposes').document(str(expose_id)).set({ u'id': expose_id })
+    def save_expose(self, expose):
+        record = expose.copy()
+        record.update({ 'created_at': datetime.datetime.now(), 'created_sort': (0 - datetime.datetime.now().timestamp()) })
+        self.db.collection(u'exposes').document(str(expose[u'id'])).set(record)
 
-    def get(self, connection=None):
+    def get_exposes_since(self, min_datetime):
         res = []
-        for doc in self.db.collection(u'exposes').stream():
+        for doc in self.db.collection(u'exposes').order_by('created_sort').stream():
+            if doc.to_dict()[u'created_at'] < min_datetime:
+                break
+            res.append(doc.to_dict())
+        return res
+
+    def get_recent_exposes(self, count, filter=None):
+        res = []
+        for doc in self.db.collection(u'exposes').order_by('created_sort').stream():
+            expose = doc.to_dict()
+            if filter is None or filter.is_interesting_expose(expose):
+                res.append(expose)
+                if len(res) == count:
+                    break
+        return res
+
+    def set_filters_for_user(self, user_id, filters):
+        self.db.collection(u'users').document(str(user_id)).set({ 'filters' : filters })
+
+    def get_filters_for_user(self, user_id):
+        doc = self.db.collection(u'users').document(str(user_id)).get()
+        settings = doc.to_dict()
+        if settings is None:
+            return None
+        if 'filters' in settings:
+            return settings['filters']
+        return None
+
+    def get_user_filters(self):
+        res = []
+        for doc in self.db.collection(u'users').stream():
+            settings = doc.to_dict()
+            if 'filters' in settings:
+                res.append((int(doc.id), settings['filters']))
+        return res
+
+    def get(self):
+        res = []
+        for doc in self.db.collection(u'processed').stream():
             res.append(doc.to_dict()[u'id'])
 
         self.__log__.info('already processed: ' + str(len(res)))
         self.__log__.debug(str(res))
         return res
 
-    def get_last_run_time(self, connection=None):
+    def get_last_run_time(self):
         for doc in self.db.collection(u'executions').order_by(u'timestamp', direction=firestore.Query.DESCENDING).limit(1).stream():
             return doc.to_dict()[u'timestamp']
 
-    def update_last_run_time(self, connection=None):
+    def update_last_run_time(self):
         time = datetime.datetime.now()
         self.db.collection(u'executions').add({ u'timestamp': time })
         return time

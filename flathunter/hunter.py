@@ -1,15 +1,11 @@
 import logging
 import requests
 import re
-import urllib.request
-import urllib.parse
-import urllib.error
-import datetime
-import time
+from itertools import chain
+
 from flathunter.config import Config
 from flathunter.filter import Filter
 from flathunter.processor import ProcessorChain
-
 
 class Hunter:
     __log__ = logging.getLogger(__name__)
@@ -20,47 +16,29 @@ class Hunter:
             raise Exception("Invalid config for hunter - should be a 'Config' object")
         self.id_watch = id_watch
 
-    def hunt_flats(self, connection=None):
-        new_exposes = []
-        processed = self.id_watch.get(connection)
+    def crawl_for_exposes(self, max_pages=None):
+        return chain(*[ searcher.crawl(url, max_pages)
+                        for searcher in self.config.searchers()
+                        for url in self.config.get('urls', list()) ])
 
-        for url in self.config.get('urls', list()):
-            self.__log__.debug('Processing URL: ' + url)
-            results = None
+    def hunt_flats(self, max_pages=None):
+        filter = Filter.builder() \
+                       .read_config(self.config) \
+                       .filter_already_seen(self.id_watch) \
+                       .build()
 
-            try:
-                for searcher in self.config.searchers():
-                    if re.search(searcher.URL_PATTERN, url):
-                        results = searcher.get_results(url)
-                        break
-            except requests.exceptions.ConnectionError:
-                self.__log__.warning("Connection to %s failed. Retrying. " % url.split('/')[2])
-                continue
+        processor_chain = ProcessorChain.builder(self.config) \
+                                        .save_all_exposes(self.id_watch) \
+                                        .apply_filter(filter) \
+                                        .resolve_addresses() \
+                                        .calculate_durations() \
+                                        .send_telegram_messages() \
+                                        .build()
 
-            # on error, stop execution
-            if not results:
-                self.__log__.debug('No results for: ' + url)
-                continue
+        result = []
+        # We need to iterate over this list to force the evaluation of the pipeline
+        for expose in processor_chain.process(self.crawl_for_exposes(max_pages)):
+            self.__log__.info('New offer: ' + expose['title'])
+            result.append(expose)
 
-            filter = Filter.builder() \
-                           .read_config(self.config) \
-                           .predicate_filter(lambda e: e['id'] not in processed) \
-                           .build()
-
-            processor_chain = ProcessorChain.builder(self.config) \
-                                            .apply_filter(filter) \
-                                            .map(lambda e: self.__log__.info('New offer: ' + e['title'])) \
-                                            .resolve_addresses() \
-                                            .calculate_durations() \
-                                            .send_telegram_messages() \
-                                            .map(lambda e: self.id_watch.add(e['id'], connection)) \
-                                            .build()
-
-            new_exposes = new_exposes + list(processor_chain.process(results))
-
-        self.__log__.info(str(len(new_exposes)) + ' new offers found')
-        self.id_watch.update_last_run_time(connection)
-        return new_exposes
-
-    def get_last_run_time(self, connection=None):
-        return self.id_watch.get_last_run_time(connection)
+        return result

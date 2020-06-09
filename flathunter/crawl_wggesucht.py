@@ -3,16 +3,16 @@ import re
 
 import requests
 from bs4 import BeautifulSoup
+from flathunter.abstract_crawler import Crawler
 
-
-class CrawlWgGesucht:
+class CrawlWgGesucht(Crawler):
     __log__ = logging.getLogger(__name__)
     URL_PATTERN = re.compile(r'https://www\.wg-gesucht\.de')
 
     def __init__(self):
         logging.getLogger("requests").setLevel(logging.WARNING)
 
-    def get_results(self, search_url):
+    def get_results(self, search_url, max_pages=None):
         self.__log__.debug("Got search URL %s" % search_url)
 
         # load first page
@@ -53,6 +53,7 @@ class CrawlWgGesucht:
             title_row = row.find('h3', {"class": "truncate_title"})
             title = title_row.text.strip()
             url = base_url + title_row.find('a')['href']
+            image = re.match(r'background-image: url\((.*)\);', row.find('div', {"class": "card_image"}).find('a')['style'])[1]
             detail_string = row.find("div", { "class": "col-xs-11" }).text.strip().split("|")
             details_array = list(map(lambda s: re.sub(' +', ' ', re.sub(r'\W', ' ', s.strip())), detail_string))
             numbers_row = row.find("div", { "class": "middle" })
@@ -63,12 +64,14 @@ class CrawlWgGesucht:
 
             details = {
                 'id': int(url.split('.')[-2]),
+                'image': image,
                 'url': url,
                 'title': "%s ab dem %s" % (title, date),
                 'price': price,
                 'size': size,
                 'rooms': rooms + " Zi.",
-                'address': url
+                'address': url,
+                'crawler': self.get_name()
             }
             entries.append(details)
 

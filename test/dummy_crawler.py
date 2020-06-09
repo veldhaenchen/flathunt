@@ -5,7 +5,9 @@ from random import random
 from random import randint
 from random import choice
 
-class DummyCrawler:
+from flathunter.abstract_crawler import Crawler
+
+class DummyCrawler(Crawler):
     __log__ = logging.getLogger(__name__)
     URL_PATTERN = re.compile(r'https://www\.example\.com')
 
@@ -14,7 +16,7 @@ class DummyCrawler:
         self.titlewords = titlewords
         self.addresses_as_links = addresses_as_links
 
-    def get_results(self, search_url):
+    def get_results(self, search_url, max_pages=None):
         self.__log__.debug("Generating dummy results")
         entries = []
         for _ in range(randint(20, 40)):
@@ -25,7 +27,8 @@ class DummyCrawler:
                 'title': "Great flat %s terrible landlord" % (choice(self.titlewords)),
                 'price': "%d EUR" % (randint(300, 3000)),
                 'size': "%d m^2" % (randint(15, 150)),
-                'rooms': "%d" % (randint(1, 5))
+                'rooms': "%d" % (randint(1, 5)),
+                'crawler': self.get_name()
             }
             if self.addresses_as_links:
                 details['address'] = "https://www.example.com/expose/" + str(expose_id)

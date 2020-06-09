@@ -2,16 +2,16 @@ import logging
 import requests
 import re
 from bs4 import BeautifulSoup
+from flathunter.abstract_crawler import Crawler
 
-
-class CrawlImmowelt:
+class CrawlImmowelt(Crawler):
     __log__ = logging.getLogger(__name__)
     URL_PATTERN = re.compile(r'https://www\.immowelt\.de')
 
     def __init__(self):
         logging.getLogger("requests").setLevel(logging.WARNING)
 
-    def get_results(self, search_url):
+    def get_results(self, search_url, max_pages=None):
         self.__log__.debug("Got search URL %s" % search_url)
 
         soup = self.get_page(search_url)
@@ -43,6 +43,11 @@ class CrawlImmowelt:
 
             tags = expose_ids[idx].find_all(class_="hardfact")
             url = "https://www.immowelt.de" + expose_ids[idx].find("a").get("href")
+            picture = expose_ids[idx].find("picture")
+            if picture is not None:
+                image = picture.find("img")['src']
+            else:
+                image = None
             address = expose_ids[idx].find(class_="listlocation")
             address.find("span").extract()
             address = address.text.strip()
@@ -69,13 +74,14 @@ class CrawlImmowelt:
 
             details = {
                 'id': int(expose_ids[idx].get("data-estateid")),
+                'image': image,
                 'url': url,
                 'title': title_el.text.strip(),
                 'price': price,
                 'size': size,
                 'rooms': rooms,
-                'address': address
-
+                'address': address,
+                'crawler': self.get_name()
             }
             entries.append(details)
 

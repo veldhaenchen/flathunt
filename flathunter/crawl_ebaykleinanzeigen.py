@@ -2,9 +2,9 @@ import logging
 import requests
 import re
 from bs4 import BeautifulSoup
+from flathunter.abstract_crawler import Crawler
 
-
-class CrawlEbayKleinanzeigen:
+class CrawlEbayKleinanzeigen(Crawler):
     __log__ = logging.getLogger(__name__)
     USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0'
     URL_PATTERN = re.compile(r'https://www\.ebay-kleinanzeigen\.de')
@@ -12,7 +12,7 @@ class CrawlEbayKleinanzeigen:
     def __init__(self):
         logging.getLogger("requests").setLevel(logging.WARNING)
 
-    def get_results(self, search_url):
+    def get_results(self, search_url, max_pages=None):
         self.__log__.debug("Got search URL %s" % search_url)
 
         soup = self.get_page(search_url)
@@ -47,6 +47,11 @@ class CrawlEbayKleinanzeigen:
             address = expose_ids[idx].find("div", {"class": "aditem-details"})
             address.find("strong").extract()
             address.find("br").extract()
+            image_element = expose_ids[idx].find("div", {"class": "srpimagebox"})
+            if image_element is not None:
+                image = image_element["data-imgsrc"]
+            else:
+                image = None
             self.__log__.debug(address.text.strip())
             address = address.text.strip()
             address = address.replace('\n', ' ').replace('\r', '')
@@ -65,12 +70,14 @@ class CrawlEbayKleinanzeigen:
                 self.__log__.debug("Quadratmeter nicht angegeben")
             details = {
                 'id': int(expose_ids[idx].get("data-adid")),
+                'image': image,
                 'url': url,
                 'title': title_el.text.strip(),
                 'price': price,
                 'size': size,
                 'rooms': rooms,
-                'address': address
+                'address': address,
+                'crawler': self.get_name()
             }
             entries.append(details)
 

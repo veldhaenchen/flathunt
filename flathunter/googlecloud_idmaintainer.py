@@ -35,7 +35,7 @@ class GoogleCloudIdMaintainer:
 
     def get_exposes_since(self, min_datetime):
         res = []
-        for doc in self.db.collection(u'exposes').order_by('created_sort').stream():
+        for doc in self.db.collection(u'exposes').order_by('created_sort').limit(100).stream():
             if doc.to_dict()[u'created_at'] < min_datetime:
                 break
             res.append(doc.to_dict())
@@ -43,7 +43,7 @@ class GoogleCloudIdMaintainer:
 
     def get_recent_exposes(self, count, filter=None):
         res = []
-        for doc in self.db.collection(u'exposes').order_by('created_sort').stream():
+        for doc in self.db.collection(u'exposes').order_by('created_sort').limit(100).stream():
             expose = doc.to_dict()
             if filter is None or filter.is_interesting_expose(expose):
                 res.append(expose)

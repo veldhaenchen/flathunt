@@ -14,9 +14,9 @@ class WebHunter(Hunter):
                        .build()
 
         processor_chain = ProcessorChain.builder(self.config) \
+                                        .apply_filter(filter) \
                                         .crawl_expose_details() \
                                         .save_all_exposes(self.id_watch) \
-                                        .apply_filter(filter) \
                                         .resolve_addresses() \
                                         .calculate_durations() \
                                         .build()

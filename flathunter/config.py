@@ -42,22 +42,5 @@ class Config:
 
     def get_filter(self):
         builder = Filter.builder()
-        if "excluded_titles" in self.config:
-            builder.title_filter(self.config["excluded_titles"])
-        if "filters" in self.config and self.config["filters"] is not None:
-            filters_config = self.config["filters"]
-            if "excluded_titles" in filters_config:
-                builder.title_filter(filters_config["excluded_titles"])
-            if "min_price" in filters_config:
-                builder.min_price_filter(filters_config["min_price"])
-            if "max_price" in filters_config:
-                builder.max_price_filter(filters_config["max_price"])
-            if "min_size" in filters_config:
-                builder.min_size_filter(filters_config["min_size"])
-            if "max_size" in filters_config:
-                builder.max_size_filter(filters_config["max_size"])
-            if "min_rooms" in filters_config:
-                builder.min_rooms_filter(filters_config["min_rooms"])
-            if "max_rooms" in filters_config:
-                builder.max_rooms_filter(filters_config["max_rooms"])
+        builder.read_config(self.config)
         return builder.build()

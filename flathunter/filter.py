@@ -121,7 +121,7 @@ class FilterBuilder:
     def read_config(self, config):
         if "excluded_titles" in config:
             self.filters.append(TitleFilter(config["excluded_titles"]))
-        if "filters" in config:
+        if "filters" in config and config["filters"] is not None:
             filters_config = config["filters"]
             if "excluded_titles" in filters_config:
                 self.filters.append(TitleFilter(filters_config["excluded_titles"]))

@@ -23,15 +23,15 @@ class User(dict):
             if field not in parameters:
                 raise AuthenticationError("Missing field: " + field)
 
-def auth_hash(params):
+def auth_hash(params, token):
     secret = hashlib.sha256()
-    secret.update(app.config['BOT_TOKEN'].encode('utf-8'))
+    secret.update(token.encode('utf-8'))
     sorted_params = collections.OrderedDict(sorted(params.items()))
     msg = "\n".join(["{}={}".format(k, v) for k, v in sorted_params.items()])
     return hmac.new(secret.digest(), msg.encode('utf-8'), digestmod=hashlib.sha256).hexdigest()
 
-def sign_hash(params):
-    params['hash'] = auth_hash(params)
+def sign_hash(params, token):
+    params['hash'] = auth_hash(params, token)
     return params
 
 def user_for_params(params):
@@ -39,11 +39,11 @@ def user_for_params(params):
         app.logger.warning("Got login request with no authentication hash")
         return None
     params_hash = params.pop('hash')
-    calculated_hash = auth_hash(params)
+    calculated_hash = auth_hash(params, app.config['BOT_TOKEN'])
 
     if params_hash == calculated_hash:
         return User(params)
-    app.logger.warning("Unable to authenticate user: " + params['username'] + " (exp: " + calculated_hash + ")")
+    app.logger.warning("Unable to authenticate user: " + str(params) + " (exp: " + calculated_hash + ")")
     return None
 
 def generate_dummy_login_url():
@@ -55,7 +55,7 @@ def generate_dummy_login_url():
             'last_name': 'Bourne',
             'photo_url': 'https://i.example.com/profile.jpg',
             'auth_date': 123455678
-        }))
+        }, app.config['BOT_TOKEN']))
 
 def filter_values_for_user():
     if 'user' not in session:
@@ -111,9 +111,15 @@ def logout():
 
 @app.route('/login_with_telegram')
 def login_with_telegram():
-    session['user'] = user_for_params(request.args.copy())
-    app.logger.info("User is: " + str(session['user']))
-    return redirect('/')
+    try:
+        user = user_for_params(request.args.copy())
+        if user is not None:
+            session['user'] = user
+            app.logger.info("User is: " + str(session['user']))
+        return redirect('/')
+    except AuthenticationError as e:
+        app.logger.error('Invalid login attempt', request.args)
+        return redirect('/')
 
 @app.route('/filter', methods=['POST'])
 def update_filter():

@@ -57,6 +57,39 @@ def test_hunt_with_users(hunt_client, **kwargs):
     rv = hunt_client.get('/')
     assert b'<div class="expose">' in rv.data
 
+@requests_mock.Mocker(kw='m')
+def test_hunt_via_post(hunt_client, **kwargs):
+    m = kwargs['m']
+    mock_response = '{"ok":true,"result":{"message_id":456,"from":{"id":1,"is_bot":true,"first_name":"Wohnbot","username":"wohnung_search_bot"},"chat":{"id":5,"first_name":"Arthur","last_name":"Taylor","type":"private"},"date":1589813130,"text":"hello arthur"}}'
+    for title in [ 'wg', 'ruhig', 'gruen', 'tausch', 'flat' ]:
+        m.get('https://api.telegram.org/bot1234xxx.12345/sendMessage?chat_id=1234&text=Great+flat+' + title + '+terrible+landlord', text=mock_response)
+    app.config['HUNTER'].set_filters_for_user(1234, {})
+    assert app.config['HUNTER'].get_filters_for_user(1234) == {}
+    rv = hunt_client.get('/hunt')
+    assert '<div class="expose">' in json.loads(rv.data)['body']
+
+def test_update_filters(hunt_client):
+    rv = hunt_client.get('/login_with_telegram?id=1234&first_name=Jason&last_name=Bourne&username=mattdamon&photo_url=https%3A%2F%2Fi.example.com%2Fprofile.jpg&auth_date=123455678&hash=c691a55de4e28b341ccd0b793d4ca17f09f6c87b28f8a893621df81475c25952')
+    assert rv.status_code == 302
+    assert rv.headers['location'] == 'http://localhost/'
+    assert 'user' in session
+    rv = hunt_client.post('/filter', data = { 'b': '3' })
+    assert app.config['HUNTER'].get_filters_for_user(1234) == { 'b': 3.0 }
+
+def test_update_filters_not_logged_in(hunt_client):
+    rv = hunt_client.post('/filter', data = { 'b': '3' })
+    assert 'user' not in session
+    assert app.config['HUNTER'].get_filters_for_user(1234) is None
+
+def test_index_logged_in_with_filters(hunt_client):
+    rv = hunt_client.get('/login_with_telegram?id=1234&first_name=Jason&last_name=Bourne&username=mattdamon&photo_url=https%3A%2F%2Fi.example.com%2Fprofile.jpg&auth_date=123455678&hash=c691a55de4e28b341ccd0b793d4ca17f09f6c87b28f8a893621df81475c25952')
+    assert rv.status_code == 302
+    assert rv.headers['location'] == 'http://localhost/'
+    assert 'user' in session
+    hunt_client.post('/filter', data = { 'max_size': '35' })
+    rv = hunt_client.get('/')
+    assert b'<input type="text" name="max_size" value="35">' in rv.data
+
 def test_login_with_telegram(hunt_client):
     rv = hunt_client.get('/login_with_telegram?id=1234&first_name=Jason&last_name=Bourne&username=mattdamon&photo_url=https%3A%2F%2Fi.example.com%2Fprofile.jpg&auth_date=123455678&hash=c691a55de4e28b341ccd0b793d4ca17f09f6c87b28f8a893621df81475c25952')
     assert rv.status_code == 302
@@ -69,5 +102,24 @@ def test_login_with_invalid_url(hunt_client):
     rv = hunt_client.get('/login_with_telegram?username=mattdamon&id=1234&first_name=Jason&last_name=Bourne&photo_url=https%3A%2F%2Fi.example.com%2Fprofile.jpg&auth_date=123455678')
     assert rv.status_code == 302
     assert rv.headers['location'] == 'http://localhost/'
+    assert 'user' not in session
+
+def test_login_with_missing_params(hunt_client):
+    rv = hunt_client.get('/login_with_telegram?id=1234&hash=5f9093d108df178489e3235dbcff7251690852172e8e79bbaf753fd79e59f580')
+    assert rv.status_code == 302
+    assert rv.headers['location'] == 'http://localhost/'
+    assert 'user' not in session
+
+def test_login_with_invalid_hash(hunt_client):
+    rv = hunt_client.get('/login_with_telegram?id=1234&first_name=Jason&last_name=Bourne&username=mattdamon&photo_url=https%3A%2F%2Fi.example.com%2Fprofile.jpg&auth_date=123455678&hash=0091a55de4e28b341ccd0b793d4ca17f09f6c87b28f8a893621df81475c25900')
+    assert rv.status_code == 302
+    assert rv.headers['location'] == 'http://localhost/'
+    assert 'user' not in session
+
+def test_logout(hunt_client):
+    rv = hunt_client.get('/login_with_telegram?id=1234&first_name=Jason&last_name=Bourne&username=mattdamon&photo_url=https%3A%2F%2Fi.example.com%2Fprofile.jpg&auth_date=123455678&hash=c691a55de4e28b341ccd0b793d4ca17f09f6c87b28f8a893621df81475c25952')
+    assert rv.status_code == 302
+    assert rv.headers['location'] == 'http://localhost/'
     assert 'user' in session
-    assert session['user'] is None
+    rv = hunt_client.get('/logout')
+    assert 'user' not in session

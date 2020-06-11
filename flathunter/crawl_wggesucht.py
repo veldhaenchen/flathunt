@@ -59,20 +59,26 @@ class CrawlWgGesucht(Crawler):
             numbers_row = row.find("div", { "class": "middle" })
             price = numbers_row.find("div", { "class": "col-xs-3" }).text.strip()
             rooms = re.findall(r'\d Zimmer', details_array[0])[0][:1]
-            date = re.findall(r'\d{2}.\d{2}.\d{4}', numbers_row.find("div", { "class": "text-center" }).text)[0]
+            dates = re.findall(r'\d{2}.\d{2}.\d{4}', numbers_row.find("div", { "class": "text-center" }).text)
             size = re.findall(r'\d{2,4}\sm²', numbers_row.find("div", { "class": "text-right" }).text)[0]
 
             details = {
                 'id': int(url.split('.')[-2]),
                 'image': image,
                 'url': url,
-                'title': "%s ab dem %s" % (title, date),
+                'title': "%s ab dem %s" % (title, dates[0]),
                 'price': price,
                 'size': size,
-                'rooms': rooms + " Zi.",
+                'rooms': rooms,
                 'address': url,
                 'crawler': self.get_name()
             }
+            if len(dates) == 2:
+                details['from'] = dates[0]
+                details['to'] = dates[1]
+            elif len(dates) == 1:
+                details['from'] = dates[0]
+
             entries.append(details)
 
         self.__log__.debug('extracted: ' + str(entries))

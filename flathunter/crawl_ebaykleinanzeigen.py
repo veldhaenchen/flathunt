@@ -1,6 +1,7 @@
 import logging
 import requests
 import re
+import datetime
 from bs4 import BeautifulSoup
 from flathunter.abstract_crawler import Crawler
 
@@ -8,6 +9,20 @@ class CrawlEbayKleinanzeigen(Crawler):
     __log__ = logging.getLogger(__name__)
     USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0'
     URL_PATTERN = re.compile(r'https://www\.ebay-kleinanzeigen\.de')
+    MONTHS = {
+      "Januar": "01",
+      "Februar": "02",
+      "März": "03",
+      "April": "04",
+      "Mai": "05",
+      "Juni": "06",
+      "Juli": "07",
+      "August": "08",
+      "September": "09",
+      "Oktober": "10",
+      "November": "11",
+      "Dezember": "12"
+    }
 
     def __init__(self):
         logging.getLogger("requests").setLevel(logging.WARNING)
@@ -28,6 +43,17 @@ class CrawlEbayKleinanzeigen(Crawler):
         if resp.status_code != 200:
             self.__log__.error("Got response (%i): %s" % (resp.status_code, resp.content))
         return BeautifulSoup(resp.content, 'html.parser')
+
+    def get_expose_details(self, expose):
+        soup = self.get_page(expose['url'])
+        for detail in soup.find_all('li', { "class": "addetailslist--detail" }):
+            if re.match(r'Verfügbar ab', detail.text):
+                date_string = re.match(r'(\w+) (\d{4})', detail.text)
+                if date_string is not None:
+                    expose['from'] = "01." + self.MONTHS[date_string[1]] + "." + date_string[2]
+        if 'from' not in expose:
+            expose['from'] = datetime.datetime.now().strftime('%02d.%02m.%Y')
+        return expose
 
     def extract_data(self, soup):
         entries = list()
@@ -57,14 +83,14 @@ class CrawlEbayKleinanzeigen(Crawler):
             address = address.replace('\n', ' ').replace('\r', '')
             address = " ".join(address.split())
             try:
-                self.__log__.debug(tags[0].text)
-                rooms = tags[0].text
+                self.__log__.debug(tags[1].text)
+                rooms = re.match(r'(\d+)', tags[1].text)[1]
             except IndexError:
                 self.__log__.debug("Keine Zimmeranzahl gegeben")
                 rooms = "Nicht gegeben"
             try:
-                self.__log__.debug(tags[1].text)
-                size = tags[1].text
+                self.__log__.debug(tags[0].text)
+                size = tags[0].text
             except IndexError:
                 size = "Nicht gegeben"
                 self.__log__.debug("Quadratmeter nicht angegeben")

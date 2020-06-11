@@ -26,12 +26,10 @@ class AlreadySeenFilter:
 
     def __init__(self, id_watch):
         self.id_watch = id_watch
-        self.processed = self.id_watch.get()
 
     def is_interesting(self, expose):
-        if expose['id'] not in self.processed:
+        if not self.id_watch.is_processed(expose['id']):
             self.id_watch.mark_processed(expose['id'])
-            self.processed.append(expose['id'])
             return True
         return False
 
@@ -58,6 +56,13 @@ class IdMaintainer:
                 self.__log__.error("Error %s:" % e.args[0])
                 raise e
         return connection
+
+    def is_processed(self, expose_id):
+        self.__log__.debug('is_processed(' + str(expose_id) + ')')
+        cur = self.get_connection().cursor()
+        cur.execute('SELECT id FROM processed WHERE id = ?', (expose_id,))
+        row = cur.fetchone()
+        return (row is not None)
 
     def mark_processed(self, expose_id):
         self.__log__.debug('mark_processed(' + str(expose_id) + ')')
@@ -109,20 +114,6 @@ class IdMaintainer:
         res = []
         for row in cur.fetchall():
             res.append((row[0], json.loads(row[1])['filters']))
-        return res
-
-    def get(self):
-        res = []
-        cur = self.get_connection().cursor()
-        cur.execute("SELECT * FROM processed ORDER BY 1")
-        while True:
-            row = cur.fetchone()
-            if row == None:
-                break
-            res.append(row[0])
-
-        self.__log__.info('already processed: ' + str(len(res)))
-        self.__log__.debug(str(res))
         return res
 
     def get_last_run_time(self):

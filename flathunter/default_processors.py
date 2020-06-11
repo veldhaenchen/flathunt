@@ -27,6 +27,17 @@ class AddressResolver(Processor):
                     break
         return expose
 
+class CrawlExposeDetails(Processor):
+
+    def __init__(self, config):
+        self.config = config
+
+    def process_expose(self, expose):
+        for searcher in self.config.searchers():
+            if re.search(searcher.URL_PATTERN, expose['url']):
+                expose = searcher.get_expose_details(expose)
+        return expose
+
 class LambdaProcessor(Processor):
 
     def __init__(self, config, func):

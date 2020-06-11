@@ -23,6 +23,11 @@ class GoogleCloudIdMaintainer:
         self.__log__.debug('mark_processed(' + str(expose_id) + ')')
         self.db.collection(u'processed').document(str(expose_id)).set({ u'id': expose_id })
 
+    def is_processed(self, expose_id):
+        self.__log__.debug('is_processed(' + str(expose_id) + ')')
+        doc = self.db.collection(u'processed').document(str(expose_id))
+        return doc.get().exists
+
     def save_expose(self, expose):
         record = expose.copy()
         record.update({ 'created_at': datetime.datetime.now(), 'created_sort': (0 - datetime.datetime.now().timestamp()) })
@@ -30,7 +35,7 @@ class GoogleCloudIdMaintainer:
 
     def get_exposes_since(self, min_datetime):
         res = []
-        for doc in self.db.collection(u'exposes').order_by('created_sort').stream():
+        for doc in self.db.collection(u'exposes').order_by('created_sort').limit(100).stream():
             if doc.to_dict()[u'created_at'] < min_datetime:
                 break
             res.append(doc.to_dict())
@@ -38,7 +43,7 @@ class GoogleCloudIdMaintainer:
 
     def get_recent_exposes(self, count, filter=None):
         res = []
-        for doc in self.db.collection(u'exposes').order_by('created_sort').stream():
+        for doc in self.db.collection(u'exposes').order_by('created_sort').limit(100).stream():
             expose = doc.to_dict()
             if filter is None or filter.is_interesting_expose(expose):
                 res.append(expose)
@@ -64,15 +69,6 @@ class GoogleCloudIdMaintainer:
             settings = doc.to_dict()
             if 'filters' in settings:
                 res.append((int(doc.id), settings['filters']))
-        return res
-
-    def get(self):
-        res = []
-        for doc in self.db.collection(u'processed').stream():
-            res.append(doc.to_dict()[u'id'])
-
-        self.__log__.info('already processed: ' + str(len(res)))
-        self.__log__.debug(str(res))
         return res
 
     def get_last_run_time(self):

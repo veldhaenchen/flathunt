@@ -11,12 +11,35 @@ urls:
   - https://www.immowelt.de/liste/berlin/wohnungen/mieten?roomi=2&prima=1500&wflmi=70&sort=createdate%2Bdesc
     """
 
-    FILTERS_CONFIG = """
+    EMPTY_FILTERS_CONFIG = """
 urls:
   - https://www.immowelt.de/liste/berlin/wohnungen/mieten?roomi=2&prima=1500&wflmi=70&sort=createdate%2Bdesc
 
 filters:
 
+"""
+
+    LEGACY_FILTERS_CONFIG = """
+urls:
+  - https://www.immowelt.de/liste/berlin/wohnungen/mieten?roomi=2&prima=1500&wflmi=70&sort=createdate%2Bdesc
+
+excluded_titles:
+
+"""
+
+    FILTERS_CONFIG = """
+urls:
+  - https://www.immowelt.de/liste/berlin/wohnungen/mieten?roomi=2&prima=1500&wflmi=70&sort=createdate%2Bdesc
+
+filters:
+    excluded_titles:
+        - fish
+    min_size: 30
+    max_size: 100
+    min_price: 500
+    max_price: 1500
+    min_rooms: 2
+    max_rooms: 5
 """
 
     def test_loads_config(self):
@@ -40,6 +63,19 @@ filters:
        self.assertTrue(len(config.get('urls')) > 0, "Expected URLs in config file")
 
     def test_loads_config_from_string(self):
+       config = Config(string=self.EMPTY_FILTERS_CONFIG)
+       self.assertIsNotNone(config)
+       my_filter = config.get_filter()
+       self.assertIsNotNone(my_filter)
+
+    def test_loads_legacy_config_from_string(self):
+       config = Config(string=self.LEGACY_FILTERS_CONFIG)
+       self.assertIsNotNone(config)
+       my_filter = config.get_filter()
+       self.assertIsNotNone(my_filter)
+       self.assertTrue(len(my_filter.filters) > 0)
+
+    def test_loads_filters_config_from_string(self):
        config = Config(string=self.FILTERS_CONFIG)
        self.assertIsNotNone(config)
        my_filter = config.get_filter()

@@ -76,9 +76,13 @@ class IdMaintainer:
         self.get_connection().commit()
 
     def get_exposes_since(self, min_datetime):
+        def row_to_expose(row):
+            obj = json.loads(row[2])
+            obj['created_at'] = row[0]
+            return obj
         cur = self.get_connection().cursor()
         cur.execute('SELECT created, crawler, details FROM exposes WHERE created >= ? ORDER BY created DESC', (min_datetime,))
-        return list(map(lambda t: json.loads(t[2]), cur.fetchall()))
+        return list(map(lambda t: row_to_expose(t), cur.fetchall()))
 
     def get_recent_exposes(self, count, filter=None):
         cur = self.get_connection().cursor()

@@ -53,24 +53,19 @@ class GoogleCloudIdMaintainer:
                     break
         return res
 
-    def set_filters_for_user(self, user_id, filters):
-        self.db.collection(u'users').document(str(user_id)).set({ 'filters' : filters })
-
-    def get_filters_for_user(self, user_id):
+    def get_settings_for_user(self, user_id):
         doc = self.db.collection(u'users').document(str(user_id)).get()
-        settings = doc.to_dict()
-        if settings is None:
-            return None
-        if 'filters' in settings:
-            return settings['filters']
-        return None
+        return doc.to_dict()
 
-    def get_user_filters(self):
+    def save_settings_for_user(self, user_id, settings):
+        self.db.collection(u'users').document(str(user_id)).set(settings)
+
+    def get_user_settings(self):
         res = []
         for doc in self.db.collection(u'users').stream():
             settings = doc.to_dict()
-            if 'filters' in settings:
-                res.append((int(doc.id), settings['filters']))
+            if settings is not None:
+                res.append((int(doc.id), settings))
         return res
 
     def get_last_run_time(self):

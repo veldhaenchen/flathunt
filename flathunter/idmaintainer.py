@@ -99,25 +99,25 @@ class IdMaintainer:
                 res.append(expose)
         return res
 
-    def set_filters_for_user(self, user_id, filters):
+    def save_settings_for_user(self, user_id, settings):
         cur = self.get_connection().cursor()
-        cur.execute('INSERT OR REPLACE INTO users VALUES (?, ?)', (user_id, json.dumps({ 'filters': filters })))
+        cur.execute('INSERT OR REPLACE INTO users VALUES (?, ?)', (user_id, json.dumps(settings)))
         self.get_connection().commit()
 
-    def get_filters_for_user(self, user_id):
+    def get_settings_for_user(self, user_id):
         cur = self.get_connection().cursor()
         cur.execute('SELECT settings FROM users WHERE id = ?', (user_id,))
         row = cur.fetchone()
         if row == None:
             return None
-        return json.loads(row[0])['filters']
+        return json.loads(row[0])
 
-    def get_user_filters(self):
+    def get_user_settings(self):
         cur = self.get_connection().cursor()
         cur.execute('SELECT id, settings FROM users')
         res = []
         for row in cur.fetchall():
-            res.append((row[0], json.loads(row[1])['filters']))
+            res.append((row[0], json.loads(row[1])))
         return res
 
     def get_last_run_time(self):

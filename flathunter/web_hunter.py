@@ -41,6 +41,9 @@ class WebHunter(Hunter):
     def get_recent_exposes(self, count=9, filter=None):
         return self.id_watch.get_recent_exposes(count, filter=filter)
 
+    def get_exposes_since(self, datetime):
+        return self.id_watch.get_exposes_since(datetime)
+
     def set_filters_for_user(self, user_id, filters):
         self.id_watch.set_filters_for_user(user_id, filters)
 

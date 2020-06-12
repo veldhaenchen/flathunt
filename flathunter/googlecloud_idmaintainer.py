@@ -2,6 +2,7 @@ import logging
 import firebase_admin
 import traceback
 import datetime
+import pytz
 from firebase_admin import credentials
 from firebase_admin import firestore
 
@@ -30,13 +31,14 @@ class GoogleCloudIdMaintainer:
 
     def save_expose(self, expose):
         record = expose.copy()
-        record.update({ 'created_at': datetime.datetime.now(), 'created_sort': (0 - datetime.datetime.now().timestamp()) })
+        record.update({ 'created_at': pytz.UTC.localize(datetime.datetime.now()), 'created_sort': (0 - datetime.datetime.now().timestamp()) })
         self.db.collection(u'exposes').document(str(expose[u'id'])).set(record)
 
     def get_exposes_since(self, min_datetime):
+        localized_datetime = min_datetime.replace(tzinfo=pytz.UTC)
         res = []
-        for doc in self.db.collection(u'exposes').order_by('created_sort').limit(100).stream():
-            if doc.to_dict()[u'created_at'] < min_datetime:
+        for doc in self.db.collection(u'exposes').order_by('created_sort').limit(10000).stream():
+            if doc.to_dict()[u'created_at'] < localized_datetime:
                 break
             res.append(doc.to_dict())
         return res

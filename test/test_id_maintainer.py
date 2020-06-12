@@ -82,6 +82,7 @@ def test_exposes_are_returned_as_dictionaries():
     assert len(saved) > 0
     expose = saved[0]
     assert expose['title'] is not None
+    assert expose['created_at'] is not None
 
 def test_exposes_are_returned_with_limit():
     config = Config(string=IdMaintainerTest.CONFIG_WITH_FILTERS)

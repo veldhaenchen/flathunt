@@ -67,6 +67,7 @@ def test_exposes_are_returned_as_dictionaries(id_watch):
     assert len(saved) > 0
     expose = saved[0]
     assert expose['title'] is not None
+    assert expose['created_at'] is not None
 
 def test_exposes_are_returned_with_limit(id_watch):
     config = Config(string=CONFIG_WITH_FILTERS)

@@ -2,11 +2,11 @@ import collections
 import hmac
 import hashlib
 import datetime
-import numbers
 import re
 from urllib import parse
 
 from flathunter.web import app
+from flathunter.web.util import sanitize_float
 from flathunter.filter import FilterBuilder
 from flask import render_template, jsonify, request, session, redirect
 from flask_api import status
@@ -74,14 +74,6 @@ def form_filter_values():
         for field in [ 'max_price', 'min_price', 'max_size', 'min_size', 'max_rooms', 'min_rooms' ]:
             values[field] = int(filters[field]) if field in filters else ""
     return values
-
-def sanitize_float(f):
-    if isinstance(f, numbers.Number):
-        return float(f)
-    digits = re.match(r'\d+', f)
-    if digits is None:
-        return None
-    return float(digits[0])
 
 @app.route('/index')
 @app.route('/')

@@ -1,5 +1,9 @@
 {% extends 'layout.html' %}
 
+{% block title %}
+Home
+{% endblock %}
+
 {% block content %}
 {% if session['user'] %}
   <div class="search_form">

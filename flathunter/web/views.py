@@ -75,6 +75,11 @@ def form_filter_values():
             values[field] = int(filters[field]) if field in filters else ""
     return values
 
+def notifications_muted_for_user():
+    if 'user' not in session:
+        return None
+    return app.config["HUNTER"].notifications_muted_for_user(session['user']['id'])
+
 @app.route('/index')
 @app.route('/')
 def index():
@@ -87,7 +92,7 @@ def index():
         title="Home", exposes=hunter.get_recent_exposes(filter=filter), last_run=hunter.get_last_run_time(),
         bot_name=bot_name, domain=domain,
         login_url=generate_dummy_login_url(),
-        filters=form_values)
+        filters=form_values, notifications_enabled=(not notifications_muted_for_user()))
 
 # Accept GET requests here to support Google Cloud Cron calls
 @app.route('/hunt', methods=['GET','POST'])
@@ -112,6 +117,14 @@ def login_with_telegram():
     except AuthenticationError as e:
         app.logger.error('Invalid login attempt', request.args)
         return redirect('/')
+
+@app.route('/toggle_notifications', methods=['POST'])
+def toggle_notifications():
+    if 'user' not in session:
+        return jsonify(status="Not found", message="Not logged in"), status.HTTP_404_NOT_FOUND
+    notifications_enabled = app.config["HUNTER"].toggle_notification_status(session['user']['id'])
+    app.logger.info("Notifications enabled for user toggled to: " + str(notifications_enabled))
+    return jsonify(status="Updated", notifications_enabled=notifications_enabled), status.HTTP_201_CREATED
 
 @app.route('/filter', methods=['POST'])
 def update_filter():

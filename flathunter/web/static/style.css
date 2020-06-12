@@ -118,7 +118,7 @@ div.center_button {
   justify-content: center;
 }
 
-button.login_telegram {
+button {
   font-size: 16px;
   line-height: 20px;
   padding: 9px 21px 11px;
@@ -130,17 +130,24 @@ button.login_telegram {
   vertical-align: top;
 }
 
+button.login_telegram {
+}
+
 button.set_search_criteria {
-  font-size: 16px;
-  line-height: 20px;
-  padding: 9px 21px 11px;
-  border-radius: 20px;
-  background-color: #54a9eb;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  vertical-align: top;
   margin-top: 20px;
+}
+
+button.toggle_notification {
+  margin-top: 20px;
+  margin-left: 20px;
+}
+
+button.toggle_notification.enabled {
+  background-color: red;
+}
+
+button.toggle_notification.disabled {
+  background-color: green;
 }
 
 i.telegram_icon {

@@ -42,6 +42,11 @@ Home
       </div>
       <div class="center_button">
         <button class="set_search_criteria">Set search criteria</button>
+        {% if notifications_enabled %}
+          <button type="button" class="toggle_notification enabled" onclick="toggle_notification()">Disable notifications</button>
+        {% else %}
+          <button type="button" class="toggle_notification disabled" onclick="toggle_notification()">Enable notifications</button>
+        {% endif %}
       </div>
     </form>
   </div>
@@ -82,6 +87,29 @@ Home
 </div>
 
 <script>
+
+function toggle_notification() {
+  const button = document.getElementsByClassName("toggle_notification")[0]
+  var xhr = new XMLHttpRequest();
+  xhr.addEventListener("load", function() {
+    if (xhr.status != 201) {
+      console.log("Error toggling notification status: " + xhr.status);
+    } else {
+      const response = JSON.parse(xhr.response);
+      if (response.notifications_enabled) {
+        button.classList.add("enabled");
+        button.classList.remove("disabled");
+        button.innerHTML = "Disable notifications";
+      } else {
+        button.classList.add("disabled");
+        button.classList.remove("enabled");
+        button.innerHTML = "Enable notifications";
+      }
+    }
+  });
+  xhr.open("POST", "/toggle_notifications");
+  xhr.send();
+}
 
 function hunt_flats() {
   if (document.getElementsByClassName("hunt-button")[0].classList.contains("disabled")) {

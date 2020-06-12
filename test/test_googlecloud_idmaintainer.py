@@ -6,6 +6,7 @@ from mockfirestore import MockFirestore
 from flathunter.googlecloud_idmaintainer import GoogleCloudIdMaintainer
 from flathunter.config import Config
 from flathunter.hunter import Hunter
+from flathunter.web_hunter import WebHunter
 from flathunter.filter import Filter
 from dummy_crawler import DummyCrawler
 from test_util import count
@@ -93,15 +94,21 @@ def test_exposes_are_returned_filtered(id_watch):
 
 def test_filters_for_user_are_saved(id_watch):
     filter = { 'fish': 'cat' }
-    id_watch.set_filters_for_user(123, filter)
-    assert id_watch.get_filters_for_user(123) == filter
+    config = Config(string=CONFIG_WITH_FILTERS)
+    hunter = WebHunter(config, id_watch)
+    hunter.set_filters_for_user(123, filter)
+    assert hunter.get_filters_for_user(123) == filter
 
 def test_filters_for_user_returns_none_if_none_present(id_watch):
-    assert id_watch.get_filters_for_user(123) == None
-    assert id_watch.get_filters_for_user(None) == None
+    config = Config(string=CONFIG_WITH_FILTERS)
+    hunter = WebHunter(config, id_watch)
+    assert hunter.get_filters_for_user(123) == None
+    assert hunter.get_filters_for_user(None) == None
 
 def test_all_filters_can_be_loaded(id_watch):
     filter = { 'fish': 'cat' }
-    id_watch.set_filters_for_user(123, filter)
-    id_watch.set_filters_for_user(124, filter)
-    assert id_watch.get_user_filters() == [ (123, filter), (124, filter) ]
+    config = Config(string=CONFIG_WITH_FILTERS)
+    hunter = WebHunter(config, id_watch)
+    hunter.set_filters_for_user(123, filter)
+    hunter.set_filters_for_user(124, filter)
+    assert id_watch.get_user_settings() == [ (123, { 'filters': filter }), (124, { 'filters': filter }) ]

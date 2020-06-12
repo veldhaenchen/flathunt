@@ -8,35 +8,33 @@ Home
 {% if session['user'] %}
   <div class="search_form">
     <form method="post" action="/filter">
-      <div class="form_holder">
-        <div class="form_column">
-          <div class="form_input">
-            <p>Max price</p>
-            <input type="text" name="max_price" value="{{ filters['max_price'] }}"></input>
+      <div class="container">
+        <div class="form-row col-sm-9 mx-auto">
+          <div class="form-group col-sm-4">
+            <label for="max_price">Max price</label>
+            <input type="text" class="form-control" id="max_price" name="max_price" placeholder="any" value="{{ filters['max_price'] }}">
           </div>
-          <div class="form_input">
-            <p>Min price</p>
-            <input type="text" name="min_price" value="{{ filters['min_price'] }}"></input>
+          <div class="form-group col-sm-4">
+            <label for="max_size">Max size</label>
+            <input type="text" class="form-control" id="max_size" name="max_size" placeholder="any" value="{{ filters['max_size'] }}">
           </div>
-        </div>
-        <div class="form_column">
-          <div class="form_input">
-            <p>Max size</p>
-            <input type="text" name="max_size" value="{{ filters['max_size'] }}"></input>
-          </div>
-          <div class="form_input">
-            <p>Min size</p>
-            <input type="text" name="min_size" value="{{ filters['min_size'] }}"></input>
+          <div class="form-group col-sm-4">
+            <label for="max_rooms">Max rooms</label>
+            <input type="text" class="form-control" id="max_rooms" name="max_rooms" placeholder="any" value="{{ filters['max_rooms'] }}">
           </div>
         </div>
-        <div class="form_column">
-          <div class="form_input">
-            <p>Max rooms</p>
-            <input type="text" name="max_rooms" value="{{ filters['max_rooms'] }}"></input>
+        <div class="form-row col-sm-9 mx-auto">
+          <div class="form-group col-sm-4">
+            <label for="min_price">Min price</label>
+            <input type="text" class="form-control" id="min_price" name="min_price" placeholder="any" value="{{ filters['min_price'] }}">
           </div>
-          <div class="form_input">
-            <p>Min rooms</p>
-            <input type="text" name="min_rooms" value="{{ filters['min_rooms'] }}"></input>
+          <div class="form-group col-sm-4">
+            <label for="min_size">Min size</label>
+            <input type="text" class="form-control" id="min_size" name="min_size" placeholder="any" value="{{ filters['min_size'] }}">
+          </div>
+          <div class="form-group col-sm-4">
+            <label for="min_rooms">Min rooms</label>
+            <input type="text" class="form-control" id="min_rooms" name="min_rooms" placeholder="any" value="{{ filters['min_rooms'] }}">
           </div>
         </div>
       </div>
@@ -51,12 +49,16 @@ Home
     </form>
   </div>
 {% else %}
-  <div class="intro">
-  <p>Flathunter helps you find somewhere to live in Germany, by periodically fetching apartment listings from the major property portals (ImmoScout, ImmoWelt, Ebay Kleinanzeigen and WG Gesucht) and sending the details of apartments that match your criteria to you in a Telegram message.</p>
+  <div class="container">
+    <div class="row">
+      <div class="intro col-sm-9 mx-auto">
+        <p>Flathunter helps you find somewhere to live in Germany, by periodically fetching apartment listings from the major property portals (ImmoScout, ImmoWelt, Ebay Kleinanzeigen and WG Gesucht) and sending the details of apartments that match your criteria to you in a Telegram message.</p>
+      </div>
+    </div>
   </div>
 {% endif %}
 
-<div id="expose_partial">
+<div id="expose_partial" class="container">
 {% include "exposes.html" %}
 </div>
 
@@ -80,7 +82,6 @@ Home
 {% endif %}
 
 <div class="button-holder">
-  <div onclick="hunt_flats()" class="hunt-button">Trigger Appartment Search</div>
   <div>
     <p class="status-text">Last run: <span id="last-run">{{ last_run }}</span></p>
   </div>
@@ -109,26 +110,6 @@ function toggle_notification() {
   });
   xhr.open("POST", "/toggle_notifications");
   xhr.send();
-}
-
-function hunt_flats() {
-  if (document.getElementsByClassName("hunt-button")[0].classList.contains("disabled")) {
-    return;
-  }
-  var xhr = new XMLHttpRequest();
-  xhr.addEventListener("load", function() {
-    if (xhr.status != 201) {
-      console.log("Error starting hunt: " + xhr.status);
-    } else {
-      document.getElementsByClassName("hunt-button")[0].classList.remove("disabled");
-      const response = JSON.parse(xhr.response);
-      document.getElementById("last-run").innerHTML = response.completedAt;
-      document.getElementById("expose_partial").innerHTML = response.body;
-    }
-  });
-  xhr.open("POST", "/hunt");
-  xhr.send();
-  document.getElementsByClassName("hunt-button")[0].classList.add("disabled");
 }
 
 </script>

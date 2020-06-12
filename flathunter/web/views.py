@@ -94,6 +94,10 @@ def index():
         login_url=generate_dummy_login_url(),
         filters=form_values, notifications_enabled=(not notifications_muted_for_user()))
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
 # Accept GET requests here to support Google Cloud Cron calls
 @app.route('/hunt', methods=['GET','POST'])
 def hunt():

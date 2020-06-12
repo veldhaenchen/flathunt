@@ -38,12 +38,16 @@ def hunt_client():
 
 def test_get_index(hunt_client):
     rv = hunt_client.get('/')
-    assert b'<h1>Flathunter</h1>' in rv.data
+    assert b'<a class="navbar-brand" href="/">Flathunter</a>' in rv.data
+
+def test_get_about(hunt_client):
+    rv = hunt_client.get('/about')
+    assert b'<a class="navbar-brand" href="/">Flathunter</a>' in rv.data
 
 def test_get_index_with_exposes(hunt_client):
     app.config['HUNTER'].hunt_flats()
     rv = hunt_client.get('/')
-    assert b'<div class="expose">' in rv.data
+    assert b'<div class="expose' in rv.data
 
 @requests_mock.Mocker(kw='m')
 def test_hunt_with_users(hunt_client, **kwargs):
@@ -55,7 +59,7 @@ def test_hunt_with_users(hunt_client, **kwargs):
     assert app.config['HUNTER'].get_filters_for_user(1234) == {}
     app.config['HUNTER'].hunt_flats()
     rv = hunt_client.get('/')
-    assert b'<div class="expose">' in rv.data
+    assert b'<div class="expose' in rv.data
 
 @requests_mock.Mocker(kw='m')
 def test_hunt_via_post(hunt_client, **kwargs):
@@ -66,7 +70,7 @@ def test_hunt_via_post(hunt_client, **kwargs):
     app.config['HUNTER'].set_filters_for_user(1234, {})
     assert app.config['HUNTER'].get_filters_for_user(1234) == {}
     rv = hunt_client.get('/hunt')
-    assert '<div class="expose">' in json.loads(rv.data)['body']
+    assert '<div class="expose' in json.loads(rv.data)['body']
 
 @requests_mock.Mocker(kw='m')
 def test_do_not_send_messages_if_notifications_disabled(hunt_client, **kwargs):
@@ -79,7 +83,7 @@ def test_do_not_send_messages_if_notifications_disabled(hunt_client, **kwargs):
     rv = hunt_client.post('/toggle_notifications')
     assert rv.status_code == 201
     rv = hunt_client.get('/hunt')
-    assert '<div class="expose">' in json.loads(rv.data)['body']
+    assert '<div class="expose' in json.loads(rv.data)['body']
 
 def test_toggle_notification_status_when_logged_out_fails(hunt_client):
     rv = hunt_client.post('/toggle_notifications')
@@ -118,7 +122,7 @@ def test_index_logged_in_with_filters(hunt_client):
     assert 'user' in session
     hunt_client.post('/filter', data = { 'max_size': '35' })
     rv = hunt_client.get('/')
-    assert b'<input type="text" name="max_size" value="35">' in rv.data
+    assert b'<input type="text" class="form-control" id="max_size" name="max_size" placeholder="any" value="35">' in rv.data
 
 def test_login_with_telegram(hunt_client):
     rv = hunt_client.get('/login_with_telegram?id=1234&first_name=Jason&last_name=Bourne&username=mattdamon&photo_url=https%3A%2F%2Fi.example.com%2Fprofile.jpg&auth_date=123455678&hash=c691a55de4e28b341ccd0b793d4ca17f09f6c87b28f8a893621df81475c25952')

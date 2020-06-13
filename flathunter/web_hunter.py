@@ -79,4 +79,7 @@ class WebHunter(Hunter):
         return not notifications_enabled
 
     def notifications_muted_for_user(self, user_id):
-        return ('mute_notifications' in self.id_watch.get_settings_for_user(user_id))
+        settings = self.id_watch.get_settings_for_user(user_id)
+        if settings is None:
+            return False
+        return ('mute_notifications' in settings)

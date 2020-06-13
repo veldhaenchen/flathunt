@@ -76,6 +76,14 @@ def test_hunt_via_post(hunt_client, **kwargs):
     rv = hunt_client.get('/hunt')
     assert '<div class="expose' in json.loads(rv.data)['body']
 
+def test_render_index_after_login(hunt_client):
+    rv = hunt_client.get('/login_with_telegram?id=1234&first_name=Jason&last_name=Bourne&username=mattdamon&photo_url=https%3A%2F%2Fi.example.com%2Fprofile.jpg&auth_date=123455678&hash=c691a55de4e28b341ccd0b793d4ca17f09f6c87b28f8a893621df81475c25952')
+    assert rv.status_code == 302
+    assert rv.headers['location'] == 'http://localhost/'
+    assert 'user' in session
+    rv = hunt_client.get('/')
+    assert rv.status_code == 200
+ 
 @requests_mock.Mocker(kw='m')
 def test_do_not_send_messages_if_notifications_disabled(hunt_client, **kwargs):
     m = kwargs['m']

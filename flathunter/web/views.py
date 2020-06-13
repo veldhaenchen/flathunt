@@ -98,6 +98,10 @@ def index():
 def about():
     return render_template('about.html')
 
+@app.route('/resources')
+def resources():
+    return render_template('resources.html')
+
 # Accept GET requests here to support Google Cloud Cron calls
 @app.route('/hunt', methods=['GET','POST'])
 def hunt():

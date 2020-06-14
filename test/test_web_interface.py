@@ -151,7 +151,7 @@ def test_login_with_invalid_url(hunt_client):
     assert 'user' not in session
 
 def test_login_with_missing_params(hunt_client):
-    rv = hunt_client.get('/login_with_telegram?id=1234&hash=5f9093d108df178489e3235dbcff7251690852172e8e79bbaf753fd79e59f580')
+    rv = hunt_client.get('/login_with_telegram?ad=1234&hash=5f9093d108df178489e3235dbcff7251690852172e8e79bbaf753fd79e59f580')
     assert rv.status_code == 302
     assert rv.headers['location'] == 'http://localhost/'
     assert 'user' not in session

@@ -19,7 +19,7 @@ class User(dict):
 
     def __init__(self, parameters):
         super().__init__(parameters)
-        for field in [ 'id', 'first_name', 'last_name' ]:
+        for field in [ 'id' ]:
             if field not in parameters:
                 raise AuthenticationError("Missing field: " + field)
 

@@ -62,6 +62,7 @@ def test_hunt_with_users(hunt_client, **kwargs):
     app.config['HUNTER'].set_filters_for_user(1234, {})
     assert app.config['HUNTER'].get_filters_for_user(1234) == {}
     app.config['HUNTER'].hunt_flats()
+    assert len(m.request_history) == 24
     rv = hunt_client.get('/')
     assert b'<div class="expose' in rv.data
 
@@ -74,6 +75,33 @@ def test_hunt_via_post(hunt_client, **kwargs):
     app.config['HUNTER'].set_filters_for_user(1234, {})
     assert app.config['HUNTER'].get_filters_for_user(1234) == {}
     rv = hunt_client.get('/hunt')
+    assert len(m.request_history) == 24
+    assert '<div class="expose' in json.loads(rv.data)['body']
+
+@requests_mock.Mocker(kw='m')
+def test_multi_user_hunt_via_post(hunt_client, **kwargs):
+    m = kwargs['m']
+    mock_response = '{"ok":true,"result":{"message_id":456,"from":{"id":1,"is_bot":true,"first_name":"Wohnbot","username":"wohnung_search_bot"},"chat":{"id":5,"first_name":"Arthur","last_name":"Taylor","type":"private"},"date":1589813130,"text":"hello arthur"}}'
+    for title in [ 'wg', 'ruhig', 'gruen', 'tausch', 'flat' ]:
+        m.get('https://api.telegram.org/bot1234xxx.12345/sendMessage?chat_id=1234&text=Great+flat+' + title + '+terrible+landlord', text=mock_response)
+        m.get('https://api.telegram.org/bot1234xxx.12345/sendMessage?chat_id=1235&text=Great+flat+' + title + '+terrible+landlord', text=mock_response)
+    app.config['HUNTER'].set_filters_for_user(1234, {})
+    app.config['HUNTER'].set_filters_for_user(1235, {})
+    assert app.config['HUNTER'].get_filters_for_user(1234) == {}
+    rv = hunt_client.get('/hunt')
+    assert len(m.request_history) == 48
+    assert '<div class="expose' in json.loads(rv.data)['body']
+
+@requests_mock.Mocker(kw='m')
+def test_hunt_via_post_with_filters(hunt_client, **kwargs):
+    m = kwargs['m']
+    mock_response = '{"ok":true,"result":{"message_id":456,"from":{"id":1,"is_bot":true,"first_name":"Wohnbot","username":"wohnung_search_bot"},"chat":{"id":5,"first_name":"Arthur","last_name":"Taylor","type":"private"},"date":1589813130,"text":"hello arthur"}}'
+    for title in [ 'wg', 'gruen', 'flat' ]:
+        m.get('https://api.telegram.org/bot1234xxx.12345/sendMessage?chat_id=1234&text=Great+flat+' + title + '+terrible+landlord', text=mock_response)
+    app.config['HUNTER'].set_filters_for_user(1234, { 'excluded_titles': [ 'ruhig', 'tausch' ] })
+    assert app.config['HUNTER'].get_filters_for_user(1234) == { 'excluded_titles': [ 'ruhig', 'tausch' ]}
+    rv = hunt_client.get('/hunt')
+    assert len(m.request_history) == 15
     assert '<div class="expose' in json.loads(rv.data)['body']
 
 def test_render_index_after_login(hunt_client):

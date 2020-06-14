@@ -21,7 +21,9 @@ class WebHunter(Hunter):
                                         .calculate_durations() \
                                         .build()
 
-        new_exposes = processor_chain.process(self.crawl_for_exposes(max_pages=1))
+        new_exposes = []
+        for expose in processor_chain.process(self.crawl_for_exposes(max_pages=1)):
+            new_exposes.append(expose)
 
         for (user_id, settings) in self.id_watch.get_user_settings():
             if 'mute_notifications' in settings:

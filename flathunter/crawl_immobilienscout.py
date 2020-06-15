@@ -61,7 +61,7 @@ class CrawlImmobilienscout(Crawler):
     def get_expose_details(self, expose):
         soup = self.get_soup_from_url(expose['url'])
         date = soup.find('dd', { "class": "is24qa-bezugsfrei-ab" })
-        expose['from'] = datetime.datetime.now().strftime("%2d.%2d.%Y")
+        expose['from'] = datetime.datetime.now().strftime("%2d.%2m.%Y")
         if date is not None:
             if not re.match(r'.*sofort.*', date.text):
                 expose['from'] = date.text.strip()

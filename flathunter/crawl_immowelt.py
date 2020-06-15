@@ -44,12 +44,12 @@ class CrawlImmowelt(Crawler):
                         continue
                     description = description_element.find("p").text
                     if re.match(r'.*sofort.*', description, re.MULTILINE|re.DOTALL|re.IGNORECASE):
-                        expose['from'] = datetime.datetime.now().strftime("%2d.%2d.%Y")
+                        expose['from'] = datetime.datetime.now().strftime("%2d.%2m.%Y")
                     date_string = re.match(r'.*(\d{2}.\d{2}.\d{4}).*', description, re.MULTILINE|re.DOTALL)
                     if date_string is not None:
                         expose['from'] = date_string[1]
             if 'from' not in expose:
-                expose['from'] = datetime.datetime.now().strftime("%2d.%2d.%Y")
+                expose['from'] = datetime.datetime.now().strftime("%2d.%2m.%Y")
         return expose
 
     def extract_data(self, soup):

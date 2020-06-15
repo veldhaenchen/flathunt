@@ -21,7 +21,9 @@ class WebHunter(Hunter):
                                         .calculate_durations() \
                                         .build()
 
-        new_exposes = processor_chain.process(self.crawl_for_exposes(max_pages=1))
+        new_exposes = []
+        for expose in processor_chain.process(self.crawl_for_exposes(max_pages=1)):
+            new_exposes.append(expose)
 
         for (user_id, settings) in self.id_watch.get_user_settings():
             if 'mute_notifications' in settings:
@@ -79,4 +81,7 @@ class WebHunter(Hunter):
         return not notifications_enabled
 
     def notifications_muted_for_user(self, user_id):
-        return ('mute_notifications' in self.id_watch.get_settings_for_user(user_id))
+        settings = self.id_watch.get_settings_for_user(user_id)
+        if settings is None:
+            return False
+        return ('mute_notifications' in settings)

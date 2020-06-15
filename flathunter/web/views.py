@@ -19,7 +19,7 @@ class User(dict):
 
     def __init__(self, parameters):
         super().__init__(parameters)
-        for field in [ 'id', 'first_name', 'last_name' ]:
+        for field in [ 'id' ]:
             if field not in parameters:
                 raise AuthenticationError("Missing field: " + field)
 
@@ -97,6 +97,10 @@ def index():
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+@app.route('/resources')
+def resources():
+    return render_template('resources.html')
 
 # Accept GET requests here to support Google Cloud Cron calls
 @app.route('/hunt', methods=['GET','POST'])

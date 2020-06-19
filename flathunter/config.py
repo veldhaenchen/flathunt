@@ -22,6 +22,11 @@ class Config:
         self.__log__.info("Using config %s" % filename)
         with open(filename) as file:
             self.config = yaml.safe_load(file)
+            self.__default_items__()
+
+    def __default_items__(self):
+        if "database_location" not in self.config:
+            self.config["database_location"] = os.path.dirname(os.path.abspath(__file__))
 
     def __iter__(self):
         return self.config.__iter__()

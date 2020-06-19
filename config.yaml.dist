@@ -124,3 +124,6 @@ telegram:
 #    bot_name: bot_name_xxx
 #    domain: flathunter.example.com
 #    session_key: SomeSecretValue
+#    listen:
+#      host: 127.0.0.1
+#      port: 8080

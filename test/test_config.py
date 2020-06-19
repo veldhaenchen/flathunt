@@ -80,3 +80,8 @@ filters:
        self.assertIsNotNone(config)
        my_filter = config.get_filter()
        self.assertIsNotNone(my_filter)
+
+    def test_defaults_fields(self):
+       config = Config(string=self.FILTERS_CONFIG)
+       self.assertIsNotNone(config)
+       self.assertEqual(config["database_location"], os.path.dirname(os.path.abspath(__file__)))

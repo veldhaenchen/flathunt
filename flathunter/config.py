@@ -22,11 +22,6 @@ class Config:
         self.__log__.info("Using config %s" % filename)
         with open(filename) as file:
             self.config = yaml.safe_load(file)
-            self.__default_items__()
-
-    def __default_items__(self):
-        if "database_location" not in self.config:
-            self.config["database_location"] = os.path.dirname(os.path.abspath(__file__))
 
     def __iter__(self):
         return self.config.__iter__()
@@ -36,6 +31,11 @@ class Config:
 
     def get(self, key, value=None):
         return self.config.get(key, value)
+
+    def database_location(self):
+        if "database_location" in self.config:
+            return self.config["database_location"]
+        return os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + "/..")
 
     @staticmethod
     def set_searchers(searchers):

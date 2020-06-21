@@ -84,4 +84,4 @@ filters:
     def test_defaults_fields(self):
        config = Config(string=self.FILTERS_CONFIG)
        self.assertIsNotNone(config)
-       self.assertEqual(config["database_location"], os.path.dirname(os.path.abspath(__file__)))
+       self.assertEqual(config.database_location(), os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + "/.."))

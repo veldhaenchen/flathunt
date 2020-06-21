@@ -35,7 +35,7 @@ __log__ = logging.getLogger(__name__)
 
 
 def launch_flat_hunt(config):
-    id_watch = IdMaintainer('%s/processed_ids.db' % config["database_location"])
+    id_watch = IdMaintainer('%s/processed_ids.db' % config.database_location())
 
     hunter = Hunter(config, id_watch)
     hunter.hunt_flats()

@@ -4,6 +4,10 @@ loop:
     active: yes
     sleeping_time: 600
 
+# Location of the Database to store already seen offerings
+# Defaults to the current directory
+#database_location: /path/to/database
+
 # List the URLs containing your filter properties below.
 # Currently supported services: www.immobilienscout24.de and
 # www.wg-gesucht.de. List the URLs in the following format:

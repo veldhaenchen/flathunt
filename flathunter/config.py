@@ -32,6 +32,11 @@ class Config:
     def get(self, key, value=None):
         return self.config.get(key, value)
 
+    def database_location(self):
+        if "database_location" in self.config:
+            return self.config["database_location"]
+        return os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + "/..")
+
     @staticmethod
     def set_searchers(searchers):
         Config.__searchers__ = searchers

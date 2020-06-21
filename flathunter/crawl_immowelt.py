@@ -1,12 +1,15 @@
+"""Expose crawler for ImmoWelt"""
 import logging
-import requests
 import re
 import datetime
+import requests
 from bs4 import BeautifulSoup
 
 from flathunter.abstract_crawler import Crawler
 
 class CrawlImmowelt(Crawler):
+    """Implementation of Crawler interface for ImmoWelt"""
+
     __log__ = logging.getLogger(__name__)
     URL_PATTERN = re.compile(r'https://www\.immowelt\.de')
 
@@ -14,38 +17,42 @@ class CrawlImmowelt(Crawler):
         logging.getLogger("requests").setLevel(logging.WARNING)
 
     def get_results(self, search_url, max_pages=None):
-        self.__log__.debug("Got search URL %s" % search_url)
+        """Loads the exposes from the ImmoWelt site, starting at the provided URL"""
+        self.__log__.debug("Got search URL %s", search_url)
 
         soup = self.get_page(search_url)
 
         # get data from first page
         entries = self.extract_data(soup)
-        self.__log__.debug('Number of found entries: ' + str(len(entries)))
+        self.__log__.debug('Number of found entries: %d', len(entries))
 
         return entries
 
     def get_page(self, search_url):
+        """Applies a page number to a formatted search URL and fetches the exposes at that page"""
         resp = requests.get(search_url)  # TODO add page_no in url
         if resp.status_code != 200:
-            self.__log__.error("Got response (%i): %s" % (resp.status_code, resp.content))
+            self.__log__.error("Got response (%i): %s", resp.status_code, resp.content)
         return BeautifulSoup(resp.content, 'html.parser')
 
     def get_expose_details(self, expose):
+        """Loads additional details for an expose by processing the expose detail URL"""
         soup = self.get_page(expose['url'])
-        immo_div = soup.find("div", { "id": "divImmobilie" })
+        immo_div = soup.find("div", {"id": "divImmobilie"})
         if immo_div is not None:
-            details = immo_div.find_all("div", { "class": "clear" })
+            details = immo_div.find_all("div", {"class": "clear"})
             for detail in details:
-                if detail.find("div", { "class": "iw_left" }) is None:
+                if detail.find("div", {"class": "iw_left"}) is None:
                     continue
-                if detail.find("div", { "class": "iw_left" }).text.strip() == 'Die Wohnung':
-                    description_element = detail.find("div", { "class": "iw_right" })
+                if detail.find("div", {"class": "iw_left"}).text.strip() == 'Die Wohnung':
+                    description_element = detail.find("div", {"class": "iw_right"})
                     if description_element is None or description_element.find("p") is None:
                         continue
                     description = description_element.find("p").text
                     if re.match(r'.*sofort.*', description, re.MULTILINE|re.DOTALL|re.IGNORECASE):
                         expose['from'] = datetime.datetime.now().strftime("%2d.%2m.%Y")
-                    date_string = re.match(r'.*(\d{2}.\d{2}.\d{4}).*', description, re.MULTILINE|re.DOTALL)
+                    date_string = re.match(r'.*(\d{2}.\d{2}.\d{4}).*',
+                                           description, re.MULTILINE|re.DOTALL)
                     if date_string is not None:
                         expose['from'] = date_string[1]
             if 'from' not in expose:
@@ -53,6 +60,7 @@ class CrawlImmowelt(Crawler):
         return expose
 
     def extract_data(self, soup):
+        """Extracts all exposes from a provided Soup object"""
         entries = list()
         soup = soup.find(id="listItemWrapperFixed")
         try:
@@ -109,13 +117,13 @@ class CrawlImmowelt(Crawler):
             }
             entries.append(details)
 
-        self.__log__.debug('extracted: ' + str(entries))
+        self.__log__.debug('extracted: %d', entries)
 
         return entries
 
     @staticmethod
     def load_address(url):
-        # extract address from expose itself
+        """Extract address from expose itself"""
         expose_html = requests.get(url).content
         expose_soup = BeautifulSoup(expose_html, 'html.parser')
         try:

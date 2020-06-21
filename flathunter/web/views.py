@@ -86,10 +86,10 @@ def index():
     hunter = app.config["HUNTER"]
     bot_name = app.config.get("BOT_NAME", None)
     domain = app.config.get("DOMAIN", None)
-    filter = filter_for_user()
+    filter_set = filter_for_user()
     form_values = form_filter_values()
     return render_template("index.html",
-        title="Home", exposes=hunter.get_recent_exposes(filter=filter), last_run=hunter.get_last_run_time(),
+        title="Home", exposes=hunter.get_recent_exposes(filter_set=filter_set), last_run=hunter.get_last_run_time(),
         bot_name=bot_name, domain=domain,
         login_url=generate_dummy_login_url(),
         filters=form_values, notifications_enabled=(not notifications_muted_for_user()))

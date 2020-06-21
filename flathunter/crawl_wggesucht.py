@@ -1,3 +1,4 @@
+"""Expose crawler for WgGesucht"""
 import logging
 import re
 
@@ -6,6 +7,8 @@ from bs4 import BeautifulSoup
 from flathunter.abstract_crawler import Crawler
 
 class CrawlWgGesucht(Crawler):
+    """Implementation of Crawler interface for WgGesucht"""
+
     __log__ = logging.getLogger(__name__)
     URL_PATTERN = re.compile(r'https://www\.wg-gesucht\.de')
 
@@ -13,35 +16,27 @@ class CrawlWgGesucht(Crawler):
         logging.getLogger("requests").setLevel(logging.WARNING)
 
     def get_results(self, search_url, max_pages=None):
-        self.__log__.debug("Got search URL %s" % search_url)
+        """Loads the exposes from the WgGesucht site, starting at the provided URL"""
+        self.__log__.debug("Got search URL %s", search_url)
 
         # load first page
-        page_no = 0
-        soup = self.get_page(search_url, page_no)
-        no_of_pages = 0  # TODO get it from soup
-        self.__log__.info('Found pages: ' + str(no_of_pages))
+        soup = self.get_page(search_url)
 
         # get data from first page
         entries = self.extract_data(soup)
-        self.__log__.debug('Number of found entries: ' + str(len(entries)))
-
-        # iterate over all remaining pages
-        while (page_no + 1) < no_of_pages:  # page_no starts with 0, no_of_pages with 1
-            page_no += 1
-            self.__log__.debug('Checking page %i' % page_no)
-            soup = self.get_page(search_url, page_no)
-            entries.extend(self.extract_data(soup))
-            self.__log__.debug('Number of found entries: ' + str(len(entries)))
+        self.__log__.debug('Number of found entries: %d', len(entries))
 
         return entries
 
-    def get_page(self, search_url, page_no):
-        resp = requests.get(search_url)  # TODO add page_no in url
+    def get_page(self, search_url):
+        """Applies a page number to a formatted search URL and fetches the exposes at that page"""
+        resp = requests.get(search_url)
         if resp.status_code != 200:
-            self.__log__.error("Got response (%i): %s" % (resp.status_code, resp.content))
+            self.__log__.error("Got response (%i): %s", resp.status_code, resp.content)
         return BeautifulSoup(resp.content, 'lxml')
 
     def extract_data(self, soup):
+        """Extracts all exposes from a provided Soup object"""
         entries = list()
 
         findings = soup.find_all(lambda e: e.has_attr('id') and e['id'].startswith('liste-'))
@@ -53,14 +48,19 @@ class CrawlWgGesucht(Crawler):
             title_row = row.find('h3', {"class": "truncate_title"})
             title = title_row.text.strip()
             url = base_url + title_row.find('a')['href']
-            image = re.match(r'background-image: url\((.*)\);', row.find('div', {"class": "card_image"}).find('a')['style'])[1]
-            detail_string = row.find("div", { "class": "col-xs-11" }).text.strip().split("|")
-            details_array = list(map(lambda s: re.sub(' +', ' ', re.sub(r'\W', ' ', s.strip())), detail_string))
-            numbers_row = row.find("div", { "class": "middle" })
-            price = numbers_row.find("div", { "class": "col-xs-3" }).text.strip()
+            image = re.match(r'background-image: url\((.*)\);',
+                             row.find('div', {"class": "card_image"}).find('a')['style'])[1]
+            detail_string = row.find("div", {"class": "col-xs-11"}).text.strip().split("|")
+            details_array = list(map(lambda s: re.sub(' +', ' ',
+                                                      re.sub(r'\W', ' ', s.strip())),
+                                     detail_string))
+            numbers_row = row.find("div", {"class": "middle"})
+            price = numbers_row.find("div", {"class": "col-xs-3"}).text.strip()
             rooms = re.findall(r'\d Zimmer', details_array[0])[0][:1]
-            dates = re.findall(r'\d{2}.\d{2}.\d{4}', numbers_row.find("div", { "class": "text-center" }).text)
-            size = re.findall(r'\d{2,4}\sm²', numbers_row.find("div", { "class": "text-right" }).text)[0]
+            dates = re.findall(r'\d{2}.\d{2}.\d{4}',
+                               numbers_row.find("div", {"class": "text-center"}).text)
+            size = re.findall(r'\d{2,4}\sm²',
+                              numbers_row.find("div", {"class": "text-right"}).text)[0]
 
             details = {
                 'id': int(url.split('.')[-2]),
@@ -81,14 +81,15 @@ class CrawlWgGesucht(Crawler):
 
             entries.append(details)
 
-        self.__log__.debug('extracted: ' + str(entries))
+        self.__log__.debug('extracted: %d', entries)
 
         return entries
 
     @staticmethod
     def load_address(url):
-        # extract address from expose itself
-        r = requests.get(url)
-        flat = BeautifulSoup(r.content, 'lxml')
-        address = ' '.join(flat.find('div', {"class": "col-sm-4 mb10"}).find("a", {"href": "#"}).text.strip().split())
+        """Extract address from expose itself"""
+        response = requests.get(url)
+        flat = BeautifulSoup(response.content, 'lxml')
+        address = ' '.join(flat.find('div', {"class": "col-sm-4 mb10"})\
+                     .find("a", {"href": "#"}).text.strip().split())
         return address

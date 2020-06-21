@@ -104,7 +104,7 @@ def test_exposes_are_returned_filtered():
     hunter.hunt_flats()
     hunter.hunt_flats()
     filter = Filter.builder().max_size_filter(70).build()
-    saved = id_watch.get_recent_exposes(10, filter=filter)
+    saved = id_watch.get_recent_exposes(10, filter_set=filter)
     assert len(saved) == 10
     for expose in saved:
         assert int(re.match(r'\d+', expose['size'])[0]) <= 70

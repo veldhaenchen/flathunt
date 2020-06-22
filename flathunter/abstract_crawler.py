@@ -10,7 +10,17 @@ class Crawler:
     URL_PATTERN = None
 
     def get_results(self, search_url, max_pages=None):
-        """Load the exposes from the provided URL. Should be implemented in subclass"""
+        """Loads the exposes from the site, starting at the provided URL"""
+        self.__log__.debug("Got search URL %s", search_url)
+
+        # load first page
+        soup = self.get_page(search_url)
+
+        # get data from first page
+        entries = self.extract_data(soup)
+        self.__log__.debug('Number of found entries: %d', len(entries))
+
+        return entries
 
     def crawl(self, url, max_pages=None):
         """Load as many exposes as possible from the provided URL"""

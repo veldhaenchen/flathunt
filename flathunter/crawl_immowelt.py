@@ -16,18 +16,6 @@ class CrawlImmowelt(Crawler):
     def __init__(self):
         logging.getLogger("requests").setLevel(logging.WARNING)
 
-    def get_results(self, search_url, max_pages=None):
-        """Loads the exposes from the ImmoWelt site, starting at the provided URL"""
-        self.__log__.debug("Got search URL %s", search_url)
-
-        soup = self.get_page(search_url)
-
-        # get data from first page
-        entries = self.extract_data(soup)
-        self.__log__.debug('Number of found entries: %d', len(entries))
-
-        return entries
-
     def get_page(self, search_url):
         """Applies a page number to a formatted search URL and fetches the exposes at that page"""
         resp = requests.get(search_url)  # TODO add page_no in url

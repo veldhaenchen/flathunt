@@ -7,4 +7,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 VOLUME /config
 
-CMD [ "python3", "-u", "flathunter.py", "-c", "/config/config.yaml" ]
+CMD [ "python3", "-u", "flathunt.py", "-c", "/config/config.yaml" ]

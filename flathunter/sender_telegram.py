@@ -1,10 +1,14 @@
-import urllib.request, urllib.parse, urllib.error
-import requests
+"""Functions and classes related to sending Telegram messages"""
+import urllib.request
+import urllib.parse
+import urllib.error
 import logging
+import requests
 
 from flathunter.abstract_processor import Processor
 
 class SenderTelegram(Processor):
+    """Expose processor that sends Telegram messages"""
     __log__ = logging.getLogger(__name__)
 
     def __init__(self, config, receivers=None):
@@ -16,6 +20,7 @@ class SenderTelegram(Processor):
             self.receiver_ids = receivers
 
     def process_expose(self, expose):
+        """Send a message to a user describing the expose"""
         message = self.config.get('message', "").format(
             title=expose['title'],
             rooms=expose['rooms'],
@@ -28,6 +33,7 @@ class SenderTelegram(Processor):
         return expose
 
     def send_msg(self, message):
+        """Send messages to each of the receivers in receiver_ids"""
         if self.receiver_ids is None:
             return
         for chat_id in self.receiver_ids:
@@ -37,12 +43,13 @@ class SenderTelegram(Processor):
             self.__log__.debug(('chatid:', chat_id))
             self.__log__.debug(('text', text))
             qry = url % (self.bot_token, chat_id, text)
-            self.__log__.debug("Retrieving URL %s" % qry)
+            self.__log__.debug("Retrieving URL %s", qry)
             resp = requests.get(qry)
-            self.__log__.debug("Got response (%i): %s" % (resp.status_code, resp.content))
+            self.__log__.debug("Got response (%i): %s", resp.status_code, resp.content)
             data = resp.json()
 
             # handle error
             if resp.status_code != 200:
-                sc = resp.status_code
-                self.__log__.error("When sending bot message, we got status %i with message: %s" % (sc, data))
+                status_code = resp.status_code
+                self.__log__.error("When sending bot message, we got status %i with message: %s",
+                                   status_code, data)

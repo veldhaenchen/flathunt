@@ -60,7 +60,7 @@ Before running the project for the first time, copy `config.yaml.dist` to `confi
 
 To configure the searches, simply visit the property portal of your choice (e.g. ImmoScout), configure the search on the website to match your search criteria, then copy the URL of the results page into the config file. You can add as many URLs as you like, also multiple from the same website if you have multiple different criteria (e.g. running the same search in multiple different Bezirke).
 
- * Currently, ebay-kleinanzeigen and immowelt only crawl the first page, so make sure to **sort by newest offers**.
+ * Currently, ebay-kleinanzeigen, immowelt and WG Gesucht only crawl the first page, so make sure to **sort by newest offers**.
  * Your links should point to the German version of the websites, since it is tested only there. Otherwise you might have problems.
 
 #### Telegram
@@ -121,7 +121,7 @@ $ gcloud app deploy cron.yaml
 By default, the application runs on the commandline and outputs logs to `stdout`. It will poll in a loop and send updates after each run. The `processed_ids.db` file contains details of which listings have already been sent to the Telegram bot - if you delete that, it will be recreated, and you may receive duplicate listings.
 
 ```
-usage: flathunter.py [-h] [--config CONFIG]
+usage: flathunt.py [-h] [--config CONFIG]
 
 Searches for flats on Immobilienscout24.de and wg-gesucht.de and sends results
 to Telegram User

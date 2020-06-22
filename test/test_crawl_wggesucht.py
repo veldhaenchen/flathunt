@@ -10,7 +10,7 @@ class WgGesuchtCrawlerTest(unittest.TestCase):
         self.crawler = CrawlWgGesucht()
 
     def test(self):
-        soup = self.crawler.get_page(self.TEST_URL, 1)
+        soup = self.crawler.get_page(self.TEST_URL)
         self.assertIsNotNone(soup, "Should get a soup from the URL")
         entries = self.crawler.extract_data(soup)
         self.assertIsNotNone(entries, "Should parse entries from search URL")

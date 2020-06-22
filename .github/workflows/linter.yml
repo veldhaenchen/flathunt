@@ -43,7 +43,4 @@ jobs:
       # Run Linter against code base #
       ################################
       - name: Lint Code Base
-        uses: docker://github/super-linter:v2.1.1
-        env:
-          VALIDATE_ALL_CODEBASE: true
-          VALIDATE_ANSIBLE: false
+        uses: codders/pylint-runner-github-action@v0.0.2

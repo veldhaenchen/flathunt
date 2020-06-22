@@ -2,6 +2,7 @@
 import re
 import logging
 import requests
+from bs4 import BeautifulSoup
 
 class Crawler:
     """Defines the Crawler interface"""
@@ -9,6 +10,24 @@ class Crawler:
     __log__ = logging.getLogger(__name__)
     URL_PATTERN = None
 
+    # pylint: disable=unused-argument
+    def get_page(self, search_url, page_no=None):
+        """Applies a page number to a formatted search URL and fetches the exposes at that page"""
+        return self.get_soup_from_url(search_url)
+
+    def get_soup_from_url(self, url):
+        """Creates a Soup object from the HTML at the provided URL"""
+        resp = requests.get(url)
+        if resp.status_code != 200:
+            self.__log__.error("Got response (%i): %s", resp.status_code, resp.content)
+        return BeautifulSoup(resp.content, 'html.parser')
+
+    # pylint: disable=no-self-use
+    def extract_data(self, soup):
+        """Should be implemented in subclass"""
+        raise "Method not implemented"
+
+    # pylint: disable=unused-argument
     def get_results(self, search_url, max_pages=None):
         """Loads the exposes from the site, starting at the provided URL"""
         self.__log__.debug("Got search URL %s", search_url)

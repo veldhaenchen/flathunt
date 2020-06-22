@@ -83,6 +83,7 @@ class GoogleCloudIdMaintainer:
 
     def get_last_run_time(self):
         """Returns the datetime of the last run"""
+        # pylint: disable=no-member
         for doc in self.database.collection(u'executions')\
                         .order_by(u'timestamp', direction=firestore.Query.DESCENDING)\
                         .limit(1).stream():

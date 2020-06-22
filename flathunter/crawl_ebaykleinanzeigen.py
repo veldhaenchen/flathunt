@@ -30,9 +30,9 @@ class CrawlEbayKleinanzeigen(Crawler):
     def __init__(self):
         logging.getLogger("requests").setLevel(logging.WARNING)
 
-    def get_page(self, search_url):
-        """Applies a page number to a formatted search URL and fetches the exposes at that page"""
-        resp = requests.get(search_url, headers={'User-Agent': self.USER_AGENT})
+    def get_soup_from_url(self, url):
+        """Creates a Soup object from the HTML at the provided URL"""
+        resp = requests.get(url, headers={'User-Agent': self.USER_AGENT})
         if resp.status_code != 200:
             self.__log__.error("Got response (%i): %s", resp.status_code, resp.content)
         return BeautifulSoup(resp.content, 'html.parser')
@@ -62,6 +62,7 @@ class CrawlEbayKleinanzeigen(Crawler):
         # soup.find_all(lambda e: e.has_attr('data-adid'))
         # print(expose_ids)
         for idx, title_el in enumerate(title_elements):
+            price = expose_ids[idx].find("strong").text
             tags = expose_ids[idx].find_all(class_="simpletag tag-small")
             address = expose_ids[idx].find("div", {"class": "aditem-details"})
             address.find("strong").extract()
@@ -92,7 +93,7 @@ class CrawlEbayKleinanzeigen(Crawler):
                 'image': image,
                 'url': ("https://www.ebay-kleinanzeigen.de" + title_el.get("href")),
                 'title': title_el.text.strip(),
-                'price': expose_ids[idx].find("strong").text,
+                'price': price,
                 'size': size,
                 'rooms': rooms,
                 'address': address,
@@ -104,13 +105,9 @@ class CrawlEbayKleinanzeigen(Crawler):
 
         return entries
 
-    @staticmethod
-    def load_address(url):
+    def load_address(self, url):
         """Extract address from expose itself"""
-        expose_html = requests.get(url,
-                                   headers={'User-Agent': CrawlEbayKleinanzeigen.USER_AGENT}
-                                   ).content
-        expose_soup = BeautifulSoup(expose_html, 'html.parser')
+        expose_soup = self.get_soup_from_url(url)
         try:
             street_raw = expose_soup.find(id="street-address").text
         except AttributeError:

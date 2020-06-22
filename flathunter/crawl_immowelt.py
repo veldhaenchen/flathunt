@@ -2,8 +2,6 @@
 import logging
 import re
 import datetime
-import requests
-from bs4 import BeautifulSoup
 
 from flathunter.abstract_crawler import Crawler
 
@@ -15,13 +13,6 @@ class CrawlImmowelt(Crawler):
 
     def __init__(self):
         logging.getLogger("requests").setLevel(logging.WARNING)
-
-    def get_page(self, search_url):
-        """Applies a page number to a formatted search URL and fetches the exposes at that page"""
-        resp = requests.get(search_url)  # TODO add page_no in url
-        if resp.status_code != 200:
-            self.__log__.error("Got response (%i): %s", resp.status_code, resp.content)
-        return BeautifulSoup(resp.content, 'html.parser')
 
     def get_expose_details(self, expose):
         """Loads additional details for an expose by processing the expose detail URL"""
@@ -47,6 +38,7 @@ class CrawlImmowelt(Crawler):
                 expose['from'] = datetime.datetime.now().strftime("%2d.%2m.%Y")
         return expose
 
+    # pylint: disable=too-many-locals
     def extract_data(self, soup):
         """Extracts all exposes from a provided Soup object"""
         entries = list()
@@ -97,9 +89,9 @@ class CrawlImmowelt(Crawler):
                 'image': image,
                 'url': url,
                 'title': title_el.text.strip(),
+                'rooms': rooms,
                 'price': price,
                 'size': size,
-                'rooms': rooms,
                 'address': address,
                 'crawler': self.get_name()
             }
@@ -108,20 +100,3 @@ class CrawlImmowelt(Crawler):
         self.__log__.debug('extracted: %d', entries)
 
         return entries
-
-    @staticmethod
-    def load_address(url):
-        """Extract address from expose itself"""
-        expose_html = requests.get(url).content
-        expose_soup = BeautifulSoup(expose_html, 'html.parser')
-        try:
-            street_raw = expose_soup.find(id="street-address").text
-        except AttributeError:
-            street_raw = ""
-        try:
-            address_raw = expose_soup.find(id="viewad-locality").text
-        except AttributeError:
-            address_raw = ""
-        address = address_raw.strip().replace("\n", "") + " " + street_raw.strip()
-
-        return address

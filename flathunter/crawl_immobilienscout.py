@@ -2,8 +2,6 @@
 import logging
 import re
 import datetime
-import requests
-from bs4 import BeautifulSoup
 
 from flathunter.abstract_crawler import Crawler
 
@@ -57,14 +55,7 @@ class CrawlImmobilienscout(Crawler):
             entries.extend(cur_entry)
         return entries
 
-    def get_soup_from_url(self, url):
-        """Creates a Soup object from the HTML at the provided URL"""
-        resp = requests.get(url)
-        if resp.status_code != 200:
-            self.__log__.error("Got response (%i): %s", resp.status_code, resp.content)
-        return BeautifulSoup(resp.content, 'html.parser')
-
-    def get_page(self, search_url, page_no):
+    def get_page(self, search_url, page_no=None):
         """Applies a page number to a formatted search URL and fetches the exposes at that page"""
         return self.get_soup_from_url(search_url.format(page_no))
 
@@ -78,6 +69,7 @@ class CrawlImmobilienscout(Crawler):
                 expose['from'] = date.text.strip()
         return expose
 
+    # pylint: disable=too-many-locals
     def extract_data(self, soup):
         """Extracts all exposes from a provided Soup object"""
         entries = list()

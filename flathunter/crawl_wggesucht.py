@@ -15,13 +15,7 @@ class CrawlWgGesucht(Crawler):
     def __init__(self):
         logging.getLogger("requests").setLevel(logging.WARNING)
 
-    def get_page(self, search_url):
-        """Applies a page number to a formatted search URL and fetches the exposes at that page"""
-        resp = requests.get(search_url)
-        if resp.status_code != 200:
-            self.__log__.error("Got response (%i): %s", resp.status_code, resp.content)
-        return BeautifulSoup(resp.content, 'lxml')
-
+    # pylint: disable=too-many-locals
     def extract_data(self, soup):
         """Extracts all exposes from a provided Soup object"""
         entries = list()

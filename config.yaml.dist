@@ -9,8 +9,9 @@ loop:
 #database_location: /path/to/database
 
 # List the URLs containing your filter properties below.
-# Currently supported services: www.immobilienscout24.de and
-# www.wg-gesucht.de. List the URLs in the following format:
+# Currently supported services: www.immobilienscout24.de,
+# www.immowelt.de, www.wg-gesucht.de, and www.ebay-kleinanzeigen.de.
+# List the URLs in the following format:
 # urls:
 # 	- https://www.immobilienscout24.de/Suche/...
 # 	- https://www.wg-gesucht.de/...

@@ -70,6 +70,7 @@ class CrawlImmobilienscout(Crawler):
         return expose
 
     # pylint: disable=too-many-locals
+    # pylint: disable=too-many-branches
     def extract_data(self, soup):
         """Extracts all exposes from a provided Soup object"""
         entries = list()
@@ -111,21 +112,23 @@ class CrawlImmobilienscout(Crawler):
             else:
                 image = None
 
-            # Entries without price, size, or room count will get skipped.
+            details = {
+                'id': expose_ids[idx],
+                'url': expose_urls[idx],
+                'image': image,
+                'title': title_el.text.strip().replace('NEU', ''),
+                'address': address,
+                'crawler': self.get_name()
+            }
             if len(attr_els) > 2:
-                details = {
-                    'id': expose_ids[idx],
-                    'url': expose_urls[idx],
-                    'image': image,
-                    'title': title_el.text.strip().replace('NEU', ''),
-                    'price': attr_els[0].text.strip().split(' ')[0].strip(),
-                    'size': attr_els[1].text.strip().split(' ')[0].strip() + " qm",
-                    'rooms': attr_els[2].text.strip().split(' ')[0].strip(),
-                    'address': address,
-                    'crawler': self.get_name()
-                }
+                details['price'] = attr_els[0].text.strip().split(' ')[0].strip()
+                details['size'] = attr_els[1].text.strip().split(' ')[0].strip() + " qm"
+                details['rooms'] = attr_els[2].text.strip().split(' ')[0].strip()
             else:
-                continue
+                # If there are less than three elements, it is unclear which is what.
+                details['price'] = ''
+                details['size'] = ''
+                details['rooms'] = ''
             # print entries
             exist = False
             for expose in entries:

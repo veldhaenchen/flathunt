@@ -111,6 +111,7 @@ class CrawlImmobilienscout(Crawler):
             else:
                 image = None
 
+            # Entries without price, size, or room count will get skipped.
             if len(attr_els) > 2:
                 details = {
                     'id': expose_ids[idx],
@@ -123,6 +124,8 @@ class CrawlImmobilienscout(Crawler):
                     'address': address,
                     'crawler': self.get_name()
                 }
+            else:
+                continue
             # print entries
             exist = False
             for expose in entries:

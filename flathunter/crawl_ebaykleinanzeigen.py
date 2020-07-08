@@ -79,13 +79,13 @@ class CrawlEbayKleinanzeigen(Crawler):
             try:
                 self.__log__.debug(tags[1].text)
                 rooms = re.match(r'(\d+)', tags[1].text)[1]
-            except IndexError:
+            except (IndexError, TypeError):
                 self.__log__.debug("Keine Zimmeranzahl gegeben")
                 rooms = "Nicht gegeben"
             try:
                 self.__log__.debug(tags[0].text)
                 size = tags[0].text
-            except IndexError:
+            except (IndexError, TypeError):
                 size = "Nicht gegeben"
                 self.__log__.debug("Quadratmeter nicht angegeben")
             details = {

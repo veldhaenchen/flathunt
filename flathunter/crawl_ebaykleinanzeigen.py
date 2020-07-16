@@ -48,6 +48,7 @@ class CrawlEbayKleinanzeigen(Crawler):
             expose['from'] = datetime.datetime.now().strftime('%02d.%02m.%Y')
         return expose
 
+    # pylint: disable=too-many-locals
     def extract_data(self, soup):
         """Extracts all exposes from a provided Soup object"""
         entries = list()
@@ -62,12 +63,17 @@ class CrawlEbayKleinanzeigen(Crawler):
         # soup.find_all(lambda e: e.has_attr('data-adid'))
         # print(expose_ids)
         for idx, title_el in enumerate(title_elements):
-            price = expose_ids[idx].find("strong").text
-            tags = expose_ids[idx].find_all(class_="simpletag tag-small")
-            address = expose_ids[idx].find("div", {"class": "aditem-details"})
-            address.find("strong").extract()
-            address.find("br").extract()
-            image_element = expose_ids[idx].find("div", {"class": "srpimagebox"})
+            try:
+                price = expose_ids[idx].find("strong").text
+                tags = expose_ids[idx].find_all(class_="simpletag tag-small")
+                address = expose_ids[idx].find("div", {"class": "aditem-details"})
+                address.find("strong").extract()
+                address.find("br").extract()
+                image_element = expose_ids[idx].find("div", {"class": "srpimagebox"})
+            except AttributeError as error:
+                self.__log__.warning("Unable to process Ebay expose: %s", str(error))
+                continue
+
             if image_element is not None:
                 image = image_element["data-imgsrc"]
             else:

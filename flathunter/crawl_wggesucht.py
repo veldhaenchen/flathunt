@@ -41,12 +41,12 @@ class CrawlWgGesucht(Crawler):
             dates = re.findall(r'\d{2}.\d{2}.\d{4}',
                                numbers_row.find("div", {"class": "text-center"}).text)
             if len(dates) == 0:
-                self.__log__.warn("No dates found - skipping")
+                self.__log__.warning("No dates found - skipping")
                 continue
             size = re.findall(r'\d{1,4}\sm²',
                               numbers_row.find("div", {"class": "text-right"}).text)
             if len(size) == 0:
-                self.__log__.warn("No size found - skipping")
+                self.__log__.warning("No size found - skipping")
                 continue
 
             details = {

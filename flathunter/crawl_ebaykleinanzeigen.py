@@ -48,6 +48,7 @@ class CrawlEbayKleinanzeigen(Crawler):
             expose['from'] = datetime.datetime.now().strftime('%02d.%02m.%Y')
         return expose
 
+    # pylint: disable=too-many-locals
     def extract_data(self, soup):
         """Extracts all exposes from a provided Soup object"""
         entries = list()
@@ -69,8 +70,8 @@ class CrawlEbayKleinanzeigen(Crawler):
                 address.find("strong").extract()
                 address.find("br").extract()
                 image_element = expose_ids[idx].find("div", {"class": "srpimagebox"})
-            except AttributeError as e:
-                self.__log__.warn("Unable to process Ebay expose: " + str(e))
+            except AttributeError as error:
+                self.__log__.warning("Unable to process Ebay expose: %s", str(error))
                 continue
 
             if image_element is not None:

@@ -38,6 +38,8 @@ class CrawlImmobilienscout(Crawler):
                     .text.replace('.', ''))
         except IndexError:
             self.__log__.debug('Index Error occurred')
+            no_of_results = 0
+
         # get data from first page
         entries = self.extract_data(soup)
 

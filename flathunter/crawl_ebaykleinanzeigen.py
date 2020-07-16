@@ -62,12 +62,17 @@ class CrawlEbayKleinanzeigen(Crawler):
         # soup.find_all(lambda e: e.has_attr('data-adid'))
         # print(expose_ids)
         for idx, title_el in enumerate(title_elements):
-            price = expose_ids[idx].find("strong").text
-            tags = expose_ids[idx].find_all(class_="simpletag tag-small")
-            address = expose_ids[idx].find("div", {"class": "aditem-details"})
-            address.find("strong").extract()
-            address.find("br").extract()
-            image_element = expose_ids[idx].find("div", {"class": "srpimagebox"})
+            try:
+                price = expose_ids[idx].find("strong").text
+                tags = expose_ids[idx].find_all(class_="simpletag tag-small")
+                address = expose_ids[idx].find("div", {"class": "aditem-details"})
+                address.find("strong").extract()
+                address.find("br").extract()
+                image_element = expose_ids[idx].find("div", {"class": "srpimagebox"})
+            except AttributeError as e:
+                self.__log__.warn("Unable to process Ebay expose: " + str(e))
+                continue
+
             if image_element is not None:
                 image = image_element["data-imgsrc"]
             else:

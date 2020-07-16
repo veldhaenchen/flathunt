@@ -40,8 +40,14 @@ class CrawlWgGesucht(Crawler):
             rooms = re.findall(r'\d Zimmer', details_array[0])[0][:1]
             dates = re.findall(r'\d{2}.\d{2}.\d{4}',
                                numbers_row.find("div", {"class": "text-center"}).text)
+            if len(dates) == 0:
+                self.__log__.warn("No dates found - skipping")
+                continue
             size = re.findall(r'\d{1,4}\sm²',
-                              numbers_row.find("div", {"class": "text-right"}).text)[0]
+                              numbers_row.find("div", {"class": "text-right"}).text)
+            if len(size) == 0:
+                self.__log__.warn("No size found - skipping")
+                continue
 
             details = {
                 'id': int(url.split('.')[-2]),
@@ -49,7 +55,7 @@ class CrawlWgGesucht(Crawler):
                 'url': url,
                 'title': "%s ab dem %s" % (title, dates[0]),
                 'price': price,
-                'size': size,
+                'size': size[0],
                 'rooms': rooms,
                 'address': url,
                 'crawler': self.get_name()

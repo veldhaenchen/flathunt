@@ -132,3 +132,7 @@ telegram:
 #    listen:
 #      host: 127.0.0.1
 #      port: 8080
+
+# If you are deploying to google cloud,
+# uncomment this and set it to your project id. More info in the readme.
+# google_cloud_project_id: my-flathunters-project-id

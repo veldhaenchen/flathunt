@@ -140,5 +140,5 @@ class CrawlImmobilienscout(Crawler):
             if not exist:
                 entries.append(details)
 
-        self.__log__.debug('extracted: %d', entries)
+        self.__log__.debug('extracted: %d', len(entries))
         return entries

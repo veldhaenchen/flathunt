@@ -9,7 +9,7 @@ from flathunter.abstract_processor import Processor
 
 class SenderTelegram(Processor):
     """Expose processor that sends Telegram messages"""
-    __log__ = logging.getLogger(__name__)
+    __log__ = logging.getLogger('flathunt')
 
     def __init__(self, config, receivers=None):
         self.config = config

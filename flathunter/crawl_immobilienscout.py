@@ -8,7 +8,7 @@ from flathunter.abstract_crawler import Crawler
 class CrawlImmobilienscout(Crawler):
     """Implementation of Crawler interface for ImmobilienScout"""
 
-    __log__ = logging.getLogger(__name__)
+    __log__ = logging.getLogger('flathunt')
     URL_PATTERN = re.compile(r'https://www\.immobilienscout24\.de')
     RESULT_LIMIT = 50
 
@@ -140,5 +140,5 @@ class CrawlImmobilienscout(Crawler):
             if not exist:
                 entries.append(details)
 
-        self.__log__.debug('extracted: %d', entries)
+        self.__log__.debug('extracted: %d', len(entries))
         return entries

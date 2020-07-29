@@ -4,6 +4,9 @@
 
 # Should the bot endlessly looop through the URLs?
 # Between each loop it waits for <sleeping_time> seconds.
+# Note that Ebay will (temporarily) block your IP if you
+# poll too often - don't lower this below 600 seconds if you
+# are crawling Ebay.
 loop:
     active: yes
     sleeping_time: 600

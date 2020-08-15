@@ -4,11 +4,27 @@ import logging
 import requests
 from bs4 import BeautifulSoup
 
+
 class Crawler:
     """Defines the Crawler interface"""
 
     __log__ = logging.getLogger('flathunt')
     URL_PATTERN = None
+    HEADERS = {
+        'Connection': 'keep-alive',
+        'Pragma': 'no-cache',
+        'Cache-Control': 'no-cache',
+        'Upgrade-Insecure-Requests': '1',
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 '
+                      'Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,'
+                  'application/signed-exchange;v=b3;q=0.9',
+        'Sec-Fetch-Site': 'none',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-User': '?1',
+        'Sec-Fetch-Dest': 'document',
+        'Accept-Language': 'en-US,en;q=0.9',
+    }
 
     # pylint: disable=unused-argument
     def get_page(self, search_url, page_no=None):
@@ -17,7 +33,7 @@ class Crawler:
 
     def get_soup_from_url(self, url):
         """Creates a Soup object from the HTML at the provided URL"""
-        resp = requests.get(url)
+        resp = requests.get(url, headers=self.HEADERS)
         if resp.status_code != 200:
             self.__log__.error("Got response (%i): %s", resp.status_code, resp.content)
         return BeautifulSoup(resp.content, 'html.parser')
@@ -25,7 +41,7 @@ class Crawler:
     # pylint: disable=no-self-use
     def extract_data(self, soup):
         """Should be implemented in subclass"""
-        raise "Method not implemented"
+        raise Exception("Method not implemented")
 
     # pylint: disable=unused-argument
     def get_results(self, search_url, max_pages=None):

@@ -77,7 +77,7 @@ class CrawlImmobilienscout(Crawler):
         """Extracts all exposes from a provided Soup object"""
         entries = list()
 
-        title_elements = soup.find_all(
+        title_elements = soup.find(id="resultListItems").find_all(
             lambda e: e.name == 'a' and e.has_attr('class') and \
                       'result-list-entry__brand-title-container' in e['class'])
         expose_ids = list()

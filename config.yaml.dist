@@ -41,6 +41,7 @@ urls:
 #   max_price: 1000
 #   min_size: 50
 #   max_size: 80
+#   max_price_per_square: 1000
 filters:
 
 # There are often city districts in the address which

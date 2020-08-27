@@ -134,9 +134,9 @@ class PPSFilter:
         """True if price per square is below max price per square"""
         size = ExposeHelper.get_size(expose)
         price = ExposeHelper.get_price(expose)
-        pps = price / size
         if size is None or price is None:
             return True
+        pps = price / size
         return pps <= self.max_pps
 
 class PredicateFilter:

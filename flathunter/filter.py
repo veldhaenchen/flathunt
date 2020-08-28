@@ -123,6 +123,21 @@ class TitleFilter:
         if not found_objects:
             return True
         return False
+        
+class PPSFilter:
+    """Exclude exposes above a given price per square"""
+
+    def __init__(self, max_pps):
+        self.max_pps = max_pps
+
+    def is_interesting(self, expose):
+        """True if price per square is below max price per square"""
+        size = ExposeHelper.get_size(expose)
+        price = ExposeHelper.get_price(expose)
+        if size is None or price is None:
+            return True
+        pps = price / size
+        return pps <= self.max_pps
 
 class PredicateFilter:
     """Include only those exposes satisfying the predicate"""
@@ -160,6 +175,8 @@ class FilterBuilder:
                 self.filters.append(MinRoomsFilter(filters_config["min_rooms"]))
             if "max_rooms" in filters_config:
                 self.filters.append(MaxRoomsFilter(filters_config["max_rooms"]))
+            if "max_price_per_square" in filters_config:
+                self.filters.append(PPSFilter(filters_config["max_price_per_square"]))
         return self
 
     def max_size_filter(self, size):

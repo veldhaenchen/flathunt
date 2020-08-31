@@ -123,7 +123,7 @@ class TitleFilter:
         if not found_objects:
             return True
         return False
-        
+
 class PPSFilter:
     """Exclude exposes above a given price per square"""
 

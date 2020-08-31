@@ -81,7 +81,7 @@ class CrawlImmobilienscout(Crawler):
         title_elements = results_list.find_all(
             lambda e: e.name == 'a' and e.has_attr('class') and \
                       'result-list-entry__brand-title-container' in e['class']
-                      ) if results_list else []
+        ) if results_list else []
         expose_ids = list()
         expose_urls = list()
         for link in title_elements:

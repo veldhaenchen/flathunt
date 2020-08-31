@@ -37,7 +37,8 @@ class CrawlWgGesucht(Crawler):
                                      detail_string))
             numbers_row = row.find("div", {"class": "middle"})
             price = numbers_row.find("div", {"class": "col-xs-3"}).text.strip()
-            rooms = re.findall(r'\d Zimmer', details_array[0])[0][:1]
+            rooms_tmp = re.findall(r'\d Zimmer', details_array[0])
+            rooms = rooms_tmp[0][:1] if rooms_tmp else 0
             dates = re.findall(r'\d{2}.\d{2}.\d{4}',
                                numbers_row.find("div", {"class": "text-center"}).text)
             if len(dates) == 0:

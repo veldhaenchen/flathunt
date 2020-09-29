@@ -25,9 +25,9 @@ Flathunter is a Python application which periodically [scrapes](https://en.wikip
 ## Background
 
 There are at least four different rental property marketplace sites that are widely used in Germany - [ImmoScout24](https://www.immobilienscout24.de/), [immowelt](https://www.immowelt.de/), [WG-Gesucht](https://www.wg-gesucht.de/) and [ebay Kleinanzeigen](https://www.ebay-kleinanzeigen.de/). Most people end up searching through listings on all four sites on an almost daily basis during their flat search.
+In Italy on the other hand, [Idealista](https://www.idealista.it), [Subito](https://www.subito.it) and [Immobiliare.it](https://www.immobiliare.it) are very common for flat and property hunting.
 
 With Flathunter, instead of visiting the same pages on the same four sites every day, you can set the system up to scan every site, filtering by your search criteria, and notify you when new flats become available that meet your criteria.
-In Italy on the other hand, [Immobiliare.it](https://www.immobiliare.it) is very common for flat and property hunting. More websites such as [Subito](https://www.subito.it) and [Idealista](https://www.idealista.it) are also common, but not implemented as of today.
 
 ## Install
 
@@ -61,9 +61,11 @@ Before running the project for the first time, copy `config.yaml.dist` to `confi
 
 To configure the searches, simply visit the property portal of your choice (e.g. ImmoScout), configure the search on the website to match your search criteria, then copy the URL of the results page into the config file. You can add as many URLs as you like, also multiple from the same website if you have multiple different criteria (e.g. running the same search in multiple different Bezirke).
 
- * Currently, ebay-kleinanzeigen, immowelt and WG Gesucht only crawl the first page, so make sure to **sort by newest offers**.
- * Your links should point to the German version of the websites, since it is tested only there. Otherwise you might have problems.
+ * Currently, ebay-kleinanzeigen, immowelt WG-Gesucht and Idealista only crawl the first page, so make sure to **sort by newest offers**.
+ * Your links should point to the German version of the websites (in the case of ebay-kleinanzeigen, immowelt, immoscout and wggesucht), since it is tested only there. Otherwise you might have problems.
+ * For Idealista, the link should point to the Italian version of the website, for the same reason reported above.
  * For Immobiliare, the link should point to the Italian version of the website, for the same reasons reported above.
+ * For Subito, the link should point to the Italian version of the website, for the same reasons reported above.
 
 #### Telegram
 
@@ -80,6 +82,12 @@ to get list of messages the Bot has received. You will see your Chat ID in there
 
 #### 2Captcha
 Some sites implement Captcha to avoid being crawled by evil web scrappers. Since our crawler is not an evil one, the people at [2captcha](https://2captcha.com) provide us a service that helps you solve them. Head to the `2captchas` website, register and pay 3$ for 1000 solved captcha's! Check the `config.yaml.dist` on how to configure `2captcha` with `flathunter`. You will also be required to install a [chrome-web-driver](https://chromedriver.chromium.org/downloads) on your system that runs `flathunter`. The installation procedure varies depending on your system, a quick search on the internet should answer this question. 
+
+#### Proxy
+It's common that websites use bots and crawler protections to avoid being flooded with possibly malicious traffic. This can cause some issues when crawling, as we will be presented with a bot-protection page.
+To circumvent this, we can enable proxies with the configuration key `use_proxy_list` and setting it to `True`.
+Flathunt will crawl a [free-proxy list website](https://free-proxy-list.net/) to retrieve a list of possible proxies to use, and cycle through the so obtained list until an usable proxy is found.  
+*Note*: there may be a lot of attemps before such an usable proxy is found. Depending on your region or your server's internet accessibility, it can take a while.
 
 #### Google API
 

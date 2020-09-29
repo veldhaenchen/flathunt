@@ -24,6 +24,7 @@ pytest-mock = "*"
 pytest = "*"
 pylint = "*"
 selenium = "*"
+random-user-agent = "*"
 
 [dev-packages]
 

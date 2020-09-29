@@ -153,3 +153,7 @@ telegram:
 # If you are deploying to google cloud,
 # uncomment this and set it to your project id. More info in the readme.
 # google_cloud_project_id: my-flathunters-project-id
+
+# For websites like idealista.it, there are anti-crawler measures that can be
+# circumvented using proxies.
+# use_proxy_list: True

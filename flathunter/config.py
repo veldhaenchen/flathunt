@@ -9,6 +9,7 @@ from flathunter.crawl_wggesucht import CrawlWgGesucht
 from flathunter.crawl_immowelt import CrawlImmowelt
 from flathunter.crawler_subito import CrawlSubito
 from flathunter.crawl_immobiliare import CrawlImmobiliare
+from flathunter.crawl_idealista import CrawlIdealista
 from flathunter.filter import Filter
 
 class Config:
@@ -30,7 +31,8 @@ class Config:
                               CrawlEbayKleinanzeigen(),
                               CrawlImmowelt(),
                               CrawlSubito(),
-                              CrawlImmobiliare()]
+                              CrawlImmobiliare(),
+                              CrawlIdealista(self)]
 
     def __iter__(self):
         """Emulate dictionary"""
@@ -66,3 +68,6 @@ class Config:
 
     def captcha_enabled(self):
         return ("captcha" in self.config)
+
+    def use_proxy(self):
+        return ("use_proxy_list" in self.config and self.config["use_proxy_list"])

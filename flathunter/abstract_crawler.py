@@ -161,6 +161,9 @@ class Crawler:
         self.__log__.debug("Captcha promise: %s", recaptcha_answer)
         recaptcha_answer = recaptcha_answer.split("|")[1]
         driver.execute_script(f'document.getElementById("g-recaptcha-response").innerHTML="{recaptcha_answer}";')
+        # TODO: Below function call can be different depending on the websites implementation. It is resposible for
+        #  sending the the promise that we get from recaptcha_answer. For now, if it breaks, it is required to
+        #  reverse engineer it by hand. Not sure if there is a way to automate it.
         driver.execute_script(f'solvedCaptcha("{recaptcha_answer}")')
         self._check_if_iframe_not_visible(driver)
 

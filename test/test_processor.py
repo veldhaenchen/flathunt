@@ -2,7 +2,7 @@ import unittest
 import yaml
 import re
 from flathunter.crawl_immowelt import CrawlImmowelt
-from flathunter.hunter import Hunter 
+from flathunter.hunter import Hunter
 from flathunter.config import Config
 from flathunter.idmaintainer import IdMaintainer
 from flathunter.processor import ProcessorChain
@@ -24,7 +24,7 @@ google_maps_api:
     def test_addresses_are_processed_by_hunter(self):
         config = Config(string=self.DUMMY_CONFIG)
         config.set_searchers([DummyCrawler(addresses_as_links=True)])
-        hunter = Hunter(Config(string=self.DUMMY_CONFIG), IdMaintainer(":memory:"))
+        hunter = Hunter(config, IdMaintainer(":memory:"))
         exposes = hunter.hunt_flats()
         self.assertTrue(count(exposes) > 4, "Expected to find exposes")
         for expose in exposes:
@@ -37,9 +37,9 @@ google_maps_api:
         exposes = crawler.get_results("https://www.example.com/search")
         for expose in exposes:
             self.assertTrue(expose['address'].startswith('http'), "Expected addresses not yet to be processed")
-        chain = ProcessorChain.builder(Config(string=self.DUMMY_CONFIG)) \
-                              .resolve_addresses() \
-                              .build()
+        chain = ProcessorChain.builder(config) \
+            .resolve_addresses() \
+            .build()
         exposes = chain.process(exposes)
         for expose in exposes:
             self.assertFalse(expose['address'].startswith('http'), "Expected addresses to be processed")

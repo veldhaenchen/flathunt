@@ -13,20 +13,20 @@ class Config:
     """Class to represent flathunter configuration"""
 
     __log__ = logging.getLogger('flathunt')
-    __searchers__ = [CrawlImmobilienscout(),
-                     CrawlWgGesucht(),
-                     CrawlEbayKleinanzeigen(),
-                     CrawlImmowelt()]
 
     def __init__(self, filename=None, string=None):
         if string is not None:
             self.config = yaml.safe_load(string)
-            return
-        if filename is None:
-            filename = os.path.dirname(os.path.abspath(__file__)) + "/../config.yaml"
-        self.__log__.info("Using config %s", filename)
-        with open(filename) as file:
-            self.config = yaml.safe_load(file)
+        else:
+            if filename is None:
+                filename = os.path.dirname(os.path.abspath(__file__)) + "/../config.yaml"
+            self.__log__.info("Using config %s", filename)
+            with open(filename) as file:
+                self.config = yaml.safe_load(file)
+        self.__searchers__ = [CrawlImmobilienscout(self),
+                              CrawlWgGesucht(),
+                              CrawlEbayKleinanzeigen(),
+                              CrawlImmowelt()]
 
     def __iter__(self):
         """Emulate dictionary"""
@@ -46,18 +46,19 @@ class Config:
             return self.config["database_location"]
         return os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + "/..")
 
-    @staticmethod
-    def set_searchers(searchers):
+    def set_searchers(self, searchers):
         """Update the active search plugins"""
-        Config.__searchers__ = searchers
+        self.__searchers__ = searchers
 
-    @staticmethod
-    def searchers():
+    def searchers(self):
         """Get the list of search plugins"""
-        return Config.__searchers__
+        return self.__searchers__
 
     def get_filter(self):
         """Read the configured filter"""
         builder = Filter.builder()
         builder.read_config(self.config)
         return builder.build()
+
+    def captcha_enabled(self):
+        return ("captcha" in self.config)

@@ -108,10 +108,9 @@ class CrawlImmobilienscout(Crawler):
             'rooms': str(entry["resultlist.realEstate"]["numberOfRooms"])
         }
 
-    def get_page(self, search_url, driver, page_no=None):
+    def get_page(self, search_url, driver=None, page_no=None):
         """Applies a page number to a formatted search URL and fetches the exposes at that page"""
-        return self.get_soup_from_url(search_url.format(page_no), driver, self.captcha_api_key, self.checkbox,
-                                      self.afterlogin_string)
+        return self.get_soup_from_url(search_url.format(page_no), driver=driver, captcha_api_key=self.captcha_api_key, checkbox=self.checkbox, afterlogin_string=self.afterlogin_string)
 
     def get_expose_details(self, expose):
         """Loads additional details for an expose by processing the expose detail URL"""

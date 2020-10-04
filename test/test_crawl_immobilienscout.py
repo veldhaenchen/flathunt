@@ -3,14 +3,20 @@ import pytest
 from flathunter.crawl_immobilienscout import CrawlImmobilienscout
 from flathunter.config import Config
 
+DUMMY_CONFIG = """
+urls:
+  - https://www.immowelt.de/liste/berlin/wohnungen/mieten?roomi=2&prima=1500&wflmi=70&sort=createdate%2Bdesc
+    """
+
+
 TEST_URL = 'https://www.immobilienscout24.de/Suche/de/berlin/berlin/wohnung-mieten?numberofrooms=2.0-&price=-1500.0&livingspace=70.0-&sorting=2&pagenumber=1'
 
 @pytest.fixture
 def crawler():
-    return CrawlImmobilienscout(Config())
+    return CrawlImmobilienscout(Config(string=DUMMY_CONFIG))
 
 def test_crawl_works(crawler):
-    soup = crawler.get_page(TEST_URL, 1)
+    soup = crawler.get_page(TEST_URL, page_no=1)
     assert soup is not None
     entries = crawler.extract_data(soup)
     assert entries is not None
@@ -21,7 +27,7 @@ def test_crawl_works(crawler):
         assert entries[0][attr] is not None
 
 def test_process_expose_fetches_details(crawler):
-    soup = crawler.get_page(TEST_URL, 1)
+    soup = crawler.get_page(TEST_URL, page_no=1)
     assert soup is not None
     entries = crawler.extract_data(soup)
     assert entries is not None

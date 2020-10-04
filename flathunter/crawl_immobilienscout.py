@@ -2,6 +2,7 @@
 import logging
 import re
 import datetime
+import json
 
 from flathunter.abstract_crawler import Crawler
 
@@ -51,6 +52,11 @@ class CrawlImmobilienscout(Crawler):
         # load first page to get number of entries
         page_no = 1
         soup = self.get_page(search_url, self.driver, page_no)
+
+        # If we are using Selenium, just parse the results from the JSON in the page response
+        if self.driver is not None:
+            return self.get_entries_from_javascript()
+
         try:
             no_of_results = int(
                 soup.find_all(lambda e: e.has_attr('data-is24-qa') and \
@@ -76,6 +82,31 @@ class CrawlImmobilienscout(Crawler):
                 break
             entries.extend(cur_entry)
         return entries
+
+    def get_entries_from_javascript(self):
+        result_json = self.driver.execute_script('return IS24.resultList;')
+        try:
+            entry_list = result_json['resultListModel']['searchResponseModel']['resultlist.resultlist']['resultlistEntries'][0]['resultlistEntry']
+        except KeyError as key_error:
+            self.__log__.warn("Unable to process IS24 json: " + str(key_error))
+            return []
+        except IndexError as index_error:
+            self.__log__.warn("Unable to process IS24 json: " + str(key_error))
+            return []
+        return [ self.extract_entry_from_javascript(entry) for entry in entry_list ]
+
+    def extract_entry_from_javascript(self, entry):
+        return {
+            'id': int(entry["@id"]),
+            'url': ("https://www.immobilienscout24.de/expose/" + str(entry["@id"])),
+            'image': entry["resultlist.realEstate"]["galleryAttachments"]["attachment"][0]["@xlink.href"],
+            'title': entry["resultlist.realEstate"]["title"],
+            'address': entry["resultlist.realEstate"]["address"]["description"]["text"],
+            'crawler': self.get_name(),
+            'price': str(entry["resultlist.realEstate"]["monthlyRate"]),
+            'size': str(entry["resultlist.realEstate"]["livingSpace"]),
+            'rooms': str(entry["resultlist.realEstate"]["numberOfRooms"])
+        }
 
     def get_page(self, search_url, driver, page_no=None):
         """Applies a page number to a formatted search URL and fetches the exposes at that page"""

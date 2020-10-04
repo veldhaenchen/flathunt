@@ -86,7 +86,7 @@ class CrawlImmobilienscout(Crawler):
 
     def get_entries_from_javascript(self):
         try:
-            result_json = self.driver.execute_script('return IS24.resultList;')
+            result_json = self.driver.execute_script('return window.IS24.resultList;')
         except JavascriptException:
             self.__log__.warn("Unable to find IS24 variable in window")
             return []

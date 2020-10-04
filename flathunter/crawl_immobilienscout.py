@@ -5,6 +5,7 @@ import datetime
 import json
 
 from flathunter.abstract_crawler import Crawler
+from selenium.common.exceptions import JavascriptException
 
 class CrawlImmobilienscout(Crawler):
     """Implementation of Crawler interface for ImmobilienScout"""
@@ -84,7 +85,11 @@ class CrawlImmobilienscout(Crawler):
         return entries
 
     def get_entries_from_javascript(self):
-        result_json = self.driver.execute_script('return IS24.resultList;')
+        try:
+            result_json = self.driver.execute_script('return IS24.resultList;')
+        except JavascriptException:
+            self.__log__.warn("Unable to find IS24 variable in window")
+            return []
         try:
             entry_list = result_json['resultListModel']['searchResponseModel']['resultlist.resultlist']['resultlistEntries'][0]['resultlistEntry']
         except KeyError as key_error:

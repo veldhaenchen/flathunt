@@ -14,12 +14,16 @@ class CrawlIdealista(Crawler):
     URL_PATTERN = re.compile(r'https://www\.idealista\.it')
 
     def __init__(self, config):
+        self.config = config
         logging.getLogger("requests").setLevel(logging.WARNING)
 
     # pylint: disable=unused-argument
     def get_page(self, search_url, driver=None, page_no=None):
         """Applies a page number to a formatted search URL and fetches the exposes at that page"""
-        return self.get_soup_with_proxy(search_url)
+        if (self.config.use_proxy()):
+            return self.get_soup_with_proxy(search_url)
+
+        return self.get_soup_from_url(search_url)
 
     # pylint: disable=too-many-locals
     def extract_data(self, soup):

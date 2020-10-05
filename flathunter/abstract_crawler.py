@@ -22,7 +22,7 @@ class Crawler:
     __log__ = logging.getLogger('flathunt')
     URL_PATTERN = None
 
-    user_agent_rotator = UserAgent(popularity=[Popularity.COMMON], hardware_types=[HardwareType.COMPUTER])
+    user_agent_rotator = UserAgent(popularity=[Popularity.COMMON._value_], hardware_types=[HardwareType.COMPUTER._value_])
 
     HEADERS = {
         'Connection': 'keep-alive',
@@ -50,7 +50,7 @@ class Crawler:
 
     def rotate_user_agent(self):
         """Choose a new random user agent"""
-        user_agent_rotator = UserAgent(popularity=[Popularity.COMMON], hardware_types=[HardwareType.COMPUTER])
+        user_agent_rotator = UserAgent(popularity=[Popularity.COMMON._value_], hardware_types=[HardwareType.COMPUTER._value_])
         self.HEADERS['User-Agent'] = user_agent_rotator.get_random_user_agent()
 
     # pylint: disable=unused-argument
@@ -70,6 +70,7 @@ class Crawler:
             if re.search("g-recaptcha", driver.page_source):
                 self.resolvecaptcha(driver, checkbox, afterlogin_string, captcha_api_key)
             return BeautifulSoup(driver.page_source, 'html.parser')
+        return BeautifulSoup(resp.content, 'html.parser')
 
     def get_soup_with_proxy(self, url):
         """Will try proxies until it's possible to crawl and return a soup"""

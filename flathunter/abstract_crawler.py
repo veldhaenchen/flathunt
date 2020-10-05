@@ -13,6 +13,7 @@ from selenium import webdriver
 from itertools import cycle
 from bs4 import BeautifulSoup
 from random_user_agent.user_agent import UserAgent
+from random_user_agent.params import HardwareType, Popularity
 from flathunter import proxies
 
 class Crawler:
@@ -21,7 +22,7 @@ class Crawler:
     __log__ = logging.getLogger('flathunt')
     URL_PATTERN = None
 
-    user_agent_rotator = UserAgent()
+    user_agent_rotator = UserAgent(popularity=[Popularity.COMMON], hardware_types=[HardwareType.COMPUTER])
 
     HEADERS = {
         'Connection': 'keep-alive',
@@ -49,7 +50,7 @@ class Crawler:
 
     def rotate_user_agent(self):
         """Choose a new random user agent"""
-        user_agent_rotator = UserAgent()
+        user_agent_rotator = UserAgent(popularity=[Popularity.COMMON], hardware_types=[HardwareType.COMPUTER])
         self.HEADERS['User-Agent'] = user_agent_rotator.get_random_user_agent()
 
     # pylint: disable=unused-argument

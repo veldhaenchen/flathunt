@@ -27,6 +27,7 @@ Flathunter is a Python application which periodically [scrapes](https://en.wikip
 There are at least four different rental property marketplace sites that are widely used in Germany - [ImmoScout24](https://www.immobilienscout24.de/), [immowelt](https://www.immowelt.de/), [WG-Gesucht](https://www.wg-gesucht.de/) and [ebay Kleinanzeigen](https://www.ebay-kleinanzeigen.de/). Most people end up searching through listings on all four sites on an almost daily basis during their flat search.
 
 With Flathunter, instead of visiting the same pages on the same four sites every day, you can set the system up to scan every site, filtering by your search criteria, and notify you when new flats become available that meet your criteria.
+In Italy on the other hand, [Immobiliare.it](https://www.immobiliare.it) is very common for flat and property hunting. More websites such as [Subito](https://www.subito.it) and [Idealista](https://www.idealista.it) are also common, but not implemented as of today.
 
 ## Install
 
@@ -62,6 +63,7 @@ To configure the searches, simply visit the property portal of your choice (e.g.
 
  * Currently, ebay-kleinanzeigen, immowelt and WG Gesucht only crawl the first page, so make sure to **sort by newest offers**.
  * Your links should point to the German version of the websites, since it is tested only there. Otherwise you might have problems.
+ * For Immobiliare, the link should point to the Italian version of the website, for the same reasons reported above.
 
 #### Telegram
 

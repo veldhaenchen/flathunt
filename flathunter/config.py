@@ -7,6 +7,7 @@ from flathunter.crawl_ebaykleinanzeigen import CrawlEbayKleinanzeigen
 from flathunter.crawl_immobilienscout import CrawlImmobilienscout
 from flathunter.crawl_wggesucht import CrawlWgGesucht
 from flathunter.crawl_immowelt import CrawlImmowelt
+from flathunter.crawl_immobiliare import CrawlImmobiliare
 from flathunter.filter import Filter
 
 class Config:
@@ -26,7 +27,8 @@ class Config:
         self.__searchers__ = [CrawlImmobilienscout(self),
                               CrawlWgGesucht(),
                               CrawlEbayKleinanzeigen(),
-                              CrawlImmowelt()]
+                              CrawlImmowelt(),
+                              CrawlImmobiliare()]
 
     def __iter__(self):
         """Emulate dictionary"""

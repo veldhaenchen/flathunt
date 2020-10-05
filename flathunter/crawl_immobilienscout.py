@@ -96,7 +96,7 @@ class CrawlImmobilienscout(Crawler):
             self.__log__.warn("Unable to process IS24 json: " + str(key_error))
             return []
         except IndexError as index_error:
-            self.__log__.warn("Unable to process IS24 json: " + str(key_error))
+            self.__log__.warn("Unable to process IS24 json: " + str(index_error))
             return []
         return [ self.extract_entry_from_javascript(entry) for entry in entry_list ]
 
@@ -104,7 +104,7 @@ class CrawlImmobilienscout(Crawler):
         return {
             'id': int(entry["@id"]),
             'url': ("https://www.immobilienscout24.de/expose/" + str(entry["@id"])),
-            'image': entry["resultlist.realEstate"]["galleryAttachments"]["attachment"][0]["@xlink.href"],
+            'image': entry["resultlist.realEstate"]["galleryAttachments"]["attachment"][0]["@xlink.href"] if "galleryAttachments" in entry["resultlist.realEstate"] else "https://www.static-immobilienscout24.de/statpic/placeholder_house/496c95154de31a357afa978cdb7f15f0_placeholder_medium.png",
             'title': entry["resultlist.realEstate"]["title"],
             'address': entry["resultlist.realEstate"]["address"]["description"]["text"],
             'crawler': self.get_name(),

@@ -50,8 +50,7 @@ class Crawler:
 
     def rotate_user_agent(self):
         """Choose a new random user agent"""
-        user_agent_rotator = UserAgent(popularity=[Popularity.COMMON._value_], hardware_types=[HardwareType.COMPUTER._value_])
-        self.HEADERS['User-Agent'] = user_agent_rotator.get_random_user_agent()
+        self.HEADERS['User-Agent'] = self.user_agent_rotator.get_random_user_agent()
 
     # pylint: disable=unused-argument
     def get_page(self, search_url, driver=None, page_no=None):

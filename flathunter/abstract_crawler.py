@@ -1,7 +1,6 @@
 """Interface for webcrawlers. Crawler implementations should subclass this"""
 import re
 import logging
-import random
 import requests
 import selenium
 from time import sleep as sleep
@@ -11,8 +10,11 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium import webdriver
+from itertools import cycle
 from bs4 import BeautifulSoup
-
+from random_user_agent.user_agent import UserAgent
+from random_user_agent.params import HardwareType, Popularity
+from flathunter import proxies
 
 class Crawler:
     """Defines the Crawler interface"""
@@ -20,41 +22,14 @@ class Crawler:
     __log__ = logging.getLogger('flathunt')
     URL_PATTERN = None
 
-    USER_AGENTS = [
-        # Chrome
-        ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-         "AppleWebKit/537.36 (KHTML, like Gecko)"
-         "Chrome/74.0.3729.169 Safari/537.36"),
-        ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-         "AppleWebKit/537.36 (KHTML, like Gecko) "
-         "Chrome/80.0.3987.149 Safari/537.36"),
-        # Edge
-        ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-         "AppleWebKit/537.36 (KHTML, like Gecko) "
-         "Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393"),
-        ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-         "AppleWebKit/537.36 (KHTML, like Gecko) "
-         "Chrome/70.0.3538.102 Safari/537.36 Edge/18.18363"),
-        # Firefox
-        ("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) "
-         "Gecko/20100101 Firefox/40.1"),
-        ("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) "
-         "Gecko/20100101 Firefox/54.0"),
-        # Safari
-        ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) "
-         "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.1.2 "
-         "Safari/605.1.15"),
-        ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_3) "
-         "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 "
-         "Safari/605.1.15")
-    ]
+    user_agent_rotator = UserAgent(popularity=[Popularity.COMMON._value_], hardware_types=[HardwareType.COMPUTER._value_])
 
     HEADERS = {
         'Connection': 'keep-alive',
         'Pragma': 'no-cache',
         'Cache-Control': 'no-cache',
         'Upgrade-Insecure-Requests': '1',
-        'User-Agent': f'{random.choice(USER_AGENTS)}',
+        'User-Agent': user_agent_rotator.get_random_user_agent(),
         'Accept': 'text/html,application/xhtml+xml,application/xml;'
                   'q=0.9,image/webp,image/apng,*/*;q=0.8,'
                   'application/signed-exchange;v=b3;q=0.9',
@@ -75,7 +50,8 @@ class Crawler:
 
     def rotate_user_agent(self):
         """Choose a new random user agent"""
-        self.HEADERS['User-Agent'] = random.choice(self.USER_AGENTS)
+        user_agent_rotator = UserAgent(popularity=[Popularity.COMMON._value_], hardware_types=[HardwareType.COMPUTER._value_])
+        self.HEADERS['User-Agent'] = user_agent_rotator.get_random_user_agent()
 
     # pylint: disable=unused-argument
     def get_page(self, search_url, driver=None, page_no=None):
@@ -84,6 +60,7 @@ class Crawler:
 
     def get_soup_from_url(self, url, driver=None, captcha_api_key=None, checkbox=None, afterlogin_string=None):
         """Creates a Soup object from the HTML at the provided URL"""
+
         self.rotate_user_agent()
         resp = requests.get(url, headers=self.HEADERS)
         if resp.status_code != 200:
@@ -93,6 +70,39 @@ class Crawler:
             if re.search("g-recaptcha", driver.page_source):
                 self.resolvecaptcha(driver, checkbox, afterlogin_string, captcha_api_key)
             return BeautifulSoup(driver.page_source, 'html.parser')
+        return BeautifulSoup(resp.content, 'html.parser')
+
+    def get_soup_with_proxy(self, url):
+        """Will try proxies until it's possible to crawl and return a soup"""
+        resolved = False
+        resp = None
+
+        # We will keep trying to fetch new proxies until one works
+        while not resolved:
+            proxies_list = proxies.get_proxies()
+            for proxy in proxies_list:
+                self.rotate_user_agent()
+
+                try:
+                    # Very low proxy read timeout, or it will get stuck on slow proxies
+                    resp = requests.get(url, headers=self.HEADERS, proxies={"http": proxy, "https": proxy}, timeout=(20, 0.1))
+
+                    if resp.status_code != 200:
+                        self.__log__.error("Got response (%i): %s", resp.status_code, resp.content)
+                    else:
+                        resolved = True
+                        break
+
+                except requests.exceptions.ConnectionError:
+                    self.__log__.error("Connection failed for proxy %s. Trying new proxy...", proxy)
+                except requests.exceptions.Timeout:
+                    self.__log__.error("Connection timed out for proxy %s. Trying new proxy...", proxy)
+                except:
+                    self.__log__.error("Some error occurred. Trying new proxy...")
+
+        if not resp:
+            raise Exception("An error occurred while fetching proxies or content")
+
         return BeautifulSoup(resp.content, 'html.parser')
 
     # pylint: disable=no-self-use

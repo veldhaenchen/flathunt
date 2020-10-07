@@ -11,8 +11,9 @@ class CrawlImmowelt(Crawler):
     __log__ = logging.getLogger('flathunt')
     URL_PATTERN = re.compile(r'https://www\.immowelt\.de')
 
-    def __init__(self):
+    def __init__(self, config):
         logging.getLogger("requests").setLevel(logging.WARNING)
+        self.config = config
 
     def get_expose_details(self, expose):
         """Loads additional details for an expose by processing the expose detail URL"""

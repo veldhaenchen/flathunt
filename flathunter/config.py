@@ -27,11 +27,11 @@ class Config:
             with open(filename) as file:
                 self.config = yaml.safe_load(file)
         self.__searchers__ = [CrawlImmobilienscout(self),
-                              CrawlWgGesucht(),
-                              CrawlEbayKleinanzeigen(),
-                              CrawlImmowelt(),
-                              CrawlSubito(),
-                              CrawlImmobiliare(),
+                              CrawlWgGesucht(self),
+                              CrawlEbayKleinanzeigen(self),
+                              CrawlImmowelt(self),
+                              CrawlSubito(self),
+                              CrawlImmobiliare(self),
                               CrawlIdealista(self)]
 
     def __iter__(self):

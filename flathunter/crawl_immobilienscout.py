@@ -10,6 +10,10 @@ from selenium.common.exceptions import JavascriptException
 class CrawlImmobilienscout(Crawler):
     """Implementation of Crawler interface for ImmobilienScout"""
 
+    def __init__(self, config):
+        logging.getLogger("requests").setLevel(logging.WARNING)
+        self.config = config
+
     __log__ = logging.getLogger('flathunt')
     URL_PATTERN = re.compile(r'https://www\.immobilienscout24\.de')
     RESULT_LIMIT = 50

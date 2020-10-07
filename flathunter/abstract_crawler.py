@@ -21,6 +21,9 @@ class Crawler:
     __log__ = logging.getLogger('flathunt')
     URL_PATTERN = None
 
+    def __init__(self, config):
+        self.config = config
+
     user_agent_rotator = UserAgent(popularity=[Popularity.COMMON._value_],
                                    hardware_types=[HardwareType.COMPUTER._value_])
 
@@ -64,6 +67,8 @@ class Crawler:
         resp = requests.get(url, headers=self.HEADERS)
         if resp.status_code != 200:
             self.__log__.error("Got response (%i): %s", resp.status_code, resp.content)
+        if self.config.use_proxy():
+            return self.get_soup_with_proxy(url)
         if driver is not None and re.search("g-recaptcha", resp.text):
             driver.get(url)
             if re.search("g-recaptcha", driver.page_source):

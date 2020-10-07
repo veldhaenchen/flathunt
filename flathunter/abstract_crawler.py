@@ -21,7 +21,8 @@ class Crawler:
     __log__ = logging.getLogger('flathunt')
     URL_PATTERN = None
 
-    user_agent_rotator = UserAgent(popularity=[Popularity.COMMON._value_], hardware_types=[HardwareType.COMPUTER._value_])
+    user_agent_rotator = UserAgent(popularity=[Popularity.COMMON._value_],
+                                   hardware_types=[HardwareType.COMPUTER._value_])
 
     HEADERS = {
         'Connection': 'keep-alive',
@@ -83,7 +84,8 @@ class Crawler:
 
                 try:
                     # Very low proxy read timeout, or it will get stuck on slow proxies
-                    resp = requests.get(url, headers=self.HEADERS, proxies={"http": proxy, "https": proxy}, timeout=(20, 0.1))
+                    resp = requests.get(url, headers=self.HEADERS, proxies={"http": proxy, "https": proxy},
+                                        timeout=(20, 0.1))
 
                     if resp.status_code != 200:
                         self.__log__.error("Got response (%i): %s", resp.status_code, resp.content)
@@ -169,7 +171,7 @@ class Crawler:
         self.__log__.debug("Captcha promise: %s", recaptcha_answer)
         recaptcha_answer = recaptcha_answer.split("|")[1]
         driver.execute_script(f'document.getElementById("g-recaptcha-response").innerHTML="{recaptcha_answer}";')
-        # TODO: Below function call can be different depending on the websites implementation. It is resposible for
+        # TODO: Below function call can be different depending on the websites implementation. It is responsible for
         #  sending the the promise that we get from recaptcha_answer. For now, if it breaks, it is required to
         #  reverse engineer it by hand. Not sure if there is a way to automate it.
         driver.execute_script(f'solvedCaptcha("{recaptcha_answer}")')

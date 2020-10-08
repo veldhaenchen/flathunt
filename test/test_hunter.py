@@ -18,6 +18,7 @@ google_maps_api:
   key: SOME_KEY
   url: https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={dest}&mode={mode}&sensor=true&key={key}&arrival_time={arrival}
   enable: true
+  use_proxy_list: False
     """
 
     FILTER_TITLES_CONFIG = """
@@ -95,7 +96,7 @@ excluded_titles:
 
     def test_hunt_flats(self):
         config = Config(string=self.DUMMY_CONFIG)
-        config.set_searchers([CrawlImmowelt()])
+        config.set_searchers([CrawlImmowelt(Config(string=self.DUMMY_CONFIG))])
         hunter = Hunter(config, IdMaintainer(":memory:"))
         exposes = hunter.hunt_flats()
         self.assertTrue(count(exposes) > 0, "Expected to find exposes")

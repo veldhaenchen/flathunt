@@ -11,8 +11,9 @@ class CrawlWgGesucht(Crawler):
     __log__ = logging.getLogger('flathunt')
     URL_PATTERN = re.compile(r'https://www\.wg-gesucht\.de')
 
-    def __init__(self):
+    def __init__(self, config):
         logging.getLogger("requests").setLevel(logging.WARNING)
+        self.config = config
 
     # pylint: disable=too-many-locals
     def extract_data(self, soup):

@@ -25,8 +25,9 @@ class CrawlEbayKleinanzeigen(Crawler):
         "Dezember": "12"
     }
 
-    def __init__(self):
+    def __init__(self, config):
         logging.getLogger("requests").setLevel(logging.WARNING)
+        self.config = config
 
     def get_page(self, url):
         """Applies a page number to a formatted search URL and fetches the exposes at that page"""

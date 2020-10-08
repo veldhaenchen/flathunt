@@ -10,7 +10,6 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium import webdriver
-from itertools import cycle
 from bs4 import BeautifulSoup
 from random_user_agent.user_agent import UserAgent
 from random_user_agent.params import HardwareType, Popularity
@@ -22,7 +21,11 @@ class Crawler:
     __log__ = logging.getLogger('flathunt')
     URL_PATTERN = None
 
-    user_agent_rotator = UserAgent(popularity=[Popularity.COMMON._value_], hardware_types=[HardwareType.COMPUTER._value_])
+    def __init__(self, config):
+        self.config = config
+
+    user_agent_rotator = UserAgent(popularity=[Popularity.COMMON._value_],
+                                   hardware_types=[HardwareType.COMPUTER._value_])
 
     HEADERS = {
         'Connection': 'keep-alive',
@@ -64,6 +67,8 @@ class Crawler:
         resp = requests.get(url, headers=self.HEADERS)
         if resp.status_code != 200:
             self.__log__.error("Got response (%i): %s", resp.status_code, resp.content)
+        if self.config.use_proxy():
+            return self.get_soup_with_proxy(url)
         if driver is not None and re.search("g-recaptcha", resp.text):
             driver.get(url)
             if re.search("g-recaptcha", driver.page_source):
@@ -84,7 +89,8 @@ class Crawler:
 
                 try:
                     # Very low proxy read timeout, or it will get stuck on slow proxies
-                    resp = requests.get(url, headers=self.HEADERS, proxies={"http": proxy, "https": proxy}, timeout=(20, 0.1))
+                    resp = requests.get(url, headers=self.HEADERS, proxies={"http": proxy, "https": proxy},
+                                        timeout=(20, 0.1))
 
                     if resp.status_code != 200:
                         self.__log__.error("Got response (%i): %s", resp.status_code, resp.content)
@@ -170,7 +176,7 @@ class Crawler:
         self.__log__.debug("Captcha promise: %s", recaptcha_answer)
         recaptcha_answer = recaptcha_answer.split("|")[1]
         driver.execute_script(f'document.getElementById("g-recaptcha-response").innerHTML="{recaptcha_answer}";')
-        # TODO: Below function call can be different depending on the websites implementation. It is resposible for
+        # TODO: Below function call can be different depending on the websites implementation. It is responsible for
         #  sending the the promise that we get from recaptcha_answer. For now, if it breaks, it is required to
         #  reverse engineer it by hand. Not sure if there is a way to automate it.
         driver.execute_script(f'solvedCaptcha("{recaptcha_answer}")')

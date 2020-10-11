@@ -69,7 +69,7 @@ class Crawler:
             self.__log__.error("Got response (%i): %s", resp.status_code, resp.content)
         if self.config.use_proxy():
             return self.get_soup_with_proxy(url)
-        if driver is not None and re.search("g-recaptcha", resp.text):
+        if driver is not None:
             driver.get(url)
             if re.search("g-recaptcha", driver.page_source):
                 self.resolvecaptcha(driver, checkbox, afterlogin_string, captcha_api_key)

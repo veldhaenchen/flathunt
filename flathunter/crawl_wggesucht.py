@@ -77,5 +77,5 @@ class CrawlWgGesucht(Crawler):
         """Extract address from expose itself"""
         response = self.get_soup_from_url(url)
         address = ' '.join(response.find('div', {"class": "col-sm-4 mb10"})
-                           .find("a", {"href": "#"}).text.strip().split())
+                           .find("a", {"href": "#mapContainer"}).text.strip().split())
         return address

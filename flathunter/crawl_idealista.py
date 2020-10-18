@@ -61,7 +61,7 @@ class CrawlIdealista(Crawler):
                 'price': price,
                 'size': size,
                 'rooms': rooms,
-                'address': re.findall("(?:\sin\s|\sa\s)(.*)$", title)[0],
+                'address': re.findall(r'(?:\sin\s|\sa\s)(.*)$', title)[0],
                 'crawler': self.get_name()
             }
 

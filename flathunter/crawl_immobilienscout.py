@@ -6,6 +6,7 @@ import json
 
 from flathunter.abstract_crawler import Crawler
 from selenium.common.exceptions import JavascriptException
+from jsonpath_ng import jsonpath, parse
 
 class CrawlImmobilienscout(Crawler):
     """Implementation of Crawler interface for ImmobilienScout"""
@@ -94,27 +95,24 @@ class CrawlImmobilienscout(Crawler):
         except JavascriptException:
             self.__log__.warn("Unable to find IS24 variable in window")
             return []
-        try:
-            entry_list = result_json['resultListModel']['searchResponseModel']['resultlist.resultlist']['resultlistEntries'][0]['resultlistEntry']
-        except KeyError as key_error:
-            self.__log__.warn("Unable to process IS24 json: " + str(key_error))
-            return []
-        except IndexError as index_error:
-            self.__log__.warn("Unable to process IS24 json: " + str(index_error))
-            return []
-        return [ self.extract_entry_from_javascript(entry) for entry in entry_list ]
+        return self.get_entries_from_json(result_json)
+
+    def get_entries_from_json(self, json):
+        jsonpath_expr = parse("$..['resultlist.realEstate']")
+        return [ self.extract_entry_from_javascript(entry.value) for entry in jsonpath_expr.find(json) ]
 
     def extract_entry_from_javascript(self, entry):
+        image_path = parse("$..galleryAttachments..['@xlink.href']")
         return {
             'id': int(entry["@id"]),
             'url': ("https://www.immobilienscout24.de/expose/" + str(entry["@id"])),
-            'image': entry["resultlist.realEstate"]["galleryAttachments"]["attachment"][0]["@xlink.href"] if "galleryAttachments" in entry["resultlist.realEstate"] else "https://www.static-immobilienscout24.de/statpic/placeholder_house/496c95154de31a357afa978cdb7f15f0_placeholder_medium.png",
-            'title': entry["resultlist.realEstate"]["title"],
-            'address': entry["resultlist.realEstate"]["address"]["description"]["text"],
+            'image': next(iter([ galleryImage.value for galleryImage in image_path.find(entry) ]), "https://www.static-immobilienscout24.de/statpic/placeholder_house/496c95154de31a357afa978cdb7f15f0_placeholder_medium.png"),
+            'title': entry["title"],
+            'address': entry["address"]["description"]["text"],
             'crawler': self.get_name(),
-            'price': str(entry["resultlist.realEstate"]["monthlyRate"]),
-            'size': str(entry["resultlist.realEstate"]["livingSpace"]),
-            'rooms': str(entry["resultlist.realEstate"]["numberOfRooms"])
+            'price': str(entry["monthlyRate"]),
+            'size': str(entry["livingSpace"]),
+            'rooms': str(entry["numberOfRooms"])
         }
 
     def get_page(self, search_url, driver=None, page_no=None):

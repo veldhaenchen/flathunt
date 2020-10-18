@@ -1,4 +1,6 @@
 import pytest
+import json
+import os
 
 from flathunter.crawl_immobilienscout import CrawlImmobilienscout
 from flathunter.config import Config
@@ -14,6 +16,12 @@ TEST_URL = 'https://www.immobilienscout24.de/Suche/de/berlin/berlin/wohnung-miet
 @pytest.fixture
 def crawler():
     return CrawlImmobilienscout(Config(string=DUMMY_CONFIG))
+
+def test_parse_exposes_from_json(crawler):
+    with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "fixtures", "immo-scout-IS24-object.json")) as fixture:
+        data = json.load(fixture)
+    entries = crawler.get_entries_from_json(data)
+    assert len(entries) > 0
 
 def test_crawl_works(crawler):
     soup = crawler.get_page(TEST_URL, page_no=1)

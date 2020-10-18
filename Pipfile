@@ -25,6 +25,7 @@ pytest = "*"
 pylint = "*"
 selenium = "*"
 random-user-agent = "*"
+jsonpath-ng = "*"
 
 [dev-packages]
 

@@ -110,7 +110,7 @@ class CrawlImmobilienscout(Crawler):
             'title': entry["title"],
             'address': entry["address"]["description"]["text"],
             'crawler': self.get_name(),
-            'price': str(entry["monthlyRate"]),
+            'price': str(entry["price"]["value"]),
             'size': str(entry["livingSpace"]),
             'rooms': str(entry["numberOfRooms"])
         }

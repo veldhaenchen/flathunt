@@ -1,6 +1,8 @@
 """Expose crawler for WgGesucht"""
 import logging
 import re
+import requests
+from bs4 import BeautifulSoup
 
 from flathunter.abstract_crawler import Crawler
 
@@ -79,3 +81,29 @@ class CrawlWgGesucht(Crawler):
         address = ' '.join(response.find('div', {"class": "col-sm-4 mb10"})
                            .find("a", {"href": "#mapContainer"}).text.strip().split())
         return address
+
+    def get_soup_from_url(self, url, driver=None, captcha_api_key=None, checkbox=None, afterlogin_string=None):
+        """
+        Creates a Soup object from the HTML at the provided URL
+
+        Overwrites the method inherited from abstract_crawler. This is
+        necessary as we need to reload the page once for all filters to
+        be applied correctly on wg-gesucht.
+        """
+        self.rotate_user_agent()
+        sess = requests.session()
+        # First page load to set filters; response is discarded
+        sess.get(url, headers=self.HEADERS)
+        # Second page load
+        resp = sess.get(url, headers=self.HEADERS)
+
+        if resp.status_code != 200:
+            self.__log__.error("Got response (%i): %s", resp.status_code, resp.content)
+        if self.config.use_proxy():
+            return self.get_soup_with_proxy(url)
+        if driver is not None:
+            driver.get(url)
+            if re.search("g-recaptcha", driver.page_source):
+                self.resolvecaptcha(driver, checkbox, afterlogin_string, captcha_api_key)
+            return BeautifulSoup(driver.page_source, 'html.parser')
+        return BeautifulSoup(resp.content, 'html.parser')

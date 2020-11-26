@@ -158,10 +158,8 @@ class Crawler:
                 self._wait_for_captcha_resolution(driver, checkbox, afterlogin_string)
 
     def _solve(self, driver, api_key):
-        src_iframe = driver.find_element_by_tag_name("iframe").get_attribute("src")
-        google_site_key_temp = re.search("&k=(.*?)&", src_iframe)
-        self.__log__.debug("Google site key: %s", google_site_key_temp)
-        google_site_key = google_site_key_temp.group(1)
+        google_site_key = driver.find_element_by_class_name("g-recaptcha").get_attribute("data-sitekey")
+        self.__log__.debug("Google site key: %s", google_site_key)
         url = driver.current_url
         session = requests.Session()
         postrequest = (

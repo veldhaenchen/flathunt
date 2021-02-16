@@ -25,6 +25,7 @@ class WebHunter(Hunter):
                                         .save_all_exposes(self.id_watch) \
                                         .resolve_addresses() \
                                         .calculate_durations() \
+                                        .send_telegram_messages() \
                                         .build()
 
         new_exposes = []

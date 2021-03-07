@@ -60,11 +60,9 @@ class CrawlEbayKleinanzeigen(Crawler):
         # print(expose_ids)
         for idx, title_el in enumerate(title_elements):
             try:
-                price = expose_ids[idx].find("strong").text
+                price = expose_ids[idx].find(class_="aditem-main--middle--price").text.strip()
                 tags = expose_ids[idx].find_all(class_="simpletag tag-small")
-                address = expose_ids[idx].find("div", {"class": "aditem-details"})
-                address.find("strong").extract()
-                address.find("br").extract()
+                address = expose_ids[idx].find("div", {"class": "aditem-main--top--left"})
                 image_element = expose_ids[idx].find("div", {"class": "srpimagebox"})
             except AttributeError as error:
                 self.__log__.warning("Unable to process Ebay expose: %s", str(error))

@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from flathunter.abstract_crawler import Crawler
+from flathunter.string_utils import remove_prefix
 
 
 class CrawlWgGesucht(Crawler):
@@ -30,7 +31,7 @@ class CrawlWgGesucht(Crawler):
         for row in existing_findings:
             title_row = row.find('h3', {"class": "truncate_title"})
             title = title_row.text.strip()
-            url = base_url + title_row.find('a')['href']
+            url = base_url + remove_prefix(title_row.find('a')['href'], "/")
             image = re.match(r'background-image: url\((.*)\);',
                              row.find('div', {"class": "card_image"}).find('a')['style'])[1]
             detail_string = row.find("div", {"class": "col-xs-11"}).text.strip().split("|")

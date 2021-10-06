@@ -43,50 +43,56 @@ class CrawlImmowelt(Crawler):
     def extract_data(self, soup):
         """Extracts all exposes from a provided Soup object"""
         entries = list()
-        soup = soup.find(id="listItemWrapperFixed")
+        soup = soup.find("main")
+
         try:
             title_elements = soup.find_all("h2")
         except AttributeError:
             return entries
-        expose_ids = soup.find_all("div", class_="listitem_wrap")
+        expose_ids = soup.find_all("a", id=True)
 
-        # soup.find_all(lambda e: e.has_attr('data-adid'))
-        # print(expose_ids)
         for idx, title_el in enumerate(title_elements):
 
-            tags = expose_ids[idx].find_all(class_="hardfact")
-            url = "https://www.immowelt.de" + expose_ids[idx].find("a").get("href")
-            picture = expose_ids[idx].find("picture")
-            if picture is not None:
-                image = picture.find("img")['src']
-            else:
-                image = None
-            address = expose_ids[idx].find(class_="listlocation")
-            address.find("span").extract()
-            address = address.text.strip()
-
             try:
-                price = tags[0].find("strong").text.strip()
+                price = expose_ids[idx].find(
+                    "div", attrs={"data-test": "price"}).text
             except IndexError:
                 self.__log__.error("Kein Preis angegeben")
                 price = "Auf Anfrage"
 
             try:
-                tags[1].find("div").extract()
-                size = tags[1].text.strip()
+                size = expose_ids[idx].find(
+                    "div", attrs={"data-test": "area"}).text
             except IndexError:
                 size = "Nicht gegeben"
                 self.__log__.error("Quadratmeter nicht angegeben")
 
             try:
-                tags[2].find("div").extract()
-                rooms = tags[2].text.strip()
+                rooms = expose_ids[idx].find(
+                    "div", attrs={"data-test": "rooms"}).text
             except IndexError:
                 self.__log__.error("Keine Zimmeranzahl gegeben")
                 rooms = "Nicht gegeben"
 
+            url = expose_ids[idx].get("href")
+
+            picture = expose_ids[idx].find("picture")
+            if picture is not None:
+                image = picture.find("source").get("data-srcset")
+
+            else:
+                image = None
+
+            try:
+                address = expose_ids[idx].find(
+                    "div", attrs={"class": re.compile("IconFact.*")})
+                address = address.find("span").text
+            except IndexError:
+                self.__log__.error("Keine Addresse gegeben")
+                address = "Nicht gegeben"
+
             details = {
-                'id': int(expose_ids[idx].get("data-estateid")),
+                'id': expose_ids[idx].get("id"),
                 'image': image,
                 'url': url,
                 'title': title_el.text.strip(),

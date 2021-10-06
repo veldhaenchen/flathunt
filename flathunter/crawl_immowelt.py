@@ -2,6 +2,7 @@
 import logging
 import re
 import datetime
+import hashlib
 
 from flathunter.abstract_crawler import Crawler
 
@@ -92,7 +93,7 @@ class CrawlImmowelt(Crawler):
                 address = "Nicht gegeben"
 
             details = {
-                'id': expose_ids[idx].get("id"),
+                'id': int(hashlib.sha256(expose_ids[idx].get("id").encode('utf-8')).hexdigest(),16) % 10**16,
                 'image': image,
                 'url': url,
                 'title': title_el.text.strip(),

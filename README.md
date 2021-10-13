@@ -1,7 +1,8 @@
 # Flathunter
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat)](https://github.com/RichardLitt/standard-readme)
-[![travis build status](https://travis-ci.org/flathunters/flathunter.svg?branch=main)](https://travis-ci.org/github/flathunters/flathunter)
+[![Lint Code Base](https://github.com/flathunter/flathunter/actions/workflows/linter.yml/badge.svg)](https://github.com/flathunter/flathunter/actions/workflows/linter.yml)
+[![Tests](https://github.com/flathunter/flathunter/actions/workflows/tests.yml/badge.svg)](https://github.com/flathunter/flathunter/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/gh/flathunters/flathunter/branch/master/graph/badge.svg)](https://codecov.io/gh/flathunters/flathunter)
 
 A Telegram bot to help people with their flat search

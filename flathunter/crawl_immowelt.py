@@ -78,7 +78,11 @@ class CrawlImmowelt(Crawler):
             url = expose_ids[idx].get("href")
 
             picture = expose_ids[idx].find("picture")
-            if picture is not None:
+            image = None
+            if picture:
+                    src = picture.find("source")
+                if src:
+                    image = src.get("data-srcset")
                 src = picture.find("source")
                 if src is not None:
                     image = src.get("data-srcset")

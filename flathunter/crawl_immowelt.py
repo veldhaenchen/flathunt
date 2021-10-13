@@ -80,16 +80,9 @@ class CrawlImmowelt(Crawler):
             picture = expose_ids[idx].find("picture")
             image = None
             if picture:
-                    src = picture.find("source")
+                src = picture.find("source")
                 if src:
                     image = src.get("data-srcset")
-                src = picture.find("source")
-                if src is not None:
-                    image = src.get("data-srcset")
-                else:
-                    image = None
-            else:
-                image = None
 
             try:
                 address = expose_ids[idx].find(

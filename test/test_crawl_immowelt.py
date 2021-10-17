@@ -22,7 +22,7 @@ def test_crawler(crawler):
     entries = crawler.extract_data(soup)
     assert entries is not None
     assert len(entries) > 0
-    assert entries[0]['id'] > 0
+    assert entries[0]['id']
     assert entries[0]['url'].startswith("https://www.immowelt.de/expose")
     for attr in [ 'title', 'price', 'size', 'rooms', 'address', 'image' ]:
         assert entries[0][attr] is not None

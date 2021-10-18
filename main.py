@@ -24,7 +24,11 @@ if 'website' in config:
     app.config["BOT_NAME"] = config['website']['bot_name']
 else:
     app.secret_key = b'Not a secret'
-app.config["BOT_TOKEN"] = config['telegram']['bot_token']
+notifiers = config["notifiers"]
+if "telegram" in notifiers:
+    app.config["BOT_TOKEN"] = config['telegram']['bot_token']
+if "mattermost" in notifiers:
+    app.config["MM_WEBHOOK_URL"] = config['mattermost']['webhook_url']
 
 if __name__ == '__main__':
     listen = config['website']['listen']

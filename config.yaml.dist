@@ -122,6 +122,16 @@ captcha:
   driver_arguments:
     - "--headless"
 
+# You can select whether to be notified by telegram or via a mattermost
+# webhook. For all notifiers selected here a configuration must be provided
+# below.
+# notifiers:
+#   - telegram
+#   - mattermost
+notifiers:
+    - telegram
+    - mattermost
+
 # Sending messages using Telegram requires a Telegram Bot configured. 
 # Telegram.org offers a good documentation about how to create a bot.
 # Once you read it, will make sense. Still: bot_token should hold the
@@ -134,9 +144,13 @@ captcha:
 #   receiver_ids:
 #       - 12345....
 #       - 67890....
-telegram:
-    bot_token: 
-    receiver_ids:
+
+# Sending messages via mattermost requires a webhook url provided by a
+# mattermost server. You can find a description how to set up a webhook with
+# the official mattermost documentation:
+# https://docs.mattermost.com/developer/webhooks-incoming.html
+# mattermost:
+#   webhook_url: https://mattermost.example.com/signup_user_complete/?id=abcdef12356
 
 # If you are running the web interface, you can configure Login with Telegram support
 # Follow the instructions here to register your domain with the Telegram bot:

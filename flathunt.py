@@ -7,6 +7,7 @@
 import argparse
 import os
 import logging
+import sys
 import time
 from pprint import pformat
 
@@ -49,7 +50,6 @@ def launch_flat_hunt(config):
         time.sleep(config.get('loop', dict()).get('sleeping_time', 60 * 10))
         hunter.hunt_flats()
 
-
 def main():
     """Processes command-line arguments, loads the config, launches the flathunter"""
     parser = argparse.ArgumentParser(description=\
@@ -68,11 +68,17 @@ def main():
     config = Config(config_handle.name)
 
     # check config
-    if not config.get('telegram', dict()).get('bot_token'):
-        __log__.error("No telegram bot token configured. Starting like this would be pointless...")
+    notifiers = config.get('notifiers', list())
+    if 'mattermost' in notifiers \
+            and not config.get('mattermost', dict()).get('webhook_url'):
+        __log__.error("No mattermost webhook configured. Starting like this would be pointless...")
         return
-    if not config.get('telegram', dict()).get('receiver_ids'):
-        __log__.warning("No telegram receivers configured - nobody will get notifications.")
+    if 'telegram' in notifiers:
+        if not config.get('telegram', dict()).get('bot_token'):
+            __log__.error("No telegram bot token configured. Starting like this would be pointless...")
+            return
+        if not config.get('telegram', dict()).get('receiver_ids'):
+            __log__.warning("No telegram receivers configured - nobody will get notifications.")
     if not config.get('urls'):
         __log__.error("No urls configured. Starting like this would be meaningless...")
         return

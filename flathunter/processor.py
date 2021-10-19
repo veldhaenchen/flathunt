@@ -17,7 +17,7 @@ class ProcessorChainBuilder:
         self.processors = []
         self.config = config
 
-    def send_telegram_messages(self, receivers=None):
+    def send_messages(self, receivers=None):
         """Add processor that sends Telegram messages for exposes"""
         self.processors.append(SenderTelegram(self.config, receivers=receivers))
         """Add processor that sends Mattermost messages for exposes"""

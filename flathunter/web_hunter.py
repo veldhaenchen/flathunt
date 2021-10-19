@@ -25,7 +25,7 @@ class WebHunter(Hunter):
                                         .save_all_exposes(self.id_watch) \
                                         .resolve_addresses() \
                                         .calculate_durations() \
-                                        .send_telegram_messages() \
+                                        .send_messages() \
                                         .build()
 
         new_exposes = []
@@ -38,7 +38,7 @@ class WebHunter(Hunter):
             filter_set = Filter.builder().read_config(settings).build()
             processor_chain = ProcessorChain.builder(self.config) \
                                             .apply_filter(filter_set) \
-                                            .send_telegram_messages([user_id]) \
+                                            .send_messages([user_id]) \
                                             .build()
             for message in processor_chain.process(new_exposes):
                 self.__log__.debug("Sent expose %d to user %d", message['id'], user_id)

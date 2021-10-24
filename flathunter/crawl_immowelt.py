@@ -19,25 +19,21 @@ class CrawlImmowelt(Crawler):
     def get_expose_details(self, expose):
         """Loads additional details for an expose by processing the expose detail URL"""
         soup = self.get_page(expose['url'])
-        immo_div = soup.find("div", {"id": "divImmobilie"})
+        date = datetime.datetime.now().strftime("%2d.%2m.%Y")
+        
+        immo_div = soup.find("app-estate-object-informations")
         if immo_div is not None:
-            details = immo_div.find_all("div", {"class": "clear"})
-            for detail in details:
-                if detail.find("div", {"class": "iw_left"}) is None:
-                    continue
-                if detail.find("div", {"class": "iw_left"}).text.strip() == 'Die Wohnung':
-                    description_element = detail.find("div", {"class": "iw_right"})
-                    if description_element is None or description_element.find("p") is None:
-                        continue
-                    description = description_element.find("p").text
-                    if re.match(r'.*sofort.*', description, re.MULTILINE|re.DOTALL|re.IGNORECASE):
-                        expose['from'] = datetime.datetime.now().strftime("%2d.%2m.%Y")
-                    date_string = re.match(r'.*(\d{2}.\d{2}.\d{4}).*',
-                                           description, re.MULTILINE|re.DOTALL)
-                    if date_string is not None:
-                        expose['from'] = date_string[1]
-            if 'from' not in expose:
-                expose['from'] = datetime.datetime.now().strftime("%2d.%2m.%Y")
+            immo_div = soup.find("div", {"class": "equipment ng-star-inserted"})
+            if immo_div is not None:
+                details = immo_div.find_all("p")
+
+                for detail in details:
+                    if detail.text.strip() == "Bezug": 
+                        date = detail.findNext("p").text.strip()
+                        if re.match(r'.*sofort.*|.*Nach Vereinbarung.*', date, re.MULTILINE|re.DOTALL|re.IGNORECASE):
+                            date = datetime.datetime.now().strftime("%2d.%2m.%Y")
+                        break
+        expose['from'] = date
         return expose
 
     # pylint: disable=too-many-locals

@@ -1,5 +1,7 @@
 """Interface for webcrawlers. Crawler implementations should subclass this"""
 import re
+import urllib
+import json
 import logging
 import requests
 import selenium
@@ -49,6 +51,8 @@ class Crawler:
             for driver_argument in driver_arguments:
                 chrome_options.add_argument(driver_argument)
         driver = webdriver.Chrome(executable_path=driver_path, options=chrome_options)
+        driver.execute_cdp_cmd('Network.setBlockedURLs', {"urls": ["https://api.geetest.com/get.*"]})
+        driver.execute_cdp_cmd('Network.enable', {})
         return driver
 
     def rotate_user_agent(self):
@@ -71,7 +75,9 @@ class Crawler:
             return self.get_soup_with_proxy(url)
         if driver is not None:
             driver.get(url)
-            if re.search("g-recaptcha", driver.page_source):
+            if re.search("initGeetest", driver.page_source):
+                self.resolvegeetest(driver, captcha_api_key)
+            elif re.search("g-recaptcha", driver.page_source):
                 self.resolvecaptcha(driver, checkbox, afterlogin_string, captcha_api_key)
             return BeautifulSoup(driver.page_source, 'html.parser')
         return BeautifulSoup(resp.content, 'html.parser')
@@ -146,6 +152,33 @@ class Crawler:
     def get_expose_details(self, expose):
         """Loads additional detalis for an expose. Should be implemented in the subclass"""
         return expose
+
+    def resolvegeetest(self, driver, api_key: str = None):
+        data = re.findall("geetest_validate: obj.geetest_validate,\n.*?data: \"(.*)\"", driver.page_source)[0]
+        result = re.findall("initGeetest\({(.*?)}", driver.page_source, re.DOTALL)
+
+        gt = re.findall("gt: \"(.*?)\"", result[0])[0]
+        challenge = re.findall("challenge: \"(.*?)\"", result[0])[0]
+
+        self.__log__.debug("Solve geetest")
+        session = requests.Session()
+        postrequest = (
+            f"http://2captcha.com/in.php?key={api_key}&method=geetest&gt={gt}&challenge={challenge}&api_server=api.geetest.com&pageurl={urllib.parse.quote_plus(driver.current_url)}"
+        )
+        captcha_id = session.post(postrequest).text.split("|")[1]
+        recaptcha_answer = session.get(f"http://2captcha.com/res.php?key={api_key}&action=get&id={captcha_id}").text
+        while "CAPCHA_NOT_READY" in recaptcha_answer:
+            sleep(5)
+            self.__log__.debug("Captcha status: %s", recaptcha_answer)
+            recaptcha_answer = session.get(f"http://2captcha.com/res.php?key={api_key}&action=get&id={captcha_id}").text
+        self.__log__.debug("Captcha promise: %s", recaptcha_answer)
+        recaptcha_answer = recaptcha_answer.split("|", 1)[1]
+        recaptcha_answer = json.loads(recaptcha_answer)
+
+        script = f'solvedCaptcha({{geetest_challenge: "{recaptcha_answer["geetest_challenge"]}",geetest_seccode: "{recaptcha_answer["geetest_seccode"]}",geetest_validate: "{recaptcha_answer["geetest_validate"]}", data: "{data}"}});'
+        driver.execute_script(script)
+
+        sleep(2)
 
     def resolvecaptcha(self, driver, checkbox: bool, afterlogin_string: str = "", api_key: str = None):
         iframe_present = self._check_if_iframe_visible(driver)

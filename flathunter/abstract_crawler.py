@@ -69,7 +69,7 @@ class Crawler:
 
         self.rotate_user_agent()
         resp = requests.get(url, headers=self.HEADERS)
-        if resp.status_code != 200:
+        if resp.status_code != 200 and resp.status_code != 405:
             self.__log__.error("Got response (%i): %s", resp.status_code, resp.content)
         if self.config.use_proxy():
             return self.get_soup_with_proxy(url)
@@ -154,26 +154,37 @@ class Crawler:
         return expose
 
     def resolvegeetest(self, driver, api_key: str = None):
-        data = re.findall("geetest_validate: obj.geetest_validate,\n.*?data: \"(.*)\"", driver.page_source)[0]
-        result = re.findall("initGeetest\({(.*?)}", driver.page_source, re.DOTALL)
+        solved = False
+        recaptcha_answer = None
+        while solved == False:
+            data = re.findall("geetest_validate: obj.geetest_validate,\n.*?data: \"(.*)\"", driver.page_source)[0]
+            result = re.findall("initGeetest\({(.*?)}", driver.page_source, re.DOTALL)
 
-        gt = re.findall("gt: \"(.*?)\"", result[0])[0]
-        challenge = re.findall("challenge: \"(.*?)\"", result[0])[0]
+            gt = re.findall("gt: \"(.*?)\"", result[0])[0]
+            challenge = re.findall("challenge: \"(.*?)\"", result[0])[0]
 
-        self.__log__.debug("Solve geetest")
-        session = requests.Session()
-        postrequest = (
-            f"http://2captcha.com/in.php?key={api_key}&method=geetest&gt={gt}&challenge={challenge}&api_server=api.geetest.com&pageurl={urllib.parse.quote_plus(driver.current_url)}"
-        )
-        captcha_id = session.post(postrequest).text.split("|")[1]
-        recaptcha_answer = session.get(f"http://2captcha.com/res.php?key={api_key}&action=get&id={captcha_id}").text
-        while "CAPCHA_NOT_READY" in recaptcha_answer:
-            sleep(5)
-            self.__log__.debug("Captcha status: %s", recaptcha_answer)
+            self.__log__.debug("Solve geetest")
+            session = requests.Session()
+            postrequest = (
+                f"http://2captcha.com/in.php?key={api_key}&method=geetest&gt={gt}&challenge={challenge}&api_server=api.geetest.com&pageurl={urllib.parse.quote_plus(driver.current_url)}"
+            )
+            captcha_id = session.post(postrequest).text.split("|")[1]
             recaptcha_answer = session.get(f"http://2captcha.com/res.php?key={api_key}&action=get&id={captcha_id}").text
-        self.__log__.debug("Captcha promise: %s", recaptcha_answer)
-        recaptcha_answer = recaptcha_answer.split("|", 1)[1]
-        recaptcha_answer = json.loads(recaptcha_answer)
+            while "CAPCHA_NOT_READY" in recaptcha_answer:
+                sleep(5)
+                self.__log__.debug("Captcha status: %s", recaptcha_answer)
+                recaptcha_answer = session.get(f"http://2captcha.com/res.php?key={api_key}&action=get&id={captcha_id}").text
+
+            if "ERROR_CAPCHA_UNSOLVABLE" in recaptcha_answer:
+                self.__log__.debug("Captcha was not solvable. Try again")
+                driver.refresh()
+                sleep(3)
+                continue
+
+            self.__log__.debug("Captcha promise: %s", recaptcha_answer)
+            recaptcha_answer = recaptcha_answer.split("|", 1)[1]
+            recaptcha_answer = json.loads(recaptcha_answer)
+            solved = True
 
         script = f'solvedCaptcha({{geetest_challenge: "{recaptcha_answer["geetest_challenge"]}",geetest_seccode: "{recaptcha_answer["geetest_seccode"]}",geetest_validate: "{recaptcha_answer["geetest_validate"]}", data: "{data}"}});'
         driver.execute_script(script)
@@ -250,3 +261,4 @@ class Crawler:
             return iframe
         except NoSuchElementException:
             print("Element not found")
+

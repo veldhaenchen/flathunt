@@ -175,7 +175,7 @@ class Crawler:
                 self.__log__.debug("Captcha status: %s", recaptcha_answer)
                 recaptcha_answer = session.get(f"http://2captcha.com/res.php?key={api_key}&action=get&id={captcha_id}").text
 
-            if "ERROR_CAPCHA_UNSOLVABLE" in recaptcha_answer:
+            if "ERROR_CAPTCHA_UNSOLVABLE" in recaptcha_answer or "error" in recaptcha_answer:
                 self.__log__.debug("Captcha was not solvable. Try again")
                 driver.refresh()
                 sleep(3)

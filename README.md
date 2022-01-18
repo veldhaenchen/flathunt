@@ -15,6 +15,7 @@ Flathunter is a Python application which periodically [scrapes](https://en.wikip
 
 - [Background](#background)
 - [Install](#install)
+    - [Installation on Linux](#installation-on-linux)
 - [Usage](#usage)
 	- [Command-line Interface](#command-line-interface)
 	- [Web Interface](#web-interface)
@@ -52,6 +53,38 @@ For development purposes, you need to install the flathunter module in your curr
 
 ```sh
 pip install -e .
+```
+
+### Installation on Linux
+(tested on CentOS Stream)
+
+First clone the repository
+```
+cd /opt
+git clone https://github.com/flathunters/flathunter.git
+```
+add a new User and configure the permissions
+```
+useradd flathunter
+chown flathunter:flathunter -R flathunter/
+```
+Next install pipenv for the new user
+```
+sudo -u flathunter pip install --user pipenv
+cd flathunter/
+sudo -u flathunter /home/flathunter/.local/bin/pipenv install
+```
+Next configure the config file and service file to your liking. Then move the service file in place:
+```
+mv flathunter/sample-flathunter.service /lib/systemd/system/flathunter.service
+```
+At last you just have to start flathunter
+```
+systemctl enable flathunter --now
+```
+If you're using SELinux the following policy needs to be added:
+```
+chcon -R -t bin_t /home/flathunter/.local/bin/pipenv
 ```
 
 ### Configuration

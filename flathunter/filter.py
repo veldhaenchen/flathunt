@@ -118,7 +118,7 @@ class TitleFilter:
     def is_interesting(self, expose):
         """True unless title matches the filtered titles"""
         combined_excludes = "(" + ")|(".join(self.filtered_titles) + ")"
-        found_objects = re.search(combined_excludes, expose['title'].lower())
+        found_objects = re.search(combined_excludes, expose['title'], re.IGNORECASE)
         # send all non matching regex patterns
         if not found_objects:
             return True

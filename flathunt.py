@@ -14,6 +14,8 @@ from pprint import pformat
 from flathunter.idmaintainer import IdMaintainer
 from flathunter.hunter import Hunter
 from flathunter.config import Config
+from flathunter.sender_mattermost import SenderMattermost
+from flathunter.sender_telegram import SenderTelegram
 
 __author__ = "Jan Harrie"
 __version__ = "1.0"
@@ -28,7 +30,7 @@ if os.name == 'posix':
     CBLUE = '\033[94m'
     COFF = '\033[0m'
     LOG_FORMAT = '[' + CBLUE + '%(asctime)s' + COFF + '|' + CBLUE + '%(filename)-18s' + COFF + \
-             '|' + CYELLOW + '%(levelname)-8s' + COFF + ']: %(message)s'
+                 '|' + CYELLOW + '%(levelname)-8s' + COFF + ']: %(message)s'
 else:
     # else without color
     LOG_FORMAT = '[%(asctime)s|%(filename)-18s|%(levelname)-8s]: %(message)s'
@@ -39,27 +41,46 @@ logging.basicConfig(
 __log__ = logging.getLogger('flathunt')
 
 
-def launch_flat_hunt(config):
+def launch_flat_hunt(config, heartbeat=None):
     """Starts the crawler / notification loop"""
     id_watch = IdMaintainer('%s/processed_ids.db' % config.database_location())
 
     hunter = Hunter(config, id_watch)
     hunter.hunt_flats()
+    counter = 0
+    notifiers = config.get('notifiers', list())
+    if 'mattermost' in notifiers:
+        notifier = SenderMattermost(config)
+    elif 'telegram' in notifiers:
+        notifier = SenderTelegram(config)
 
     while config.get('loop', dict()).get('active', False):
+        counter += 1
+        if bool(heartbeat):
+            # its time for a new heartbeat message and reset counter
+            if counter % heartbeat == 0:
+                counter = 0
+                notifier.send_msg('Beep Boop. This is a heartbeat message. Your bot is searching actively for flats.')
         time.sleep(config.get('loop', dict()).get('sleeping_time', 60 * 10))
         hunter.hunt_flats()
 
+
 def main():
     """Processes command-line arguments, loads the config, launches the flathunter"""
-    parser = argparse.ArgumentParser(description=\
-             "Searches for flats on Immobilienscout24.de and wg-gesucht.de and sends " + \
-             "results to Telegram User", epilog="Designed by Nody")
+    parser = argparse.ArgumentParser(description= \
+                                         "Searches for flats on Immobilienscout24.de and wg-gesucht.de and sends " + \
+                                         "results to Telegram User", epilog="Designed by Nody")
     parser.add_argument('--config', '-c',
                         type=argparse.FileType('r', encoding='UTF-8'),
                         default='%s/config.yaml' % os.path.dirname(os.path.abspath(__file__)),
                         help="Config file to use. If not set, try to use '%s/config.yaml' " %
-                        os.path.dirname(os.path.abspath(__file__))
+                             os.path.dirname(os.path.abspath(__file__))
+                        )
+    parser.add_argument('--heartbeat', '-hb',
+                        action='store',
+                        default=None,
+                        help='Set the interval time to receive heartbeat messages to check that the bot is' + \
+                             'alive. Accepted strings are "hour", "day", "week". Defaults to None.'
                         )
     args = parser.parse_args()
 
@@ -83,13 +104,28 @@ def main():
         __log__.error("No urls configured. Starting like this would be meaningless...")
         return
 
+    # get heartbeat instructions
+    heartbeat = args.heartbeat
+    if heartbeat.lower() == 'hour':
+        heartbeat_interval = 6
+    elif heartbeat.lower() == 'day':
+        heartbeat_interval = 144
+    elif heartbeat.lower() == 'week':
+        heartbeat_interval = 1008
+    elif heartbeat is None:
+        heartbeat_interval = None
+    else:
+        heartbeat_interval = None
+        __log__.warning("No valid heartbeat instruction received - no heartbeat messages will be sent.")
+
     # adjust log level, if required
     if config.get('verbose'):
         __log__.setLevel(logging.DEBUG)
         __log__.debug("Settings from config: %s", pformat(config))
 
     # start hunting for flats
-    launch_flat_hunt(config)
+    launch_flat_hunt(config, heartbeat_interval)
+
 
 if __name__ == "__main__":
     main()

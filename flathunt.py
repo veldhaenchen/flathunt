@@ -14,8 +14,7 @@ from pprint import pformat
 from flathunter.idmaintainer import IdMaintainer
 from flathunter.hunter import Hunter
 from flathunter.config import Config
-from flathunter.sender_mattermost import SenderMattermost
-from flathunter.sender_telegram import SenderTelegram
+from flathunter.heartbeat import Heartbeat
 
 __author__ = "Jan Harrie"
 __version__ = "1.0"
@@ -48,19 +47,10 @@ def launch_flat_hunt(config, heartbeat=None):
     hunter = Hunter(config, id_watch)
     hunter.hunt_flats()
     counter = 0
-    notifiers = config.get('notifiers', list())
-    if 'mattermost' in notifiers:
-        notifier = SenderMattermost(config)
-    elif 'telegram' in notifiers:
-        notifier = SenderTelegram(config)
 
     while config.get('loop', dict()).get('active', False):
         counter += 1
-        if bool(heartbeat):
-            # its time for a new heartbeat message and reset counter
-            if counter % heartbeat == 0:
-                counter = 0
-                notifier.send_msg('Beep Boop. This is a heartbeat message. Your bot is searching actively for flats.')
+        counter = heartbeat.send_heartbeat(counter)
         time.sleep(config.get('loop', dict()).get('sleeping_time', 60 * 10))
         hunter.hunt_flats()
 
@@ -105,18 +95,8 @@ def main():
         return
 
     # get heartbeat instructions
-    heartbeat = args.heartbeat
-    if heartbeat.lower() == 'hour':
-        heartbeat_interval = 6
-    elif heartbeat.lower() == 'day':
-        heartbeat_interval = 144
-    elif heartbeat.lower() == 'week':
-        heartbeat_interval = 1008
-    elif heartbeat is None:
-        heartbeat_interval = None
-    else:
-        heartbeat_interval = None
-        __log__.warning("No valid heartbeat instruction received - no heartbeat messages will be sent.")
+    heartbeat_interval = args.heartbeat
+    heartbeat = Heartbeat(config, heartbeat_interval)
 
     # adjust log level, if required
     if config.get('verbose'):
@@ -124,7 +104,7 @@ def main():
         __log__.debug("Settings from config: %s", pformat(config))
 
     # start hunting for flats
-    launch_flat_hunt(config, heartbeat_interval)
+    launch_flat_hunt(config, heartbeat)
 
 
 if __name__ == "__main__":

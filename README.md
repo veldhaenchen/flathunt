@@ -180,6 +180,9 @@ optional arguments:
   --config CONFIG, -c CONFIG
                         Config file to use. If not set, try to use
                         '~git-clone-dir/config.yaml'
+  --heartbeat INTERVAL, -hb INTERVAL
+			Set the interval time to receive heartbeat messages to check that the bot is
+                        alive. Accepted strings are "hour", "day", "week". Defaults to None.
 ```
 
 ### Web Interface

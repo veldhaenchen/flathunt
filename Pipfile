@@ -26,6 +26,7 @@ pylint = "*"
 selenium = "*"
 random-user-agent = "*"
 jsonpath-ng = "*"
+backoff = "*"
 
 [dev-packages]
 

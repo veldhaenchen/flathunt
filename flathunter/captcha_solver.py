@@ -53,7 +53,7 @@ def __retrieve_2captcha_result(api_key: str, captcha_id: str) -> str:
             logger.debug("Got error response from 2captcha: %s", retrieve_response.text)
             raise requests.HTTPError()
 
-        return retrieve_response.text.split("|")[1]
+        return retrieve_response.text.split("|", 1)[1]
 
 class CaptchaUnsolvableError(Exception):
     pass

@@ -4,15 +4,10 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-beautifulsoup4 = "4.8.1"
-bs4 = "0.0.1"
-certifi = "2019.9.11"
-chardet = "3.0.4"
-idna = "2.8"
-PyYAML = "5.4"
-requests = "2.22.0"
-urllib3 = "1.25.8"
-lxml = "4.6.5"
+PyYAML = ">=5.4"
+requests = ">=2.22.0"
+urllib3 = ">=1.26.9"
+lxml = ">=4.8.0"
 coverage = "*"
 codecov = "*"
 requests-mock = "*"
@@ -27,8 +22,9 @@ selenium = "*"
 random-user-agent = "*"
 jsonpath-ng = "*"
 backoff = "*"
+pytz = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.7"
+python_version = "3"

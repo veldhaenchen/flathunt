@@ -23,6 +23,7 @@ random-user-agent = "*"
 jsonpath-ng = "*"
 backoff = "*"
 pytz = "*"
+beautifulsoup4 = "*"
 
 [dev-packages]
 

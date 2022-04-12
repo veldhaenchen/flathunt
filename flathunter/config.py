@@ -3,6 +3,9 @@ import os
 import logging
 import yaml
 
+from flathunter.captcha.imagetypers_solver import ImageTypersSolver
+from flathunter.captcha.twocaptcha_solver import TwoCaptchaSolver
+from flathunter.captcha.captcha_solver import CaptchaSolver
 from flathunter.crawl_ebaykleinanzeigen import CrawlEbayKleinanzeigen
 from flathunter.crawl_immobilienscout import CrawlImmobilienscout
 from flathunter.crawl_wggesucht import CrawlWgGesucht
@@ -68,6 +71,20 @@ class Config:
 
     def captcha_enabled(self):
         return ("captcha" in self.config)
+
+    def get_captcha_solver(self) -> CaptchaSolver:
+        captcha_config = self.config.get("captcha", dict())
+
+        imagetypers_token = captcha_config.get("imagetypers", dict()).get("token", "")
+        twocaptcha_api_key = captcha_config.get("2captcha", dict()).get("api_key", "")
+
+        if imagetypers_token:
+            return ImageTypersSolver(imagetypers_token)
+        elif twocaptcha_api_key:
+            return TwoCaptchaSolver(twocaptcha_api_key)
+        else:
+            raise Exception("No captcha solver configured properly.")
+
 
     def use_proxy(self):
         return ("use_proxy_list" in self.config and self.config["use_proxy_list"])

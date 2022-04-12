@@ -20,15 +20,14 @@ class CrawlImmobilienscout(Crawler):
     RESULT_LIMIT = 50
 
     def __init__(self, config):
+        super().__init__(config)
         logging.getLogger("requests").setLevel(logging.WARNING)
-        self.config = config
         self.driver = None
-        self.captcha_api_key = None
         self.checkbox = None
         self.afterlogin_string = None
+
         if config.captcha_enabled():
             captcha_config = config.get('captcha')
-            self.captcha_api_key = captcha_config.get('api_key', '')
             self.driver_executable_path = captcha_config.get('driver_path', '')
             self.driver_arguments = captcha_config.get('driver_arguments', list())
             if captcha_config.get('checkbox', '') == "":
@@ -39,7 +38,7 @@ class CrawlImmobilienscout(Crawler):
                 self.afterlogin_string = ""
             else:
                 self.afterlogin_string = captcha_config.get('afterlogin_string', '')
-            if self.captcha_api_key is not None or self.driver_executable_path is not None:
+            if self.captcha_solver:
                 self.driver = self.configure_driver(self.driver_executable_path, self.driver_arguments)
 
     def get_results(self, search_url, max_pages=None):
@@ -117,7 +116,7 @@ class CrawlImmobilienscout(Crawler):
 
     def get_page(self, search_url, driver=None, page_no=None):
         """Applies a page number to a formatted search URL and fetches the exposes at that page"""
-        return self.get_soup_from_url(search_url.format(page_no), driver=driver, captcha_api_key=self.captcha_api_key, checkbox=self.checkbox, afterlogin_string=self.afterlogin_string)
+        return self.get_soup_from_url(search_url.format(page_no), driver=driver, checkbox=self.checkbox, afterlogin_string=self.afterlogin_string)
 
     def get_expose_details(self, expose):
         """Loads additional details for an expose by processing the expose detail URL"""

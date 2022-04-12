@@ -113,14 +113,21 @@ google_maps_api:
     url: https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={dest}&mode={mode}&sensor=true&key={key}&arrival_time={arrival}
     enable: False
 
-# Register at 2captcha and enter your API key below. you will also
-# have to install a Chrome Web Driver and write below the path to
-# the executable.
-captcha:
-  api_key: YOUR_API_KEY
-  driver_path: YOUR_CHROME_DRIVER_PATH
-  driver_arguments:
-    - "--headless"
+# If you are planning to scrape immoscout24.de, the bot will need 
+# to circumvent the sites captcha protection by using a captcha 
+# solving service. Register at either imagetypers or 2captcha 
+# (the former is prefered), desposit some funds, uncomment the 
+# corresponding lines below and replace your API key/token.
+# you will also have to install a Chrome Web Driver and write below 
+# the executable path, the driver_arguments can be left as is.
+# captcha:
+#       imagetypers:
+#             token: alskdjaskldjfklj
+#       2captcha:
+#             api_key: alskdjaskldjfklj
+#       driver_path: YOUR_CHROME_DRIVER_PATH
+#       driver_arguments:
+#         - "--headless"
 
 # You can select whether to be notified by telegram or via a mattermost
 # webhook. For all notifiers selected here a configuration must be provided

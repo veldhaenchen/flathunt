@@ -16,7 +16,8 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 from random_user_agent.user_agent import UserAgent
 from random_user_agent.params import HardwareType, Popularity
-from flathunter import proxies, captcha_solver
+from flathunter import proxies
+from flathunter.captcha.captcha_solver import CaptchaUnsolvableError
 
 class Crawler:
     """Defines the Crawler interface"""
@@ -26,6 +27,8 @@ class Crawler:
 
     def __init__(self, config):
         self.config = config
+        if config.captcha_enabled():
+            self.captcha_solver = config.get_captcha_solver()
 
     user_agent_rotator = UserAgent(popularity=[Popularity.COMMON._value_],
                                    hardware_types=[HardwareType.COMPUTER._value_])
@@ -65,7 +68,7 @@ class Crawler:
         """Applies a page number to a formatted search URL and fetches the exposes at that page"""
         return self.get_soup_from_url(search_url)
 
-    def get_soup_from_url(self, url, driver=None, captcha_api_key=None, checkbox=None, afterlogin_string=None):
+    def get_soup_from_url(self, url, driver=None, checkbox=None, afterlogin_string=None):
         """Creates a Soup object from the HTML at the provided URL"""
 
         self.rotate_user_agent()
@@ -77,9 +80,9 @@ class Crawler:
         if driver is not None:
             driver.get(url)
             if re.search("initGeetest", driver.page_source):
-                self.resolve_geetest(driver, captcha_api_key)
+                self.resolve_geetest(driver)
             elif re.search("g-recaptcha", driver.page_source):
-                self.resolve_recaptcha(driver, checkbox, afterlogin_string, captcha_api_key)
+                self.resolve_recaptcha(driver, checkbox, afterlogin_string)
             return BeautifulSoup(driver.page_source, 'html.parser')
         return BeautifulSoup(resp.content, 'html.parser')
 
@@ -155,41 +158,40 @@ class Crawler:
         return expose
 
     @backoff.on_exception(wait_gen=backoff.constant,
-                          exception=captcha_solver.CaptchaUnsolvableError,
+                          exception=CaptchaUnsolvableError,
                           max_tries=3)
-    def resolve_geetest(self, driver, api_key: str):
+    def resolve_geetest(self, driver):
         data = re.findall("geetest_validate: obj.geetest_validate,\n.*?data: \"(.*)\"", driver.page_source)[0]
         result = re.findall("initGeetest\({(.*?)}", driver.page_source, re.DOTALL)
 
         gt = re.findall("gt: \"(.*?)\"", result[0])[0]
         challenge = re.findall("challenge: \"(.*?)\"", result[0])[0]
         try:
-            captcha_result_json = captcha_solver.solve_geetest(api_key, gt, challenge, driver.current_url)
-            captcha_result = json.loads(captcha_result_json)
-            script = f'solvedCaptcha({{geetest_challenge: "{captcha_result["geetest_challenge"]}",geetest_seccode: "{captcha_result["geetest_seccode"]}",geetest_validate: "{captcha_result["geetest_validate"]}", data: "{data}"}});'
+            captcha_response = self.captcha_solver.solve_geetest(gt, challenge, driver.current_url)
+            script = f'solvedCaptcha({{geetest_challenge: "{captcha_response.challenge}",geetest_seccode: "{captcha_response.secCode}",geetest_validate: "{captcha_response.validate}", data: "{data}"}});'
             driver.execute_script(script)
             sleep(2)
-        except captcha_solver.CaptchaUnsolvableError:
+        except CaptchaUnsolvableError:
             driver.refresh()
             raise
 
 
     @backoff.on_exception(wait_gen=backoff.constant,
-                          exception=captcha_solver.CaptchaUnsolvableError,
+                          exception=CaptchaUnsolvableError,
                           max_tries=3)
-    def resolve_recaptcha(self, driver, checkbox: bool, api_key: str ,afterlogin_string: str = ""):
+    def resolve_recaptcha(self, driver, checkbox: bool, afterlogin_string: str = ""):
         iframe_present = self._wait_for_iframe(driver)
         if checkbox is False and afterlogin_string == "" and iframe_present:
             google_site_key = driver.find_element_by_class_name("g-recaptcha").get_attribute("data-sitekey")
             try:
-                captcha_result = captcha_solver.solve_recaptcha(api_key, google_site_key, driver.current_url)
+                captcha_result = self.captcha_solver.solve_recaptcha(google_site_key, driver.current_url).result
                 driver.execute_script(f'document.getElementById("g-recaptcha-response").innerHTML="{captcha_result}";')
                 # TODO: Below function call can be different depending on the websites implementation. It is responsible for
                 #  sending the promise that we get from recaptcha_answer. For now, if it breaks, it is required to
                 #  reverse engineer it by hand. Not sure if there is a way to automate it.
                 driver.execute_script(f'solvedCaptcha("{captcha_result}")')
                 self._wait_until_iframe_disappears(driver)
-            except captcha_solver.CaptchaUnsolvableError:
+            except CaptchaUnsolvableError:
                 driver.refresh()
                 raise
         else:
@@ -197,6 +199,7 @@ class Crawler:
                 self._clickcaptcha(driver, checkbox)
             else:
                 self._wait_for_captcha_resolution(driver, checkbox, afterlogin_string)
+
     def _clickcaptcha(self, driver, checkbox: bool):
         driver.switch_to.frame(driver.find_element_by_tag_name("iframe"))
         recaptcha_checkbox = driver.find_element_by_class_name("recaptcha-checkbox-checkmark")

@@ -83,7 +83,6 @@ class Crawler:
                 self.resolve_geetest(driver)
             elif re.search("g-recaptcha", driver.page_source):
                 self.resolve_recaptcha(driver, checkbox, afterlogin_string)
-            driver.close()
             return BeautifulSoup(driver.page_source, 'html.parser')
         return BeautifulSoup(resp.content, 'html.parser')
 

@@ -79,9 +79,12 @@ class CrawlWgGesucht(Crawler):
     def load_address(self, url):
         """Extract address from expose itself"""
         response = self.get_soup_from_url(url)
-        address = ' '.join(response.find('div', {"class": "col-sm-4 mb10"})
-                           .find("a", {"href": "#mapContainer"}).text.strip().split())
-        return address
+        try:
+            address = ' '.join(response.find('div', {"class": "col-sm-4 mb10"})
+                               .find("a", {"href": "#mapContainer"}).text.strip().split())
+            return address
+        except (TypeError, AttributeError):
+            self.__log__.debug("No address in response for URL: %s", url)
 
     def get_soup_from_url(self, url, driver=None, captcha_api_key=None, checkbox=None, afterlogin_string=None):
         """

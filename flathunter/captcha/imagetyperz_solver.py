@@ -16,7 +16,7 @@ from flathunter.captcha.captcha_solver import (
 
 logger = logging.getLogger('flathunt')
 
-class ImageTypersSolver(CaptchaSolver):
+class ImageTyperzSolver(CaptchaSolver):
     """Implementation of Captcha solver for ImageTyperz"""
 
     def solve_geetest(self, geetest: str, challenge: str, page_url: str) -> GeetestResponse:
@@ -28,13 +28,13 @@ class ImageTypersSolver(CaptchaSolver):
             "gt": geetest,
             "token": self.api_key,
         }
-        captcha_id = self.__submit_imagetypers_request(
+        captcha_id = self.__submit_imagetyperz_request(
             "http://www.captchatypers.com/captchaapi/UploadGeeTestToken.ashx",
             params
         )
-        result = self.__retrieve_imagetypers_result(captcha_id)
+        result = self.__retrieve_imagetyperz_result(captcha_id)
 
-        # imagetypers sometimes returns a json object, and sometimes a ';;;;'-seperated list
+        # ImageTyperz sometimes returns a json object, and sometimes a ';;;;'-seperated list
         # one can only assume that the empolyees type in the webserver response by hand
         try:
             untyped_result = json.loads(result)
@@ -54,17 +54,17 @@ class ImageTypersSolver(CaptchaSolver):
             "googlekey": google_site_key,
             "token": self.api_key,
         }
-        captcha_id = self.__submit_imagetypers_request(
+        captcha_id = self.__submit_imagetyperz_request(
             "http://www.captchatypers.com/captchaapi/UploadRecaptchaToken.ashx",
              params
         )
-        return RecaptchaResponse(self.__retrieve_imagetypers_result(captcha_id))
+        return RecaptchaResponse(self.__retrieve_imagetyperz_result(captcha_id))
 
 
     @backoff.on_exception(**CaptchaSolver.backoff_options)
-    def __submit_imagetypers_request(self, submit_url: str, params: Dict[str, str]) -> str:
+    def __submit_imagetyperz_request(self, submit_url: str, params: Dict[str, str]) -> str:
         submit_response = requests.get(submit_url, params=params)
-        logger.debug("Got response from imagetypers/request: %s:", submit_response.text)
+        logger.debug("Got response from imagetyperz/request: %s:", submit_response.text)
 
         if "error" in submit_response.text.lower():
             raise requests.HTTPError(response=submit_response)
@@ -74,9 +74,10 @@ class ImageTypersSolver(CaptchaSolver):
 
 
     @backoff.on_exception(**CaptchaSolver.backoff_options)
-    def __retrieve_imagetypers_result(self, captcha_id: str):
-        retrieve_url = "http://www.captchatypers.com/captchaapi/GetCaptchaResponseJson.ashx"
-
+    def __retrieve_imagetyperz_result(self, captcha_id: str):
+        retrieve_url = (
+            f"http://www.captchatypers.com/captchaapi/GetCaptchaResponseJson.ashx"
+        )
         params = {
             "action": "GETTEXT",
             "token": self.api_key,
@@ -85,7 +86,7 @@ class ImageTypersSolver(CaptchaSolver):
 
         while True:
             retrieve_response = requests.get(retrieve_url, params=params)
-            logger.debug("Got response from imagetypers: %s:", retrieve_response.text)
+            logger.debug("Got response from imagetyperz: %s:", retrieve_response.text)
             response = json.loads(retrieve_response.text)[0]
             if response["Status"] == "Pending":
                 logger.info("Captcha is not ready yet, waiting...")

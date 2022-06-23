@@ -3,7 +3,7 @@ import os
 import logging
 import yaml
 
-from flathunter.captcha.imagetypers_solver import ImageTypersSolver
+from flathunter.captcha.imagetyperz_solver import ImageTyperzSolver
 from flathunter.captcha.twocaptcha_solver import TwoCaptchaSolver
 from flathunter.captcha.captcha_solver import CaptchaSolver
 from flathunter.crawl_ebaykleinanzeigen import CrawlEbayKleinanzeigen
@@ -77,12 +77,18 @@ class Config:
         """Get configured captcha solver"""
         captcha_config = self.config.get("captcha", {})
 
-        imagetypers_token = captcha_config.get("imagetypers", {}).get("token", "")
+        if captcha_config.get("imagetypers") is not None:
+            self.__log__.warning(
+                'Captcha configuration for "imagetypers" has been renamed to "imagetyperz". '
+                'We found an outdated entry, which has to be renamed accordingly, to be detected again.'
+            )
+
+        imagetyperz_token = captcha_config.get("imagetyperz", {}).get("token", "")
         twocaptcha_api_key = captcha_config.get("2captcha", {}).get("api_key", "")
 
-        if imagetypers_token:
-            return ImageTypersSolver(imagetypers_token)
-        if twocaptcha_api_key:
+        if imagetyperz_token:
+            return ImageTyperzSolver(imagetyperz_token)
+        elif twocaptcha_api_key:
             return TwoCaptchaSolver(twocaptcha_api_key)
 
         raise Exception("No captcha solver configured properly.")

@@ -1,9 +1,7 @@
 """Expose crawler for Immobiliare"""
 import logging
 import re
-
 from flathunter.abstract_crawler import Crawler
-
 
 class CrawlImmobiliare(Crawler):
     """Implementation of Crawler interface for Immobiliare"""
@@ -12,13 +10,14 @@ class CrawlImmobiliare(Crawler):
     URL_PATTERN = re.compile(r'https://www\.immobiliare\.it')
 
     def __init__(self, config):
+        super().__init__(config)
         logging.getLogger("requests").setLevel(logging.WARNING)
         self.config = config
 
     # pylint: disable=too-many-locals
     def extract_data(self, soup):
         """Extracts all exposes from a provided Soup object"""
-        entries = list()
+        entries = []
 
         findings = soup.find_all(lambda e: e.has_attr('data-id') \
             and e.has_attr('class') \
@@ -66,7 +65,6 @@ class CrawlImmobiliare(Crawler):
 
             entries.append(details)
 
-        self.__log__.debug('extracted: {}'.format(entries))
+        self.__log__.debug('extracted: %s', entries)
 
         return entries
-

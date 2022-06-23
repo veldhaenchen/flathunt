@@ -2,6 +2,7 @@
 import logging
 import traceback
 from itertools import chain
+import requests
 
 from flathunter.config import Config
 from flathunter.filter import Filter
@@ -26,13 +27,13 @@ class Hunter:
             except CaptchaUnsolvableError:
                 self.__log__.info("Error while scraping url %s: the captcha was unsolvable", url)
                 return []
-            except Exception:
+            except requests.exceptions.RequestException:
                 self.__log__.info("Error while scraping url %s:\n%s", url, traceback.format_exc())
                 return []
 
         return chain(*[try_crawl(searcher,url, max_pages)
                        for searcher in self.config.searchers()
-                       for url in self.config.get('urls', list())])
+                       for url in self.config.get('urls', [])])
 
     def hunt_flats(self, max_pages=None):
         """Crawl, process and filter exposes"""

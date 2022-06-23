@@ -28,7 +28,7 @@ def auth_hash(params, token):
     secret = hashlib.sha256()
     secret.update(token.encode('utf-8'))
     sorted_params = collections.OrderedDict(sorted(params.items()))
-    msg = "\n".join(["{}={}".format(k, v) for k, v in sorted_params.items()])
+    msg = "\n".join([f"{k}={v}" for k, v in sorted_params.items()])
     return hmac.new(secret.digest(), msg.encode('utf-8'), digestmod=hashlib.sha256).hexdigest()
 
 def sign_hash(params, token):

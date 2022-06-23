@@ -18,12 +18,11 @@ class ProcessorChainBuilder:
         self.config = config
 
     def send_messages(self, receivers=None):
-        notifiers = self.config.get('notifiers', list())
+        """Add processor that sends messages for exposes"""
+        notifiers = self.config.get('notifiers', [])
         if 'telegram' in notifiers:
-            """Add processor that sends Telegram messages for exposes"""
             self.processors.append(SenderTelegram(self.config, receivers=receivers))
         if 'mattermost' in notifiers:
-            """Add processor that sends Mattermost messages for exposes"""
             self.processors.append(SenderMattermost(self.config))
         return self
 

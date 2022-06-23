@@ -2,10 +2,7 @@
 import logging
 import re
 
-import requests
-from bs4 import BeautifulSoup
 from flathunter.abstract_crawler import Crawler
-from random_user_agent.user_agent import UserAgent
 
 class CrawlIdealista(Crawler):
     """Implementation of Crawler interface for Idealista"""
@@ -14,13 +11,14 @@ class CrawlIdealista(Crawler):
     URL_PATTERN = re.compile(r'https://www\.idealista\.it')
 
     def __init__(self, config):
+        super().__init__(config)
         self.config = config
         logging.getLogger("requests").setLevel(logging.WARNING)
 
     # pylint: disable=unused-argument
     def get_page(self, search_url, driver=None, page_no=None):
         """Applies a page number to a formatted search URL and fetches the exposes at that page"""
-        if (self.config.use_proxy()):
+        if self.config.use_proxy():
             return self.get_soup_with_proxy(search_url)
 
         return self.get_soup_from_url(search_url)
@@ -28,7 +26,7 @@ class CrawlIdealista(Crawler):
     # pylint: disable=too-many-locals
     def extract_data(self, soup):
         """Extracts all exposes from a provided Soup object"""
-        entries = list()
+        entries = []
 
         findings = soup.find_all('article', {"class": "item"})
 
@@ -51,7 +49,7 @@ class CrawlIdealista(Crawler):
             floor = detail_items[2].text.strip() if (len(detail_items) >= 3) else ""
             price = row.find("span", {"class": "item-price"}).text.strip().split("/")[0]
 
-            details_title = ("%s - %s" % (title, floor)) if (len(floor) > 0) else title
+            details_title = (f"{title} - {floor}") if (len(floor) > 0) else title
 
             details = {
                 'id': int(row.get("data-adid")),

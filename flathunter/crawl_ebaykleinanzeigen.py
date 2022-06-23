@@ -2,6 +2,7 @@
 import logging
 import re
 import datetime
+
 from flathunter.abstract_crawler import Crawler
 
 class CrawlEbayKleinanzeigen(Crawler):
@@ -26,12 +27,13 @@ class CrawlEbayKleinanzeigen(Crawler):
     }
 
     def __init__(self, config):
+        super().__init__(config)
         logging.getLogger("requests").setLevel(logging.WARNING)
         self.config = config
 
-    def get_page(self, url):
+    def get_page(self, search_url, driver=None, page_no=None):
         """Applies a page number to a formatted search URL and fetches the exposes at that page"""
-        return self.get_soup_from_url(url)
+        return self.get_soup_from_url(search_url)
 
     def get_expose_details(self, expose):
         soup = self.get_page(expose['url'])
@@ -47,7 +49,7 @@ class CrawlEbayKleinanzeigen(Crawler):
     # pylint: disable=too-many-locals
     def extract_data(self, soup):
         """Extracts all exposes from a provided Soup object"""
-        entries = list()
+        entries = []
         soup = soup.find(id="srchrslt-adtable")
         try:
             title_elements = soup.find_all(lambda e: e.has_attr('class')

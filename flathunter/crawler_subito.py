@@ -5,7 +5,6 @@ import json
 
 from flathunter.abstract_crawler import Crawler
 
-
 class CrawlSubito(Crawler):
     """Implementation of Crawler interface for Subito"""
 
@@ -13,13 +12,14 @@ class CrawlSubito(Crawler):
     URL_PATTERN = re.compile(r'https://www\.subito\.it')
 
     def __init__(self, config):
+        super().__init__(config)
         logging.getLogger("requests").setLevel(logging.WARNING)
         self.config = config
 
     # pylint: disable=too-many-locals
     def extract_data(self, soup):
         """Extracts all exposes from a provided Soup object"""
-        entries = list()
+        entries = []
 
         # as of today, subito provides a useful JSON that represents the state
         # of the search. Neat! We don't have to do much.
@@ -27,7 +27,7 @@ class CrawlSubito(Crawler):
         findings = json.loads(findings_json)["props"]["state"]["items"]["list"]
 
         for row in findings:
-            id = row["item"]["urn"]
+            row_id = row["item"]["urn"]
             title = row["item"]["subject"]
 
             # some advertisements sneak in their search for apartments into
@@ -51,14 +51,13 @@ class CrawlSubito(Crawler):
             # Unfortunately, Subito does not give the full address, so we'll just have to work
             # with what we got and be happy with the address
             geo = row["item"]["geo"]
-            address = "%s, %s, %s" % (
-                geo["town"]["value"] if geo["town"] else "",
-                geo["city"]["shortName"] if geo["city"] else "",
-                geo["region"]["value"] if geo["region"] else "",
-            )
+            town = geo["town"]["value"] if geo["town"] else ""
+            city = geo["city"]["shortName"] if geo["city"] else ""
+            region = geo["region"]["value"] if geo["region"] else ""
+            address = f"{town}, {city}, {region}"
 
             details = {
-                'id': re.sub(r"[^0-9]", "", id),
+                'id': re.sub(r"[^0-9]", "", row_id),
                 # the image is correct... however for some reason they don't show up
                 # in telegram's thumbnail
                 'image': image,
@@ -73,7 +72,6 @@ class CrawlSubito(Crawler):
 
             entries.append(details)
 
-        self.__log__.debug('extracted: {}'.format(entries))
+        self.__log__.debug('extracted: %s', entries)
 
         return entries
-

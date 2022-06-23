@@ -7,7 +7,6 @@
 import argparse
 import os
 import logging
-import sys
 import time
 from pprint import pformat
 
@@ -42,35 +41,38 @@ __log__ = logging.getLogger('flathunt')
 
 def launch_flat_hunt(config, heartbeat=None):
     """Starts the crawler / notification loop"""
-    id_watch = IdMaintainer('%s/processed_ids.db' % config.database_location())
+    id_watch = IdMaintainer(f'{config.database_location()}/processed_ids.db')
 
     hunter = Hunter(config, id_watch)
     hunter.hunt_flats()
     counter = 0
 
-    while config.get('loop', dict()).get('active', False):
+    while config.get('loop', {}).get('active', False):
         counter += 1
         counter = heartbeat.send_heartbeat(counter)
-        time.sleep(config.get('loop', dict()).get('sleeping_time', 60 * 10))
+        time.sleep(config.get('loop', {}).get('sleeping_time', 60 * 10))
         hunter.hunt_flats()
 
 
 def main():
     """Processes command-line arguments, loads the config, launches the flathunter"""
-    parser = argparse.ArgumentParser(description= \
-                                         "Searches for flats on Immobilienscout24.de and wg-gesucht.de and sends " + \
-                                         "results to Telegram User", epilog="Designed by Nody")
+    parser = argparse.ArgumentParser(
+        description=("Searches for flats on Immobilienscout24.de and wg-gesucht.de"
+                     " and sends results to Telegram User"),
+        epilog="Designed by Nody"
+    )
+    default_config_path = f"{os.path.dirname(os.path.abspath(__file__))}/config.yaml"
     parser.add_argument('--config', '-c',
                         type=argparse.FileType('r', encoding='UTF-8'),
-                        default='%s/config.yaml' % os.path.dirname(os.path.abspath(__file__)),
-                        help="Config file to use. If not set, try to use '%s/config.yaml' " %
-                             os.path.dirname(os.path.abspath(__file__))
+                        default=default_config_path,
+                        help=f'Config file to use. If not set, try to use "{default_config_path}"'
                         )
     parser.add_argument('--heartbeat', '-hb',
                         action='store',
                         default=None,
-                        help='Set the interval time to receive heartbeat messages to check that the bot is' + \
-                             'alive. Accepted strings are "hour", "day", "week". Defaults to None.'
+                        help=('Set the interval time to receive heartbeat messages to check'
+                              'that the bot is alive. Accepted strings are "hour", "day", "week".'
+                              'Defaults to None.')
                         )
     args = parser.parse_args()
 
@@ -79,16 +81,18 @@ def main():
     config = Config(config_handle.name)
 
     # check config
-    notifiers = config.get('notifiers', list())
+    notifiers = config.get('notifiers', [])
     if 'mattermost' in notifiers \
-            and not config.get('mattermost', dict()).get('webhook_url'):
+            and not config.get('mattermost', {}).get('webhook_url'):
         __log__.error("No mattermost webhook configured. Starting like this would be pointless...")
         return
     if 'telegram' in notifiers:
-        if not config.get('telegram', dict()).get('bot_token'):
-            __log__.error("No telegram bot token configured. Starting like this would be pointless...")
+        if not config.get('telegram', {}).get('bot_token'):
+            __log__.error(
+                "No telegram bot token configured. Starting like this would be pointless..."
+            )
             return
-        if not config.get('telegram', dict()).get('receiver_ids'):
+        if not config.get('telegram', {}).get('receiver_ids'):
             __log__.warning("No telegram receivers configured - nobody will get notifications.")
     if not config.get('urls'):
         __log__.error("No urls configured. Starting like this would be meaningless...")

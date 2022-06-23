@@ -27,7 +27,7 @@ class Config:
             if filename is None:
                 filename = os.path.dirname(os.path.abspath(__file__)) + "/../config.yaml"
             self.__log__.info("Using config %s", filename)
-            with open(filename) as file:
+            with open(filename, encoding="utf-8") as file:
                 self.config = yaml.safe_load(file)
         self.__searchers__ = [CrawlImmobilienscout(self),
                               CrawlWgGesucht(self),
@@ -70,21 +70,24 @@ class Config:
         return builder.build()
 
     def captcha_enabled(self):
-        return ("captcha" in self.config)
+        """Check if captcha is configured"""
+        return "captcha" in self.config
 
     def get_captcha_solver(self) -> CaptchaSolver:
-        captcha_config = self.config.get("captcha", dict())
+        """Get configured captcha solver"""
+        captcha_config = self.config.get("captcha", {})
 
-        imagetypers_token = captcha_config.get("imagetypers", dict()).get("token", "")
-        twocaptcha_api_key = captcha_config.get("2captcha", dict()).get("api_key", "")
+        imagetypers_token = captcha_config.get("imagetypers", {}).get("token", "")
+        twocaptcha_api_key = captcha_config.get("2captcha", {}).get("api_key", "")
 
         if imagetypers_token:
             return ImageTypersSolver(imagetypers_token)
-        elif twocaptcha_api_key:
+        if twocaptcha_api_key:
             return TwoCaptchaSolver(twocaptcha_api_key)
-        else:
-            raise Exception("No captcha solver configured properly.")
+
+        raise Exception("No captcha solver configured properly.")
 
 
     def use_proxy(self):
+        """Check if proxy is configured"""
         return ("use_proxy_list" in self.config and self.config["use_proxy_list"])

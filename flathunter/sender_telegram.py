@@ -13,9 +13,9 @@ class SenderTelegram(Processor):
 
     def __init__(self, config, receivers=None):
         self.config = config
-        self.bot_token = self.config.get('telegram', dict()).get('bot_token', '')
+        self.bot_token = self.config.get('telegram', {}).get('bot_token', '')
         if receivers is None:
-            self.receiver_ids = self.config.get('telegram', dict()).get('receiver_ids', list())
+            self.receiver_ids = self.config.get('telegram', {}).get('receiver_ids', [])
         else:
             self.receiver_ids = receivers
 

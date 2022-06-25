@@ -1,8 +1,9 @@
+"""Captcha solver using ImageTyperz Captcha Solving Service (http://www.imagetyperz.com)"""
+
 import json
 import logging
 from typing import Dict
-from time import sleep as sleep
-
+from time import sleep
 import backoff
 import requests
 
@@ -16,13 +17,15 @@ from flathunter.captcha.captcha_solver import (
 logger = logging.getLogger('flathunt')
 
 class ImageTypersSolver(CaptchaSolver):
-    def solve_geetest(self, gt: str, challenge: str, page_url: str) -> GeetestResponse:
+    """Implementation of Captcha solver for ImageTyperz"""
+
+    def solve_geetest(self, geetest: str, challenge: str, page_url: str) -> GeetestResponse:
         logger.info("Trying to solve geetest.")
         params = {
             "action": "UPLOADCAPTCHA",
             "domain": page_url,
             "challenge": challenge,
-            "gt": gt,
+            "gt": geetest,
             "token": self.api_key,
         }
         captcha_id = self.__submit_imagetypers_request(
@@ -72,9 +75,8 @@ class ImageTypersSolver(CaptchaSolver):
 
     @backoff.on_exception(**CaptchaSolver.backoff_options)
     def __retrieve_imagetypers_result(self, captcha_id: str):
-        retrieve_url = (
-            f"http://www.captchatypers.com/captchaapi/GetCaptchaResponseJson.ashx"
-        )
+        retrieve_url = "http://www.captchatypers.com/captchaapi/GetCaptchaResponseJson.ashx"
+
         params = {
             "action": "GETTEXT",
             "token": self.api_key,
@@ -92,7 +94,7 @@ class ImageTypersSolver(CaptchaSolver):
 
             if response["Status"] == "ERROR: IMAGE_TIMED_OUT":
                 raise CaptchaUnsolvableError()
-            elif not response["Status"] == "Solved":
+            if not response["Status"] == "Solved":
                 raise requests.HTTPError(response=retrieve_response)
 
             return response["Response"]

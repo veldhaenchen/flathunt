@@ -13,6 +13,7 @@ class CrawlImmowelt(Crawler):
     URL_PATTERN = re.compile(r'https://www\.immowelt\.de')
 
     def __init__(self, config):
+        super().__init__(config)
         logging.getLogger("requests").setLevel(logging.WARNING)
         self.config = config
 
@@ -20,7 +21,7 @@ class CrawlImmowelt(Crawler):
         """Loads additional details for an expose by processing the expose detail URL"""
         soup = self.get_page(expose['url'])
         date = datetime.datetime.now().strftime("%2d.%2m.%Y")
-        
+
         immo_div = soup.find("app-estate-object-informations")
         if immo_div is not None:
             immo_div = soup.find("div", {"class": "equipment ng-star-inserted"})
@@ -28,9 +29,14 @@ class CrawlImmowelt(Crawler):
                 details = immo_div.find_all("p")
 
                 for detail in details:
-                    if detail.text.strip() == "Bezug": 
+                    if detail.text.strip() == "Bezug":
                         date = detail.findNext("p").text.strip()
-                        if re.match(r'.*sofort.*|.*Nach Vereinbarung.*', date, re.MULTILINE|re.DOTALL|re.IGNORECASE):
+                        no_exact_date_given = re.match(
+                          r'.*sofort.*|.*Nach Vereinbarung.*',
+                          date,
+                          re.MULTILINE|re.DOTALL|re.IGNORECASE
+                        )
+                        if no_exact_date_given:
                             date = datetime.datetime.now().strftime("%2d.%2m.%Y")
                         break
         expose['from'] = date
@@ -39,7 +45,7 @@ class CrawlImmowelt(Crawler):
     # pylint: disable=too-many-locals
     def extract_data(self, soup):
         """Extracts all exposes from a provided Soup object"""
-        entries = list()
+        entries = []
         soup = soup.find("main")
 
         try:
@@ -82,14 +88,19 @@ class CrawlImmowelt(Crawler):
 
             try:
                 address = expose_ids[idx].find(
-                    "div", attrs={"class": re.compile("IconFact.*")})
+                    "div", attrs={"class": re.compile("IconFact.*")}
+                  )
                 address = address.find("span").text
             except IndexError:
                 self.__log__.error("Keine Addresse gegeben")
                 address = "Nicht gegeben"
 
+            processed_id = int(
+              hashlib.sha256(expose_ids[idx].get("id").encode('utf-8')).hexdigest(), 16
+            ) % 10**16
+
             details = {
-                'id': int(hashlib.sha256(expose_ids[idx].get("id").encode('utf-8')).hexdigest(),16) % 10**16,
+                'id': processed_id,
                 'image': image,
                 'url': url,
                 'title': title_el.text.strip(),

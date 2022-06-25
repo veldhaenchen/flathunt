@@ -10,7 +10,7 @@ config = Config()
 
 if __name__ == '__main__':
     # Use the SQLite DB file if we are running locally
-    id_watch = IdMaintainer('%s/processed_ids.db' % config.database_location())
+    id_watch = IdMaintainer(f'{config.database_location()}/processed_ids.db')
 else:
     # Use Google Cloud DB if we run on the cloud
     id_watch = GoogleCloudIdMaintainer()

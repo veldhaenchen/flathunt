@@ -27,15 +27,16 @@ class GMapsDurationProcessor(Processor):
     def get_formatted_durations(self, address):
         """Return a formatted list of GoogleMaps durations"""
         out = ""
-        for duration in self.config.get('durations', list()):
+        for duration in self.config.get('durations', []):
             if 'destination' in duration and 'name' in duration:
                 dest = duration.get('destination')
                 name = duration.get('name')
-                for mode in duration.get('modes', list()):
+                for mode in duration.get('modes', []):
                     if 'gm_id' in mode and 'title' in mode \
-                                       and 'key' in self.config.get('google_maps_api', dict()):
+                                       and 'key' in self.config.get('google_maps_api', {}):
                         duration = self.get_gmaps_distance(address, dest, mode['gm_id'])
-                        out += "> %s (%s): %s\n" % (name, mode['title'], duration)
+                        title = mode['title']
+                        out += f"> {name} ({title}): {duration}\n"
 
         return out.strip()
 
@@ -52,8 +53,8 @@ class GMapsDurationProcessor(Processor):
         self.__log__.debug("Got address: %s", address)
 
         # get google maps config stuff
-        base_url = self.config.get('google_maps_api', dict()).get('url')
-        gm_key = self.config.get('google_maps_api', dict()).get('key')
+        base_url = self.config.get('google_maps_api', {}).get('url')
+        gm_key = self.config.get('google_maps_api', {}).get('key')
 
         if not gm_key and mode != self.GM_MODE_DRIVING:
             self.__log__.warning("No Google Maps API key configured and without using a mode "
@@ -71,7 +72,7 @@ class GMapsDurationProcessor(Processor):
             return None
 
         # get the fastest route
-        distances = dict()
+        distances = {}
         for row in result['rows']:
             for element in row['elements']:
                 if 'status' in element and element['status'] != 'OK':
@@ -83,7 +84,7 @@ class GMapsDurationProcessor(Processor):
                                    element['distance']['text'],
                                    element['duration']['text'],
                                    element['duration']['value'])
-                distances[element['duration']['value']] = '%s (%s)' % \
-                                                          (element['duration']['text'],
-                                                           element['distance']['text'])
+                duration_text = element['duration']['text']
+                distance_text = element['distance']['text']
+                distances[element['duration']['value']] = f"{duration_text} ({distance_text})"
         return distances[min(distances.keys())] if distances else None

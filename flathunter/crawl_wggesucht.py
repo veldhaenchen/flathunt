@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup
 from flathunter.abstract_crawler import Crawler
 from flathunter.string_utils import remove_prefix
 
-
 class CrawlWgGesucht(Crawler):
     """Implementation of Crawler interface for WgGesucht"""
 
@@ -15,17 +14,19 @@ class CrawlWgGesucht(Crawler):
     URL_PATTERN = re.compile(r'https://www\.wg-gesucht\.de')
 
     def __init__(self, config):
+        super().__init__(config)
         logging.getLogger("requests").setLevel(logging.WARNING)
         self.config = config
 
     # pylint: disable=too-many-locals
     def extract_data(self, soup):
         """Extracts all exposes from a provided Soup object"""
-        entries = list()
+        entries = []
 
         findings = soup.find_all(lambda e: e.has_attr('id') and e['id'].startswith('liste-'))
-        existing_findings = list(
-            [e for e in findings if e.has_attr('class') and not 'display-none' in e['class']])
+        existing_findings = [
+          e for e in findings if e.has_attr('class') and not 'display-none' in e['class']
+        ]
 
         base_url = 'https://www.wg-gesucht.de/'
         for row in existing_findings:
@@ -57,7 +58,7 @@ class CrawlWgGesucht(Crawler):
                 'id': int(url.split('.')[-2]),
                 'image': image,
                 'url': url,
-                'title': "%s ab dem %s" % (title, dates[0]),
+                'title': f"{title} ab dem {dates[0]}",
                 'price': price,
                 'size': size[0],
                 'rooms': rooms,
@@ -72,7 +73,7 @@ class CrawlWgGesucht(Crawler):
 
             entries.append(details)
 
-        self.__log__.debug('extracted: {}'.format(entries))
+        self.__log__.debug('extracted: %s', entries)
 
         return entries
 
@@ -85,8 +86,14 @@ class CrawlWgGesucht(Crawler):
             return address
         except (TypeError, AttributeError):
             self.__log__.debug("No address in response for URL: %s", url)
+            return None
 
-    def get_soup_from_url(self, url, driver=None, captcha_api_key=None, checkbox=None, afterlogin_string=None):
+    def get_soup_from_url(
+      self,
+      url,
+      driver=None,
+      checkbox=None,
+      afterlogin_string=None):
         """
         Creates a Soup object from the HTML at the provided URL
 
@@ -101,13 +108,15 @@ class CrawlWgGesucht(Crawler):
         # Second page load
         resp = sess.get(url, headers=self.HEADERS)
 
-        if resp.status_code != 200:
+        if resp.status_code not in (200, 405):
             self.__log__.error("Got response (%i): %s", resp.status_code, resp.content)
         if self.config.use_proxy():
             return self.get_soup_with_proxy(url)
         if driver is not None:
             driver.get(url)
-            if re.search("g-recaptcha", driver.page_source):
-                self.resolvecaptcha(driver, checkbox, afterlogin_string, captcha_api_key)
+            if re.search("initGeetest", driver.page_source):
+                self.resolve_geetest(driver)
+            elif re.search("g-recaptcha", driver.page_source):
+                self.resolve_recaptcha(driver, checkbox, afterlogin_string)
             return BeautifulSoup(driver.page_source, 'html.parser')
         return BeautifulSoup(resp.content, 'html.parser')

@@ -80,7 +80,8 @@ class Config:
         if captcha_config.get("imagetypers") is not None:
             self.__log__.warning(
                 'Captcha configuration for "imagetypers" has been renamed to "imagetyperz". '
-                'We found an outdated entry, which has to be renamed accordingly, to be detected again.'
+                'We found an outdated entry, which has to be renamed accordingly, in order '
+                'to be detected again.'
             )
 
         imagetyperz_token = captcha_config.get("imagetyperz", {}).get("token", "")
@@ -88,7 +89,7 @@ class Config:
 
         if imagetyperz_token:
             return ImageTyperzSolver(imagetyperz_token)
-        elif twocaptcha_api_key:
+        if twocaptcha_api_key:
             return TwoCaptchaSolver(twocaptcha_api_key)
 
         raise Exception("No captcha solver configured properly.")

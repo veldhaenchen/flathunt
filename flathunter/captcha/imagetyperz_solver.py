@@ -76,7 +76,7 @@ class ImageTyperzSolver(CaptchaSolver):
     @backoff.on_exception(**CaptchaSolver.backoff_options)
     def __retrieve_imagetyperz_result(self, captcha_id: str):
         retrieve_url = (
-            f"http://www.captchatypers.com/captchaapi/GetCaptchaResponseJson.ashx"
+            "http://www.captchatypers.com/captchaapi/GetCaptchaResponseJson.ashx"
         )
         params = {
             "action": "GETTEXT",

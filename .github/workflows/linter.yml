@@ -43,4 +43,4 @@ jobs:
       # Run Linter against code base #
       ################################
       - name: Lint Code Base
-        uses: codders/pylint-runner-github-action@v0.0.2
+        uses: ./.github/actions/pylint-runner

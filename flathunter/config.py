@@ -97,4 +97,4 @@ class Config:
 
     def use_proxy(self):
         """Check if proxy is configured"""
-        return ("use_proxy_list" in self.config and self.config["use_proxy_list"])
+        return "use_proxy_list" in self.config and self.config["use_proxy_list"]

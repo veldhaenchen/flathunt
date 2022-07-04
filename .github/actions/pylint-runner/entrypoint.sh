@@ -7,7 +7,6 @@ pip install -r requirements.txt
 pylint_runner
 pylint_runner_exit_code=$?
 
-# https://pylint.pycqa.org/en/latest/user_guide/usage/run.html#exit-codes
 if [ $(( $pylint_runner_exit_code & 32 )) != 0 ] || # usage error
    [ $(( $pylint_runner_exit_code & 16 )) != 0 ] || # convention message issued
    # [ $(( $pylint_runner_exit_code & 8 )) != 0 ] || # refactor message issued -> considered okay, therefore ignored

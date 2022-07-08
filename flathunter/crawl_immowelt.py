@@ -1,20 +1,18 @@
 """Expose crawler for ImmoWelt"""
-import logging
 import re
 import datetime
 import hashlib
 
+from flathunter.logging import logger
 from flathunter.abstract_crawler import Crawler
 
 class CrawlImmowelt(Crawler):
     """Implementation of Crawler interface for ImmoWelt"""
 
-    __log__ = logging.getLogger('flathunt')
     URL_PATTERN = re.compile(r'https://www\.immowelt\.de')
 
     def __init__(self, config):
         super().__init__(config)
-        logging.getLogger("requests").setLevel(logging.WARNING)
         self.config = config
 
     def get_expose_details(self, expose):
@@ -60,7 +58,7 @@ class CrawlImmowelt(Crawler):
                 price = expose_ids[idx].find(
                     "div", attrs={"data-test": "price"}).text
             except IndexError:
-                self.__log__.error("Kein Preis angegeben")
+                logger.error("Kein Preis angegeben")
                 price = "Auf Anfrage"
 
             try:
@@ -68,13 +66,13 @@ class CrawlImmowelt(Crawler):
                     "div", attrs={"data-test": "area"}).text
             except IndexError:
                 size = "Nicht gegeben"
-                self.__log__.error("Quadratmeter nicht angegeben")
+                logger.error("Quadratmeter nicht angegeben")
 
             try:
                 rooms = expose_ids[idx].find(
                     "div", attrs={"data-test": "rooms"}).text
             except IndexError:
-                self.__log__.error("Keine Zimmeranzahl gegeben")
+                logger.error("Keine Zimmeranzahl gegeben")
                 rooms = "Nicht gegeben"
 
             url = expose_ids[idx].get("href")
@@ -92,7 +90,7 @@ class CrawlImmowelt(Crawler):
                   )
                 address = address.find("span").text
             except IndexError:
-                self.__log__.error("Keine Addresse gegeben")
+                logger.error("Keine Addresse gegeben")
                 address = "Nicht gegeben"
 
             processed_id = int(
@@ -112,6 +110,6 @@ class CrawlImmowelt(Crawler):
             }
             entries.append(details)
 
-        self.__log__.debug('extracted: %d', len(entries))
+        logger.debug('extracted: %d', len(entries))
 
         return entries

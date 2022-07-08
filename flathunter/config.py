@@ -1,8 +1,8 @@
 """Wrap configuration options as an object"""
 import os
-import logging
 import yaml
 
+from flathunter.logging import logger
 from flathunter.captcha.imagetyperz_solver import ImageTyperzSolver
 from flathunter.captcha.twocaptcha_solver import TwoCaptchaSolver
 from flathunter.captcha.captcha_solver import CaptchaSolver
@@ -18,15 +18,13 @@ from flathunter.filter import Filter
 class Config:
     """Class to represent flathunter configuration"""
 
-    __log__ = logging.getLogger('flathunt')
-
     def __init__(self, filename=None, string=None):
         if string is not None:
             self.config = yaml.safe_load(string)
         else:
             if filename is None:
                 filename = os.path.dirname(os.path.abspath(__file__)) + "/../config.yaml"
-            self.__log__.info("Using config %s", filename)
+            logger.info("Using config %s", filename)
             with open(filename, encoding="utf-8") as file:
                 self.config = yaml.safe_load(file)
         self.__searchers__ = [CrawlImmobilienscout(self),
@@ -78,7 +76,7 @@ class Config:
         captcha_config = self.config.get("captcha", {})
 
         if captcha_config.get("imagetypers") is not None:
-            self.__log__.warning(
+            logger.warning(
                 'Captcha configuration for "imagetypers" has been renamed to "imagetyperz". '
                 'We found an outdated entry, which has to be renamed accordingly, in order '
                 'to be detected again.'

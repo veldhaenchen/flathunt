@@ -1,21 +1,19 @@
 """Expose crawler for WgGesucht"""
-import logging
 import re
 import requests
 from bs4 import BeautifulSoup
 
+from flathunter.logging import logger
 from flathunter.abstract_crawler import Crawler
 from flathunter.string_utils import remove_prefix
 
 class CrawlWgGesucht(Crawler):
     """Implementation of Crawler interface for WgGesucht"""
 
-    __log__ = logging.getLogger('flathunt')
     URL_PATTERN = re.compile(r'https://www\.wg-gesucht\.de')
 
     def __init__(self, config):
         super().__init__(config)
-        logging.getLogger("requests").setLevel(logging.WARNING)
         self.config = config
 
     # pylint: disable=too-many-locals
@@ -46,12 +44,12 @@ class CrawlWgGesucht(Crawler):
             dates = re.findall(r'\d{2}.\d{2}.\d{4}',
                                numbers_row.find("div", {"class": "text-center"}).text)
             if len(dates) == 0:
-                self.__log__.warning("No dates found - skipping")
+                logger.warning("No dates found - skipping")
                 continue
             size = re.findall(r'\d{1,4}\sm²',
                               numbers_row.find("div", {"class": "text-right"}).text)
             if len(size) == 0:
-                self.__log__.warning("No size found - skipping")
+                logger.warning("No size found - skipping")
                 continue
 
             details = {
@@ -73,7 +71,7 @@ class CrawlWgGesucht(Crawler):
 
             entries.append(details)
 
-        self.__log__.debug('extracted: %s', entries)
+        logger.debug('extracted: %s', entries)
 
         return entries
 
@@ -85,7 +83,7 @@ class CrawlWgGesucht(Crawler):
                                .find("a", {"href": "#mapContainer"}).text.strip().split())
             return address
         except (TypeError, AttributeError):
-            self.__log__.debug("No address in response for URL: %s", url)
+            logger.debug("No address in response for URL: %s", url)
             return None
 
     def get_soup_from_url(
@@ -109,7 +107,7 @@ class CrawlWgGesucht(Crawler):
         resp = sess.get(url, headers=self.HEADERS)
 
         if resp.status_code not in (200, 405):
-            self.__log__.error("Got response (%i): %s", resp.status_code, resp.content)
+            logger.error("Got response (%i): %s", resp.status_code, resp.content)
         if self.config.use_proxy():
             return self.get_soup_with_proxy(url)
         if driver is not None:

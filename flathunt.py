@@ -10,6 +10,7 @@ import logging
 import time
 from pprint import pformat
 
+from flathunter.logging import logger
 from flathunter.idmaintainer import IdMaintainer
 from flathunter.hunter import Hunter
 from flathunter.config import Config
@@ -20,23 +21,6 @@ __version__ = "1.0"
 __maintainer__ = "Nody"
 __email__ = "harrymcfly@protonmail.com"
 __status__ = "Production"
-
-# init logging
-if os.name == 'posix':
-    # coloring on linux
-    CYELLOW = '\033[93m'
-    CBLUE = '\033[94m'
-    COFF = '\033[0m'
-    LOG_FORMAT = '[' + CBLUE + '%(asctime)s' + COFF + '|' + CBLUE + '%(filename)-18s' + COFF + \
-                 '|' + CYELLOW + '%(levelname)-8s' + COFF + ']: %(message)s'
-else:
-    # else without color
-    LOG_FORMAT = '[%(asctime)s|%(filename)-18s|%(levelname)-8s]: %(message)s'
-logging.basicConfig(
-    format=LOG_FORMAT,
-    datefmt='%Y/%m/%d %H:%M:%S',
-    level=logging.INFO)
-__log__ = logging.getLogger('flathunt')
 
 
 def launch_flat_hunt(config, heartbeat=None):
@@ -80,32 +64,33 @@ def main():
     config_handle = args.config
     config = Config(config_handle.name)
 
+    # adjust log level, if required
+    if config.get('verbose'):
+        logger.setLevel(logging.DEBUG)
+        logger.debug("Settings from config: %s", pformat(config))
+
     # check config
     notifiers = config.get('notifiers', [])
     if 'mattermost' in notifiers \
             and not config.get('mattermost', {}).get('webhook_url'):
-        __log__.error("No mattermost webhook configured. Starting like this would be pointless...")
+        logger.error("No mattermost webhook configured. Starting like this would be pointless...")
         return
     if 'telegram' in notifiers:
         if not config.get('telegram', {}).get('bot_token'):
-            __log__.error(
+            logger.error(
                 "No telegram bot token configured. Starting like this would be pointless..."
             )
             return
         if not config.get('telegram', {}).get('receiver_ids'):
-            __log__.warning("No telegram receivers configured - nobody will get notifications.")
+            logger.warning("No telegram receivers configured - nobody will get notifications.")
     if not config.get('urls'):
-        __log__.error("No urls configured. Starting like this would be meaningless...")
+        logger.error("No urls configured. Starting like this would be meaningless...")
         return
 
     # get heartbeat instructions
     heartbeat_interval = args.heartbeat
     heartbeat = Heartbeat(config, heartbeat_interval)
 
-    # adjust log level, if required
-    if config.get('verbose'):
-        __log__.setLevel(logging.DEBUG)
-        __log__.debug("Settings from config: %s", pformat(config))
 
     # start hunting for flats
     launch_flat_hunt(config, heartbeat)

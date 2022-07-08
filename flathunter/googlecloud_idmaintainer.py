@@ -1,16 +1,15 @@
 """Storage back-end implementation using Google Cloud Firestore"""
-import logging
 import datetime
 import pytz
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 
+from flathunter.logging import logger
 from flathunter.config import Config
 
 class GoogleCloudIdMaintainer:
     """Storage back-end - implementation of IdMaintainer API"""
-    __log__ = logging.getLogger('flathunt')
 
     def __init__(self):
         project_id = Config().get('google_cloud_project_id')
@@ -23,12 +22,12 @@ class GoogleCloudIdMaintainer:
 
     def mark_processed(self, expose_id):
         """Mark exposes as processed when we have processed them"""
-        self.__log__.debug('mark_processed(%d)', expose_id)
+        logger.debug('mark_processed(%d)', expose_id)
         self.database.collection(u'processed').document(str(expose_id)).set({u'id': expose_id})
 
     def is_processed(self, expose_id):
         """Returns true if an expose has already been marked as processed"""
-        self.__log__.debug('is_processed(%d)', expose_id)
+        logger.debug('is_processed(%d)', expose_id)
         doc = self.database.collection(u'processed').document(str(expose_id))
         return doc.get().exists
 

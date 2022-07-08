@@ -2,14 +2,13 @@
 import urllib.request
 import urllib.parse
 import urllib.error
-import logging
 import requests
 
+from flathunter.logging import logger
 from flathunter.abstract_processor import Processor
 
 class SenderTelegram(Processor):
     """Expose processor that sends Telegram messages"""
-    __log__ = logging.getLogger('flathunt')
 
     def __init__(self, config, receivers=None):
         self.config = config
@@ -39,17 +38,17 @@ class SenderTelegram(Processor):
         for chat_id in self.receiver_ids:
             url = 'https://api.telegram.org/bot%s/sendMessage?chat_id=%i&text=%s'
             text = urllib.parse.quote_plus(message.encode('utf-8'))
-            self.__log__.debug(('token:', self.bot_token))
-            self.__log__.debug(('chatid:', chat_id))
-            self.__log__.debug(('text', text))
+            logger.debug(('token:', self.bot_token))
+            logger.debug(('chatid:', chat_id))
+            logger.debug(('text', text))
             qry = url % (self.bot_token, chat_id, text)
-            self.__log__.debug("Retrieving URL %s", qry)
+            logger.debug("Retrieving URL %s", qry)
             resp = requests.get(qry)
-            self.__log__.debug("Got response (%i): %s", resp.status_code, resp.content)
+            logger.debug("Got response (%i): %s", resp.status_code, resp.content)
             data = resp.json()
 
             # handle error
             if resp.status_code != 200:
                 status_code = resp.status_code
-                self.__log__.error("When sending bot message, we got status %i with message: %s",
+                logger.error("When sending bot message, we got status %i with message: %s",
                                    status_code, data)

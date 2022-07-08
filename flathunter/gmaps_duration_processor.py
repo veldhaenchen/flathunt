@@ -1,10 +1,10 @@
 """Calculate Google-Maps distances between specific locations and the target flat"""
-import logging
 import datetime
 import time
 import urllib
 import requests
 
+from flathunter.logging import logger
 from flathunter.abstract_processor import Processor
 
 class GMapsDurationProcessor(Processor):
@@ -13,8 +13,6 @@ class GMapsDurationProcessor(Processor):
     GM_MODE_TRANSIT = 'transit'
     GM_MODE_BICYCLE = 'bicycling'
     GM_MODE_DRIVING = 'driving'
-
-    __log__ = logging.getLogger('flathunt')
 
     def __init__(self, config):
         self.config = config
@@ -50,14 +48,14 @@ class GMapsDurationProcessor(Processor):
         # decode from unicode and url encode addresses
         address = urllib.parse.quote_plus(address.strip().encode('utf8'))
         dest = urllib.parse.quote_plus(dest.strip().encode('utf8'))
-        self.__log__.debug("Got address: %s", address)
+        logger.debug("Got address: %s", address)
 
         # get google maps config stuff
         base_url = self.config.get('google_maps_api', {}).get('url')
         gm_key = self.config.get('google_maps_api', {}).get('key')
 
         if not gm_key and mode != self.GM_MODE_DRIVING:
-            self.__log__.warning("No Google Maps API key configured and without using a mode "
+            logger.warning("No Google Maps API key configured and without using a mode "
                                  "different from 'driving' is not allowed. "
                                  "Downgrading to mode 'drinving' thus. ")
             mode = 'driving'
@@ -68,7 +66,7 @@ class GMapsDurationProcessor(Processor):
                               key=gm_key, arrival=arrival_time)
         result = requests.get(url).json()
         if result['status'] != 'OK':
-            self.__log__.error("Failed retrieving distance to address %s: %s", address, result)
+            logger.error("Failed retrieving distance to address %s: %s", address, result)
             return None
 
         # get the fastest route
@@ -76,11 +74,11 @@ class GMapsDurationProcessor(Processor):
         for row in result['rows']:
             for element in row['elements']:
                 if 'status' in element and element['status'] != 'OK':
-                    self.__log__.warning("For address %s we got the status message: %s",
+                    logger.warning("For address %s we got the status message: %s",
                                          address, element['status'])
-                    self.__log__.debug("We got this result: %s", repr(result))
+                    logger.debug("We got this result: %s", repr(result))
                     continue
-                self.__log__.debug("Got distance and duration: %s / %s (%i seconds)",
+                logger.debug("Got distance and duration: %s / %s (%i seconds)",
                                    element['distance']['text'],
                                    element['duration']['text'],
                                    element['duration']['value'])

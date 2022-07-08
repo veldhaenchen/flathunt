@@ -1,6 +1,5 @@
 """Interface for webcrawlers. Crawler implementations should subclass this"""
 import re
-import logging
 from time import sleep
 import backoff
 import requests
@@ -16,12 +15,12 @@ from random_user_agent.user_agent import UserAgent
 from random_user_agent.params import HardwareType, Popularity
 
 from flathunter import proxies
+from flathunter.logging import logger
 from flathunter.captcha.captcha_solver import CaptchaUnsolvableError
 
 class Crawler:
     """Defines the Crawler interface"""
 
-    __log__ = logging.getLogger('flathunt')
     URL_PATTERN = None
 
     def __init__(self, config):
@@ -76,7 +75,7 @@ class Crawler:
         self.rotate_user_agent()
         resp = requests.get(url, headers=self.HEADERS)
         if resp.status_code not in (200, 405):
-            self.__log__.error("Got response (%i): %s", resp.status_code, resp.content)
+            logger.error("Got response (%i): %s", resp.status_code, resp.content)
         if self.config.use_proxy():
             return self.get_soup_with_proxy(url)
         if driver is not None:
@@ -109,19 +108,19 @@ class Crawler:
                     )
 
                     if resp.status_code != 200:
-                        self.__log__.error("Got response (%i): %s", resp.status_code, resp.content)
+                        logger.error("Got response (%i): %s", resp.status_code, resp.content)
                     else:
                         resolved = True
                         break
 
                 except requests.exceptions.ConnectionError:
-                    self.__log__.error("Connection failed for proxy %s. Trying new proxy...", proxy)
+                    logger.error("Connection failed for proxy %s. Trying new proxy...", proxy)
                 except requests.exceptions.Timeout:
-                    self.__log__.error(
+                    logger.error(
                       "Connection timed out for proxy %s. Trying new proxy...", proxy
                     )
                 except requests.exceptions.RequestException:
-                    self.__log__.error("Some error occurred. Trying new proxy...")
+                    logger.error("Some error occurred. Trying new proxy...")
 
         if not resp:
             raise Exception("An error occurred while fetching proxies or content")
@@ -135,14 +134,14 @@ class Crawler:
     # pylint: disable=unused-argument
     def get_results(self, search_url, max_pages=None):
         """Loads the exposes from the site, starting at the provided URL"""
-        self.__log__.debug("Got search URL %s", search_url)
+        logger.debug("Got search URL %s", search_url)
 
         # load first page
         soup = self.get_page(search_url)
 
         # get data from first page
         entries = self.extract_data(soup)
-        self.__log__.debug('Number of found entries: %d', len(entries))
+        logger.debug('Number of found entries: %d', len(entries))
 
         return entries
 
@@ -152,7 +151,7 @@ class Crawler:
             try:
                 return self.get_results(url, max_pages)
             except requests.exceptions.ConnectionError:
-                self.__log__.warning("Connection to %s failed. Retrying.", url.split('/')[2])
+                logger.warning("Connection to %s failed. Retrying.", url.split('/')[2])
                 return []
         return []
 

@@ -1,19 +1,17 @@
 """Captcha solver for 2Captcha Captcha Solving Service (https://2captcha.com)"""
 import json
-import logging
 from typing import Dict
 from time import sleep
 import backoff
 import requests
 
+from flathunter.logging import logger
 from flathunter.captcha.captcha_solver import (
     CaptchaSolver,
     CaptchaUnsolvableError,
     GeetestResponse,
     RecaptchaResponse,
 )
-
-logger = logging.getLogger('flathunt')
 
 class TwoCaptchaSolver(CaptchaSolver):
     """Implementation of Captcha solver for 2Captcha"""

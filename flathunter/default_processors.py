@@ -1,7 +1,8 @@
 """Built-in expose processor implementations. Used by the processor pipelines
    in flathunter and in the webservice"""
 import re
-import logging
+
+from flathunter.logging import logger
 from flathunter.abstract_processor import Processor
 
 class Filter(Processor):
@@ -16,7 +17,6 @@ class Filter(Processor):
 
 class AddressResolver(Processor):
     """Processor to extract apartment addresses from expose links"""
-    __log__ = logging.getLogger('flathunt')
 
     def __init__(self, config):
         self.config = config
@@ -28,7 +28,7 @@ class AddressResolver(Processor):
             for searcher in self.config.searchers():
                 if re.search(searcher.URL_PATTERN, url):
                     expose['address'] = searcher.load_address(url)
-                    self.__log__.debug("Loaded address %s for url %s", expose['address'], url)
+                    logger.debug("Loaded address %s for url %s", expose['address'], url)
                     break
         return expose
 

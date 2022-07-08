@@ -1,22 +1,22 @@
 """Expose crawler for ImmobilienScout"""
-import logging
 import re
 import datetime
 
 from selenium.common.exceptions import JavascriptException
 from jsonpath_ng import parse
+
+from flathunter.logging import logger
 from flathunter.abstract_crawler import Crawler
 
 class CrawlImmobilienscout(Crawler):
     """Implementation of Crawler interface for ImmobilienScout"""
 
-    __log__ = logging.getLogger('flathunt')
     URL_PATTERN = re.compile(r'https://www\.immobilienscout24\.de')
     RESULT_LIMIT = 50
 
     def __init__(self, config):
         super().__init__(config)
-        logging.getLogger("requests").setLevel(logging.WARNING)
+
         self.config = config
         self.driver = None
         self.checkbox = None
@@ -24,7 +24,6 @@ class CrawlImmobilienscout(Crawler):
 
         if config.captcha_enabled():
             captcha_config = config.get('captcha')
-            self.driver_executable_path = captcha_config.get('driver_path', '')
             self.driver_arguments = captcha_config.get('driver_arguments', [])
             if captcha_config.get('checkbox', '') == "":
                 self.checkbox = False
@@ -35,10 +34,7 @@ class CrawlImmobilienscout(Crawler):
             else:
                 self.afterlogin_string = captcha_config.get('afterlogin_string', '')
             if self.captcha_solver:
-                self.driver = self.configure_driver(
-                    self.driver_executable_path,
-                    self.driver_arguments
-                )
+                self.driver = self.configure_driver(self.driver_arguments)
 
     def get_results(self, search_url, max_pages=None):
         """Loads the exposes from the ImmoScout site, starting at the provided URL"""
@@ -51,7 +47,7 @@ class CrawlImmobilienscout(Crawler):
             search_url = re.sub(r"&pagenumber=[0-9]", "&pagenumber={0}", search_url)
         else:
             search_url = search_url + '&pagenumber={0}'
-        self.__log__.debug("Got search URL %s", search_url)
+        logger.debug("Got search URL %s", search_url)
 
         # load first page to get number of entries
         page_no = 1
@@ -67,7 +63,7 @@ class CrawlImmobilienscout(Crawler):
                                         e['data-is24-qa'] == 'resultlist-resultCount')[0] \
                     .text.replace('.', ''))
         except IndexError:
-            self.__log__.debug('Index Error occurred')
+            logger.debug('Index Error occurred')
             no_of_results = 0
 
         # get data from first page
@@ -76,7 +72,7 @@ class CrawlImmobilienscout(Crawler):
         # iterate over all remaining pages
         while len(entries) < min(no_of_results, self.RESULT_LIMIT) and \
                 (max_pages is None or page_no < max_pages):
-            self.__log__.debug(
+            logger.debug(
                 'Next Page, Number of entries : %d, no of results: %d',
                 len(entries), no_of_results)
             page_no += 1
@@ -92,7 +88,7 @@ class CrawlImmobilienscout(Crawler):
         try:
             result_json = self.driver.execute_script('return window.IS24.resultList;')
         except JavascriptException:
-            self.__log__.warning("Unable to find IS24 variable in window")
+            logger.warning("Unable to find IS24 variable in window")
             return []
         return self.get_entries_from_json(result_json)
 
@@ -161,7 +157,7 @@ class CrawlImmobilienscout(Crawler):
                 expose_urls.append('https://www.immobilienscout24.de/expose/' + str(expose_id))
             else:
                 expose_urls.append(link.get('href'))
-        self.__log__.debug(expose_ids)
+        logger.debug(expose_ids)
 
         attr_container_els = soup.find_all(
           lambda e: e.has_attr('data-is24-qa') and \
@@ -218,5 +214,5 @@ class CrawlImmobilienscout(Crawler):
             if not exist:
                 entries.append(details)
 
-        self.__log__.debug('extracted: %d', len(entries))
+        logger.debug('extracted: %d', len(entries))
         return entries

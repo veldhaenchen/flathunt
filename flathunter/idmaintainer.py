@@ -3,8 +3,8 @@ import threading
 import sqlite3 as lite
 import datetime
 import json
-import logging
 
+from flathunter.logging import logger
 from flathunter.abstract_processor import Processor
 
 __author__ = "Nody"
@@ -40,7 +40,6 @@ class AlreadySeenFilter:
 
 class IdMaintainer:
     """SQLite back-end for the database"""
-    __log__ = logging.getLogger('flathunt')
 
     def __init__(self, db_name):
         self.db_name = db_name
@@ -62,13 +61,13 @@ class IdMaintainer:
                                     (id INTEGER PRIMARY KEY, settings BLOB)')
                 self.threadlocal.connection.commit()
             except lite.Error as error:
-                self.__log__.error("Error %s:", error.args[0])
+                logger.error("Error %s:", error.args[0])
                 raise error
         return connection
 
     def is_processed(self, expose_id):
         """Returns true if an expose has already been processed"""
-        self.__log__.debug('is_processed(%d)', expose_id)
+        logger.debug('is_processed(%d)', expose_id)
         cur = self.get_connection().cursor()
         cur.execute('SELECT id FROM processed WHERE id = ?', (expose_id,))
         row = cur.fetchone()
@@ -76,7 +75,7 @@ class IdMaintainer:
 
     def mark_processed(self, expose_id):
         """Mark an expose as processed in the database"""
-        self.__log__.debug('mark_processed(%d)', expose_id)
+        logger.debug('mark_processed(%d)', expose_id)
         cur = self.get_connection().cursor()
         cur.execute('INSERT INTO processed VALUES(?)', (expose_id,))
         self.get_connection().commit()

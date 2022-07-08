@@ -1,14 +1,13 @@
 """Expose crawler for Ebay Kleinanzeigen"""
-import logging
 import re
 import datetime
 
+from flathunter.logging import logger
 from flathunter.abstract_crawler import Crawler
 
 class CrawlEbayKleinanzeigen(Crawler):
     """Implementation of Crawler interface for Ebay Kleinanzeigen"""
 
-    __log__ = logging.getLogger('flathunt')
     USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0'
     URL_PATTERN = re.compile(r'https://www\.ebay-kleinanzeigen\.de')
     MONTHS = {
@@ -28,7 +27,6 @@ class CrawlEbayKleinanzeigen(Crawler):
 
     def __init__(self, config):
         super().__init__(config)
-        logging.getLogger("requests").setLevel(logging.WARNING)
         self.config = config
 
     def get_page(self, search_url, driver=None, page_no=None):
@@ -67,29 +65,29 @@ class CrawlEbayKleinanzeigen(Crawler):
                 address = expose_ids[idx].find("div", {"class": "aditem-main--top--left"})
                 image_element = expose_ids[idx].find("div", {"class": "galleryimage-element"})
             except AttributeError as error:
-                self.__log__.warning("Unable to process Ebay expose: %s", str(error))
+                logger.warning("Unable to process Ebay expose: %s", str(error))
                 continue
 
             if image_element is not None:
                 image = image_element["data-imgsrc"]
             else:
                 image = None
-            self.__log__.debug(address.text.strip())
+            logger.debug(address.text.strip())
             address = address.text.strip()
             address = address.replace('\n', ' ').replace('\r', '')
             address = " ".join(address.split())
             try:
-                self.__log__.debug(tags[1].text)
+                logger.debug(tags[1].text)
                 rooms = re.match(r'(\d+)', tags[1].text)[1]
             except (IndexError, TypeError):
-                self.__log__.debug("Keine Zimmeranzahl gegeben")
+                logger.debug("Keine Zimmeranzahl gegeben")
                 rooms = "Nicht gegeben"
             try:
-                self.__log__.debug(tags[0].text)
+                logger.debug(tags[0].text)
                 size = tags[0].text
             except (IndexError, TypeError):
                 size = "Nicht gegeben"
-                self.__log__.debug("Quadratmeter nicht angegeben")
+                logger.debug("Quadratmeter nicht angegeben")
             details = {
                 'id': int(expose_ids[idx].get("data-adid")),
                 'image': image,
@@ -103,7 +101,7 @@ class CrawlEbayKleinanzeigen(Crawler):
             }
             entries.append(details)
 
-        self.__log__.debug('extracted: %d', len(entries))
+        logger.debug('extracted: %d', len(entries))
 
         return entries
 

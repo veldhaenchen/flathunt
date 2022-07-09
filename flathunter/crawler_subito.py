@@ -70,6 +70,6 @@ class CrawlSubito(Crawler):
 
             entries.append(details)
 
-        logger.debug('extracted: %s', entries)
+        logger.debug('Number of found entries: %d', len(entries))
 
         return entries

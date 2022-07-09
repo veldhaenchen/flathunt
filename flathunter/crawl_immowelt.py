@@ -105,6 +105,6 @@ class CrawlImmowelt(Crawler):
             }
             entries.append(details)
 
-        logger.debug('extracted: %d', len(entries))
+        logger.debug('Number of entries found: %d', len(entries))
 
         return entries

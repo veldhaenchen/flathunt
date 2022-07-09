@@ -71,7 +71,7 @@ class CrawlWgGesucht(Crawler):
 
             entries.append(details)
 
-        logger.debug('extracted: %s', entries)
+        logger.debug('Number of entries found: %d', len(entries))
 
         return entries
 

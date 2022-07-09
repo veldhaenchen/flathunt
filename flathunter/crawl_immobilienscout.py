@@ -69,7 +69,7 @@ class CrawlImmobilienscout(Crawler):
                                         e['data-is24-qa'] == 'resultlist-resultCount')[0] \
                     .text.replace('.', ''))
         except IndexError:
-            logger.debug('Index Error occurred')
+            logger.error('Index error occurred')
             no_of_results = 0
 
         # get data from first page
@@ -79,7 +79,7 @@ class CrawlImmobilienscout(Crawler):
         while len(entries) < min(no_of_results, self.RESULT_LIMIT) and \
                 (max_pages is None or page_no < max_pages):
             logger.debug(
-                'Next Page, Number of entries : %d, no of results: %d',
+                '(Next page) Number of entries: %d / Number of results: %d',
                 len(entries), no_of_results)
             page_no += 1
             soup = self.get_page(search_url, self.driver, page_no)
@@ -163,7 +163,6 @@ class CrawlImmobilienscout(Crawler):
                 expose_urls.append('https://www.immobilienscout24.de/expose/' + str(expose_id))
             else:
                 expose_urls.append(link.get('href'))
-        logger.debug(expose_ids)
 
         attr_container_els = soup.find_all(
           lambda e: e.has_attr('data-is24-qa') and \
@@ -220,5 +219,5 @@ class CrawlImmobilienscout(Crawler):
             if not exist:
                 entries.append(details)
 
-        logger.debug('extracted: %d', len(entries))
+        logger.debug('Number of entries found: %d', len(entries))
         return entries

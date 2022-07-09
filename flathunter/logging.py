@@ -4,16 +4,16 @@ import os
 
 if os.name == 'posix':
     # provide coloring for UNIX systems
-    CYELLOW = '\033[93m'
-    CBLUE = '\033[94m'
-    COFF = '\033[0m'
+    _CYELLOW = '\033[93m'
+    _CBLUE = '\033[94m'
+    _COFF = '\033[0m'
 else:
-    CYELLOW = ''
-    CBLUE = ''
-    COFF = ''
+    _CYELLOW = ''
+    _CBLUE = ''
+    _COFF = ''
 
-LOG_FORMAT = '[' + CBLUE + '%(asctime)s' + COFF + '|' + CBLUE + '%(filename)-18s' + COFF + \
-                '|' + CYELLOW + '%(levelname)-8s' + COFF + ']: %(message)s'
+LOG_FORMAT = '[' + _CBLUE + '%(asctime)s' + _COFF + '|' + _CBLUE + '%(filename)-18s' + _COFF + \
+                '|' + _CYELLOW + '%(levelname)-8s' + _COFF + ']: %(message)s'
 
 logging.basicConfig(
     format=LOG_FORMAT,
@@ -21,6 +21,7 @@ logging.basicConfig(
     level=logging.INFO
 )
 
+# Set logging level for "requests" module
 logging.getLogger("requests").setLevel(logging.WARNING)
 
 logger = logging.getLogger('flathunt')

@@ -65,29 +65,26 @@ class CrawlEbayKleinanzeigen(Crawler):
                 address = expose_ids[idx].find("div", {"class": "aditem-main--top--left"})
                 image_element = expose_ids[idx].find("div", {"class": "galleryimage-element"})
             except AttributeError as error:
-                logger.warning("Unable to process Ebay expose: %s", str(error))
+                logger.warning("Unable to process eBay expose: %s", str(error))
                 continue
 
             if image_element is not None:
                 image = image_element["data-imgsrc"]
             else:
                 image = None
-            logger.debug(address.text.strip())
+
             address = address.text.strip()
             address = address.replace('\n', ' ').replace('\r', '')
             address = " ".join(address.split())
+
             try:
-                logger.debug(tags[1].text)
                 rooms = re.match(r'(\d+)', tags[1].text)[1]
             except (IndexError, TypeError):
-                logger.debug("Keine Zimmeranzahl gegeben")
-                rooms = "Nicht gegeben"
+                rooms = ""
             try:
-                logger.debug(tags[0].text)
                 size = tags[0].text
             except (IndexError, TypeError):
-                size = "Nicht gegeben"
-                logger.debug("Quadratmeter nicht angegeben")
+                size = ""
             details = {
                 'id': int(expose_ids[idx].get("data-adid")),
                 'image': image,
@@ -101,7 +98,7 @@ class CrawlEbayKleinanzeigen(Crawler):
             }
             entries.append(details)
 
-        logger.debug('extracted: %d', len(entries))
+        logger.debug('Number of entries found: %d', len(entries))
 
         return entries
 

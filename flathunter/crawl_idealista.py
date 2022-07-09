@@ -63,6 +63,6 @@ class CrawlIdealista(Crawler):
 
             entries.append(details)
 
-        logger.debug('extracted: %d', entries)
+        logger.debug('Number of entries found: %d', len(entries))
 
         return entries

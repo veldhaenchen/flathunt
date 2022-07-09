@@ -53,27 +53,23 @@ class CrawlImmowelt(Crawler):
         expose_ids = soup.find_all("a", id=True)
 
         for idx, title_el in enumerate(title_elements):
-
             try:
                 price = expose_ids[idx].find(
                     "div", attrs={"data-test": "price"}).text
             except IndexError:
-                logger.error("Kein Preis angegeben")
-                price = "Auf Anfrage"
+                price = ""
 
             try:
                 size = expose_ids[idx].find(
                     "div", attrs={"data-test": "area"}).text
             except IndexError:
-                size = "Nicht gegeben"
-                logger.error("Quadratmeter nicht angegeben")
+                size = ""
 
             try:
                 rooms = expose_ids[idx].find(
                     "div", attrs={"data-test": "rooms"}).text
             except IndexError:
-                logger.error("Keine Zimmeranzahl gegeben")
-                rooms = "Nicht gegeben"
+                rooms = ""
 
             url = expose_ids[idx].get("href")
 
@@ -90,8 +86,7 @@ class CrawlImmowelt(Crawler):
                   )
                 address = address.find("span").text
             except IndexError:
-                logger.error("Keine Addresse gegeben")
-                address = "Nicht gegeben"
+                address = ""
 
             processed_id = int(
               hashlib.sha256(expose_ids[idx].get("id").encode('utf-8')).hexdigest(), 16

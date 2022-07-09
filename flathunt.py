@@ -73,24 +73,23 @@ def main():
     notifiers = config.get('notifiers', [])
     if 'mattermost' in notifiers \
             and not config.get('mattermost', {}).get('webhook_url'):
-        logger.error("No mattermost webhook configured. Starting like this would be pointless...")
+        logger.error("No Mattermost webhook configured. Starting like this would be pointless...")
         return
     if 'telegram' in notifiers:
         if not config.get('telegram', {}).get('bot_token'):
             logger.error(
-                "No telegram bot token configured. Starting like this would be pointless..."
+                "No Telegram bot token configured. Starting like this would be pointless..."
             )
             return
         if not config.get('telegram', {}).get('receiver_ids'):
-            logger.warning("No telegram receivers configured - nobody will get notifications.")
+            logger.warning("No Telegram receivers configured - nobody will get notifications.")
     if not config.get('urls'):
-        logger.error("No urls configured. Starting like this would be meaningless...")
+        logger.error("No URLs configured. Starting like this would be pointless...")
         return
 
     # get heartbeat instructions
     heartbeat_interval = args.heartbeat
     heartbeat = Heartbeat(config, heartbeat_interval)
-
 
     # start hunting for flats
     launch_flat_hunt(config, heartbeat)

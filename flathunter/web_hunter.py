@@ -1,6 +1,5 @@
 """Flathunter implementation for website"""
-import logging
-
+from flathunter.logging import logger
 from flathunter.hunter import Hunter
 from flathunter.filter import Filter
 from flathunter.processor import ProcessorChain
@@ -9,8 +8,6 @@ class WebHunter(Hunter):
     """Flathunter implementation for website. Designed to hunt all exposes from
        all sites and save them to the database. Includes support for multiple users
        with individual filters implemented in-app"""
-
-    __log__ = logging.getLogger('flathunt')
 
     def hunt_flats(self, max_pages=1):
         """Crawl all URLs, and send notifications to users of new flats"""
@@ -41,7 +38,7 @@ class WebHunter(Hunter):
                                             .send_messages([user_id]) \
                                             .build()
             for message in processor_chain.process(new_exposes):
-                self.__log__.debug("Sent expose %d to user %d", message['id'], user_id)
+                logger.debug("Sent expose %d to user %d", message['id'], user_id)
 
         self.id_watch.update_last_run_time()
         return list(new_exposes)

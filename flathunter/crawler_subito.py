@@ -1,19 +1,17 @@
 """Expose crawler for Subito"""
-import logging
 import re
 import json
 
+from flathunter.logging import logger
 from flathunter.abstract_crawler import Crawler
 
 class CrawlSubito(Crawler):
     """Implementation of Crawler interface for Subito"""
 
-    __log__ = logging.getLogger('flathunt')
     URL_PATTERN = re.compile(r'https://www\.subito\.it')
 
     def __init__(self, config):
         super().__init__(config)
-        logging.getLogger("requests").setLevel(logging.WARNING)
         self.config = config
 
     # pylint: disable=too-many-locals
@@ -72,6 +70,6 @@ class CrawlSubito(Crawler):
 
             entries.append(details)
 
-        self.__log__.debug('extracted: %s', entries)
+        logger.debug('Number of found entries: %d', len(entries))
 
         return entries

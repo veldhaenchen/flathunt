@@ -1,14 +1,13 @@
-import logging
 import re
 from random import seed
 from random import random
 from random import randint
 from random import choice
 
+from flathunter.logging import logger
 from flathunter.abstract_crawler import Crawler
 
 class DummyCrawler(Crawler):
-    __log__ = logging.getLogger('flathunt')
     URL_PATTERN = re.compile(r'https://www\.example\.com')
 
     def __init__(self, titlewords=[ "wg", "tausch", "flat", "ruhig", "gruen" ], addresses_as_links=False):
@@ -17,7 +16,7 @@ class DummyCrawler(Crawler):
         self.addresses_as_links = addresses_as_links
 
     def get_results(self, search_url, max_pages=None):
-        self.__log__.debug("Generating dummy results")
+        logger.debug("Generating dummy results")
         entries = []
         for _ in range(randint(20, 40)):
             expose_id = randint(1, 2000)

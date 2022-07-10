@@ -1,20 +1,18 @@
 """Expose crawler for ImmoWelt"""
-import logging
 import re
 import datetime
 import hashlib
 
+from flathunter.logging import logger
 from flathunter.abstract_crawler import Crawler
 
 class CrawlImmowelt(Crawler):
     """Implementation of Crawler interface for ImmoWelt"""
 
-    __log__ = logging.getLogger('flathunt')
     URL_PATTERN = re.compile(r'https://www\.immowelt\.de')
 
     def __init__(self, config):
         super().__init__(config)
-        logging.getLogger("requests").setLevel(logging.WARNING)
         self.config = config
 
     def get_expose_details(self, expose):
@@ -55,27 +53,23 @@ class CrawlImmowelt(Crawler):
         expose_ids = soup.find_all("a", id=True)
 
         for idx, title_el in enumerate(title_elements):
-
             try:
                 price = expose_ids[idx].find(
                     "div", attrs={"data-test": "price"}).text
             except IndexError:
-                self.__log__.error("Kein Preis angegeben")
-                price = "Auf Anfrage"
+                price = ""
 
             try:
                 size = expose_ids[idx].find(
                     "div", attrs={"data-test": "area"}).text
             except IndexError:
-                size = "Nicht gegeben"
-                self.__log__.error("Quadratmeter nicht angegeben")
+                size = ""
 
             try:
                 rooms = expose_ids[idx].find(
                     "div", attrs={"data-test": "rooms"}).text
             except IndexError:
-                self.__log__.error("Keine Zimmeranzahl gegeben")
-                rooms = "Nicht gegeben"
+                rooms = ""
 
             url = expose_ids[idx].get("href")
 
@@ -92,8 +86,7 @@ class CrawlImmowelt(Crawler):
                   )
                 address = address.find("span").text
             except IndexError:
-                self.__log__.error("Keine Addresse gegeben")
-                address = "Nicht gegeben"
+                address = ""
 
             processed_id = int(
               hashlib.sha256(expose_ids[idx].get("id").encode('utf-8')).hexdigest(), 16
@@ -112,6 +105,6 @@ class CrawlImmowelt(Crawler):
             }
             entries.append(details)
 
-        self.__log__.debug('extracted: %d', len(entries))
+        logger.debug('Number of entries found: %d', len(entries))
 
         return entries

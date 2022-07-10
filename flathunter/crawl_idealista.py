@@ -1,19 +1,17 @@
 """Expose crawler for Idealista"""
-import logging
 import re
 
+from flathunter.logging import logger
 from flathunter.abstract_crawler import Crawler
 
 class CrawlIdealista(Crawler):
     """Implementation of Crawler interface for Idealista"""
 
-    __log__ = logging.getLogger('flathunt')
     URL_PATTERN = re.compile(r'https://www\.idealista\.it')
 
     def __init__(self, config):
         super().__init__(config)
         self.config = config
-        logging.getLogger("requests").setLevel(logging.WARNING)
 
     # pylint: disable=unused-argument
     def get_page(self, search_url, driver=None, page_no=None):
@@ -65,6 +63,6 @@ class CrawlIdealista(Crawler):
 
             entries.append(details)
 
-        self.__log__.debug('extracted: %d', entries)
+        logger.debug('Number of entries found: %d', len(entries))
 
         return entries

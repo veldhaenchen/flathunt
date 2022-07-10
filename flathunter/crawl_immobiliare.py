@@ -1,17 +1,16 @@
 """Expose crawler for Immobiliare"""
-import logging
 import re
+
+from flathunter.logging import logger
 from flathunter.abstract_crawler import Crawler
 
 class CrawlImmobiliare(Crawler):
     """Implementation of Crawler interface for Immobiliare"""
 
-    __log__ = logging.getLogger('flathunt')
     URL_PATTERN = re.compile(r'https://www\.immobiliare\.it')
 
     def __init__(self, config):
         super().__init__(config)
-        logging.getLogger("requests").setLevel(logging.WARNING)
         self.config = config
 
     # pylint: disable=too-many-locals
@@ -65,6 +64,6 @@ class CrawlImmobiliare(Crawler):
 
             entries.append(details)
 
-        self.__log__.debug('extracted: %s', entries)
+        logger.debug('Number of entries found: %d', len(entries))
 
         return entries

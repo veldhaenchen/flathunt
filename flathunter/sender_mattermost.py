@@ -1,13 +1,12 @@
 """Functions and classes related to sending Telegram messages"""
 import json
-import logging
 import requests
 
+from flathunter.logging import logger
 from flathunter.abstract_processor import Processor
 
 class SenderMattermost(Processor):
     """Expose processor that sends Mattermost messages"""
-    __log__ = logging.getLogger('flathunt')
 
     def __init__(self, config):
         self.config = config
@@ -30,17 +29,17 @@ class SenderMattermost(Processor):
 
     def send_msg(self, message):
         """Send messages to the mattermost webhook"""
-        self.__log__.debug(('webhook_url:', self.webhook_url))
-        self.__log__.debug(('message', message))
+        logger.debug(('webhook_url:', self.webhook_url))
+        logger.debug(('message', message))
         resp = requests.post(
             self.webhook_url,
             data=json.dumps({"text": message})
         )
-        self.__log__.debug("Got response (%i): %s", resp.status_code,
+        logger.debug("Got response (%i): %s", resp.status_code,
                            resp.content)
         # handle error
         if resp.status_code != 200:
-            self.__log__.error(
+            logger.error(
                 "When sending mattermost bot message, we got status %i with message: %s",
                 resp.status_code,
                 resp.text

@@ -1,20 +1,18 @@
 """Captcha solver using ImageTyperz Captcha Solving Service (http://www.imagetyperz.com)"""
 
 import json
-import logging
 from typing import Dict
 from time import sleep
 import backoff
 import requests
 
+from flathunter.logging import logger
 from flathunter.captcha.captcha_solver import (
     CaptchaSolver,
     CaptchaUnsolvableError,
     GeetestResponse,
     RecaptchaResponse,
 )
-
-logger = logging.getLogger('flathunt')
 
 class ImageTyperzSolver(CaptchaSolver):
     """Implementation of Captcha solver for ImageTyperz"""

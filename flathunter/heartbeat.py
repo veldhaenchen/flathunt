@@ -1,5 +1,5 @@
 """Providing heartbeat messages"""
-import logging
+from flathunter.logging import logger
 from flathunter.config import Config
 from flathunter.sender_mattermost import SenderMattermost
 from flathunter.sender_telegram import SenderTelegram
@@ -17,8 +17,7 @@ def interval2counter(interval):
     raise Exception("No valid heartbeat instruction received - no heartbeat messages will be sent.")
 
 class Heartbeat:
-    """heartbeat class - Will inform the user on regular intervals whether the bot is still alive"""
-    __log__ = logging.getLogger('flathunt')
+    """Will inform the user on regular intervals whether the bot is still alive"""
 
     def __init__(self, config, interval):
         self.config = config
@@ -38,6 +37,7 @@ class Heartbeat:
         # its time for a new heartbeat message and reset counter
         if self.notifier is not None and self.interval is not None:
             if counter % self.interval == 0:
+                logger.info('Sending heartbeat message.')
                 self.notifier.send_msg(
                     'Beep Boop. This is a heartbeat message. '
                     'Your bot is searching actively for flats.'

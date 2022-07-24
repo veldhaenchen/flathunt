@@ -4,10 +4,10 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-PyYAML = ">=5.4"
-requests = ">=2.22.0"
-urllib3 = ">=1.26.9"
-lxml = ">=4.8.0"
+PyYAML = "*"
+requests = "*"
+urllib3 = "*"
+lxml = "*"
 coverage = "*"
 codecov = "*"
 requests-mock = "*"

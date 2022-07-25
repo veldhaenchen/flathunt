@@ -121,7 +121,7 @@ google_maps_api:
 # you will also have to install a Chrome Web Driver and write below 
 # the executable path, the driver_arguments can be left as is.
 # captcha:
-#       imagetypers:
+#       imagetyperz:
 #             token: alskdjaskldjfklj
 #       2captcha:
 #             api_key: alskdjaskldjfklj

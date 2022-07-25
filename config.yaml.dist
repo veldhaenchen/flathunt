@@ -118,14 +118,12 @@ google_maps_api:
 # solving service. Register at either imagetypers or 2captcha 
 # (the former is prefered), desposit some funds, uncomment the 
 # corresponding lines below and replace your API key/token.
-# you will also have to install a Chrome Web Driver and write below 
-# the executable path, the driver_arguments can be left as is.
+# Use driver_arguments to provide options for Chrome WebDriver.
 # captcha:
 #       imagetypers:
 #             token: alskdjaskldjfklj
 #       2captcha:
 #             api_key: alskdjaskldjfklj
-#       driver_path: YOUR_CHROME_DRIVER_PATH
 #       driver_arguments:
 #         - "--headless"
 

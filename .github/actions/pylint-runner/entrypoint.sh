@@ -2,6 +2,7 @@
 
 set -u
 
+pipenv requirements > requirements.txt
 pip install -r requirements.txt
 
 pylint_runner

@@ -24,8 +24,6 @@ class CrawlImmobilienscout(Crawler):
 
         if config.captcha_enabled():
             captcha_config = config.get('captcha')
-
-            driver_executable_path = captcha_config.get('driver_path', '')
             driver_arguments = captcha_config.get('driver_arguments', [])
 
             if captcha_config.get('checkbox', '') == "":
@@ -37,10 +35,7 @@ class CrawlImmobilienscout(Crawler):
             else:
                 self.afterlogin_string = captcha_config.get('afterlogin_string', '')
             if self.captcha_solver:
-                self.driver = self.configure_driver(
-                    driver_executable_path,
-                    driver_arguments
-                )
+                self.driver = self.configure_driver(driver_arguments)
 
     def get_results(self, search_url, max_pages=None):
         """Loads the exposes from the ImmoScout site, starting at the provided URL"""

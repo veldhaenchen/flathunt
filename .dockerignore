@@ -1,6 +1,7 @@
 # Git/GitHub
 .git
 .github
+.gitignore
 
 # Google Cloud
 .gcloudignore

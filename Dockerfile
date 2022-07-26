@@ -12,9 +12,8 @@ RUN apt-get install -y google-chrome-stable
 WORKDIR /usr/src/app
 COPY . .
 
-RUN pip install --upgrade pip && \
-    pip install pipenv && \
-    python --version; pip --version; pipenv --version
+RUN pip install --upgrade pip
+RUN pip install pipenv
 
 RUN pipenv requirements > requirements.txt
 RUN pip install -r requirements.txt

@@ -1,12 +1,22 @@
-FROM joyzoursky/python-chromedriver:3.8
+FROM python:3.7
 
-COPY . /app
-WORKDIR /app
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+ARG PIP_NO_CACHE_DIR=1
 
-RUN export PATH=$PATH:/usr/lib/chromium-browser/
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+RUN apt-get -y update
+RUN apt-get install -y google-chrome-stable
 
-RUN pip install --no-cache-dir -r requirements.txt
+WORKDIR /usr/src/app
+COPY . .
 
-VOLUME /config
+RUN pip install --upgrade pip && \
+    pip install pipenv && \
+    python --version; pip --version; pipenv --version
 
-CMD [ "python3", "-u", "flathunt.py", "-c", "/config/config.yaml" ]
+RUN pipenv requirements > requirements.txt
+RUN pip install -r requirements.txt
+
+CMD [ "python3", "flathunt.py" ]

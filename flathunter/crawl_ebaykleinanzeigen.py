@@ -8,7 +8,6 @@ from flathunter.abstract_crawler import Crawler
 class CrawlEbayKleinanzeigen(Crawler):
     """Implementation of Crawler interface for Ebay Kleinanzeigen"""
 
-    USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0'
     URL_PATTERN = re.compile(r'https://www\.ebay-kleinanzeigen\.de')
     MONTHS = {
         "Januar": "01",
@@ -49,15 +48,15 @@ class CrawlEbayKleinanzeigen(Crawler):
         """Extracts all exposes from a provided Soup object"""
         entries = []
         soup = soup.find(id="srchrslt-adtable")
+
         try:
             title_elements = soup.find_all(lambda e: e.has_attr('class')
                                            and 'ellipsis' in e['class'])
         except AttributeError:
             return entries
+
         expose_ids = soup.find_all("article", class_="aditem")
 
-        # soup.find_all(lambda e: e.has_attr('data-adid'))
-        # print(expose_ids)
         for idx, title_el in enumerate(title_elements):
             try:
                 price = expose_ids[idx].find(class_="aditem-main--middle--price").text.strip()

@@ -120,7 +120,7 @@ google_maps_api:
 # corresponding lines below and replace your API key/token.
 # Use driver_arguments to provide options for Chrome WebDriver.
 # captcha:
-#       imagetypers:
+#       imagetyperz:
 #             token: alskdjaskldjfklj
 #       2captcha:
 #             api_key: alskdjaskldjfklj

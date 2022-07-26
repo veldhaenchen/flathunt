@@ -129,6 +129,19 @@ To use the distance calculation feature a [Google API-Key](https://developers.go
 
 Since this feature is not free, it is "disabled". Read line 62 in hunter.py to re-enable it.
 
+### Docker
+
+First build the image inside the project's root directory:
+```sh
+$ docker build -t flathunter .
+```
+
+***When running a container using the image, the ```config.yaml``` file needs to be mounted to ```/config.yaml```.** The example below  provides the file off the current working directory:
+
+```sh
+$ docker run --mount type=bind,source=$PWD/config.yaml,target=/config.yaml flathunter
+```
+
 ### Google Cloud Deployment
 
 You can run `flathunter` on Google's App Engine, in the free tier, at no cost. To get started, first install the [Google Cloud SDK](https://cloud.google.com/sdk/docs) on your machine, and run:

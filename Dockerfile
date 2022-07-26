@@ -19,4 +19,4 @@ RUN pip install --upgrade pip && \
 RUN pipenv requirements > requirements.txt
 RUN pip install -r requirements.txt
 
-CMD [ "python3", "flathunt.py" ]
+CMD [ "python", "flathunt.py", "-c", "/config.yaml" ]

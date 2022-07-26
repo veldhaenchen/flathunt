@@ -115,7 +115,7 @@ $ curl https://api.telegram.org/bot[BOT-TOKEN]/getUpdates
 to get list of messages the Bot has received. You will see your Chat ID in there.
 
 #### 2Captcha
-Some sites (including ImmoScout24) implement Captcha to avoid being crawled by evil web scrapers. Since our crawler is not an evil one, the people at [2captcha](https://2captcha.com) provide us a service that helps you solve them. Head to the `2captchas` website, register and pay 3$ for 1000 solved captcha's! Check the `config.yaml.dist` on how to configure `2captcha` with `flathunter`. You will also be required to install a [chrome-web-driver](https://chromedriver.chromium.org/downloads) on your system that runs `flathunter`. The installation procedure varies depending on your system, a quick search on the internet should answer this question. **At this time, ImmoScout24 cannot be crawled by flathunter without using 2Captcha**.
+Some sites (including ImmoScout24) implement Captcha to avoid being crawled by evil web scrapers. Since our crawler is not an evil one, the people at [2captcha](https://2captcha.com) provide us a service that helps you solve them. Head to the `2captchas` website, register and pay 3$ for 1000 solved captcha's! Check the `config.yaml.dist` on how to configure `2captcha` with `flathunter`. **At this time, ImmoScout24 cannot be crawled by flathunter without using 2Captcha**.
 
 #### Proxy
 It's common that websites use bots and crawler protections to avoid being flooded with possibly malicious traffic. This can cause some issues when crawling, as we will be presented with a bot-protection page.

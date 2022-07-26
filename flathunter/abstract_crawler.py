@@ -8,11 +8,13 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium import webdriver
 from bs4 import BeautifulSoup
 from random_user_agent.user_agent import UserAgent
 from random_user_agent.params import HardwareType, Popularity
+from webdriver_manager.chrome import ChromeDriverManager
 
 from flathunter import proxies
 from flathunter.logging import logger
@@ -22,11 +24,6 @@ class Crawler:
     """Defines the Crawler interface"""
 
     URL_PATTERN = None
-
-    def __init__(self, config):
-        self.config = config
-        if config.captcha_enabled():
-            self.captcha_solver = config.get_captcha_solver()
 
     user_agent_rotator = UserAgent(popularity=[Popularity.COMMON.value],
                                    hardware_types=[HardwareType.COMPUTER.value])
@@ -47,13 +44,22 @@ class Crawler:
         'Accept-Language': 'en-US,en;q=0.9',
     }
 
-    def configure_driver(self, driver_path, driver_arguments):
-        """Configure ChromeDriver"""
+    def __init__(self, config):
+        self.config = config
+        if config.captcha_enabled():
+            self.captcha_solver = config.get_captcha_solver()
+
+    def configure_driver(self, driver_arguments):
+        """Configure Chrome WebDriver"""
+        logger.info('Initializing Chrome WebDriver for crawler "%s"...', self.get_name())
         chrome_options = Options()
         if driver_arguments is not None:
             for driver_argument in driver_arguments:
                 chrome_options.add_argument(driver_argument)
-        driver = webdriver.Chrome(executable_path=driver_path, options=chrome_options)
+        driver = webdriver.Chrome(
+            service=Service(ChromeDriverManager().install()),
+            options=chrome_options
+        )
         driver.execute_cdp_cmd('Network.setBlockedURLs', {
           "urls": ["https://api.geetest.com/get.*"]
         })

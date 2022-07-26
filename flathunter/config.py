@@ -27,13 +27,8 @@ class Config:
             logger.info("Using config %s", filename)
             with open(filename, encoding="utf-8") as file:
                 self.config = yaml.safe_load(file)
-        self.__searchers__ = [CrawlImmobilienscout(self),
-                              CrawlWgGesucht(self),
-                              CrawlEbayKleinanzeigen(self),
-                              CrawlImmowelt(self),
-                              CrawlSubito(self),
-                              CrawlImmobiliare(self),
-                              CrawlIdealista(self)]
+        self.__searchers__ = []
+        self.check_deprecated()
 
     def __iter__(self):
         """Emulate dictionary"""
@@ -42,6 +37,35 @@ class Config:
     def __getitem__(self, value):
         """Emulate dictionary"""
         return self.config[value]
+
+    def init_searchers(self):
+        """Initialize search plugins"""
+        self.__searchers__ = [
+            CrawlImmobilienscout(self),
+            CrawlWgGesucht(self),
+            CrawlEbayKleinanzeigen(self),
+            CrawlImmowelt(self),
+            CrawlSubito(self),
+            CrawlImmobiliare(self),
+            CrawlIdealista(self)
+        ]
+
+    def check_deprecated(self):
+        """Notifies user of deprecated config items"""
+        captcha_config = self.config.get("captcha")
+        if captcha_config is not None:
+            if captcha_config.get("imagetypers") is not None:
+                logger.warning(
+                    'Captcha configuration for "imagetypers" (captcha/imagetypers) has been '
+                    'renamed to "imagetyperz". '
+                    'We found an outdated entry, which has to be renamed accordingly, in order '
+                    'to be detected again.'
+                )
+            if captcha_config.get("driver_path") is not None:
+                logger.warning(
+                    'Captcha configuration for "driver_path" (captcha/driver_path) is no longer '
+                    'required, as driver setup has been automated.'
+                )
 
     def get(self, key, value=None):
         """Emulate dictionary"""
@@ -74,13 +98,6 @@ class Config:
     def get_captcha_solver(self) -> CaptchaSolver:
         """Get configured captcha solver"""
         captcha_config = self.config.get("captcha", {})
-
-        if captcha_config.get("imagetypers") is not None:
-            logger.warning(
-                'Captcha configuration for "imagetypers" has been renamed to "imagetyperz". '
-                'We found an outdated entry, which has to be renamed accordingly, in order '
-                'to be detected again.'
-            )
 
         imagetyperz_token = captcha_config.get("imagetyperz", {}).get("token", "")
         twocaptcha_api_key = captcha_config.get("2captcha", {}).get("api_key", "")

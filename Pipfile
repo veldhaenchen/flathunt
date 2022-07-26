@@ -25,6 +25,7 @@ backoff = "*"
 pytz = "*"
 beautifulsoup4 = "*"
 pylint-runner = "*"
+webdriver-manager = "*"
 
 [dev-packages]
 

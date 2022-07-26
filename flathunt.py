@@ -10,7 +10,7 @@ import logging
 import time
 from pprint import pformat
 
-from flathunter.logging import logger
+from flathunter.logging import logger, wdm_logger
 from flathunter.idmaintainer import IdMaintainer
 from flathunter.hunter import Hunter
 from flathunter.config import Config
@@ -67,7 +67,13 @@ def main():
     # adjust log level, if required
     if config.get('verbose'):
         logger.setLevel(logging.DEBUG)
-        logger.debug("Settings from config: %s", pformat(config))
+        # Allow logging of "webdriver-manager" module on verbose mode
+        wdm_logger.setLevel(logging.INFO)
+
+    logger.debug("Settings from config: %s", pformat(config))
+
+    # initialize search plugins for config
+    config.init_searchers()
 
     # check config
     notifiers = config.get('notifiers', [])

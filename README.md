@@ -24,6 +24,7 @@ Currently available messaging services are [Telegram](https://telegram.org/) and
     - [2Captcha](#2captcha)
     - [Proxy](#proxy)
     - [Google API](#google-api)
+  - [Docker](#docker)
   - [Google Cloud Deployment](#google-cloud-deployment)
 - [Usage](#usage)
   - [Command-line Interface](#command-line-interface)
@@ -160,7 +161,7 @@ First build the image inside the project's root directory:
 $ docker build -t flathunter .
 ```
 
-***When running a container using the image, the ```config.yaml``` file needs to be mounted to ```/config.yaml```.** The example below  provides the file off the current working directory:
+**When running a container using the image, a config file needs to be mounted on the container at ```/config.yaml```.** The example below provides the file ```config.yaml``` off the current working directory:
 
 ```sh
 $ docker run --mount type=bind,source=$PWD/config.yaml,target=/config.yaml flathunter

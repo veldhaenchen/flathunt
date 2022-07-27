@@ -153,6 +153,19 @@ Flathunt will crawl a [free-proxy list website](https://free-proxy-list.net/) to
 
 To use the distance calculation feature a [Google API-Key](https://developers.google.com/maps/documentation/javascript/get-api-key) is needed, as well as to enable the [Distance Matrix API](https://developers.google.com/maps/documentation/distance-matrix/overview) (This is NOT free).
 
+### Docker
+
+First build the image inside the project's root directory:
+```sh
+$ docker build -t flathunter .
+```
+
+***When running a container using the image, the ```config.yaml``` file needs to be mounted to ```/config.yaml```.** The example below  provides the file off the current working directory:
+
+```sh
+$ docker run --mount type=bind,source=$PWD/config.yaml,target=/config.yaml flathunter
+```
+
 ### Google Cloud Deployment
 
 You can run `Flathunter` on Google's App Engine, in the free tier, at no cost. To get started, first install the [Google Cloud SDK](https://cloud.google.com/sdk/docs) on your machine, and run:

@@ -24,6 +24,7 @@ Currently available messaging services are [Telegram](https://telegram.org/) and
     - [2Captcha](#2captcha)
     - [Proxy](#proxy)
     - [Google API](#google-api)
+  - [Docker](#docker)
   - [Google Cloud Deployment](#google-cloud-deployment)
 - [Usage](#usage)
   - [Command-line Interface](#command-line-interface)

@@ -5,7 +5,7 @@
 [![Tests](https://github.com/flathunters/flathunter/actions/workflows/tests.yml/badge.svg)](https://github.com/flathunters/flathunter/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/gh/flathunters/flathunter/branch/master/graph/badge.svg)](https://codecov.io/gh/flathunters/flathunter)
 
-A scraper to help people with their rental real-estate search. 🏠🤖
+A bot to help people with their rental real-estate search. 🏠🤖
 
 ## Description
 
@@ -65,13 +65,13 @@ $ pipenv shell
 to launch a Python environment with the dependencies that your project requires. **Now that you are inside the virtual environment, you can start the actual program:**
 
 ```sh
-$ python ./flathunt.py
+$ python flathunt.py
 ```
 
 **To directly run the program without entering the venv first, use:**
 
 ```sh
-$ pipenv run python ./flathunt.py
+$ pipenv run python flathunt.py
 ```
 
 For development purposes, you need to install the flathunter module in your current environment. Simply run:

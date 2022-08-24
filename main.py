@@ -1,8 +1,11 @@
 """ Startup file for Google Cloud deployment or local webserver"""
+import logging
+
 from flathunter.idmaintainer import IdMaintainer
 from flathunter.googlecloud_idmaintainer import GoogleCloudIdMaintainer
 from flathunter.web_hunter import WebHunter
 from flathunter.config import Config
+from flathunter.logging import logger, wdm_logger
 
 from flathunter.web import app
 
@@ -14,6 +17,15 @@ if __name__ == '__main__':
 else:
     # Use Google Cloud DB if we run on the cloud
     id_watch = GoogleCloudIdMaintainer()
+
+# adjust log level, if required
+if config.get('verbose'):
+    logger.setLevel(logging.DEBUG)
+    # Allow logging of "webdriver-manager" module on verbose mode
+    wdm_logger.setLevel(logging.INFO)
+
+# initialize search plugins for config
+config.init_searchers()
 
 hunter = WebHunter(config, id_watch)
 

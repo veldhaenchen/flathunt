@@ -127,15 +127,17 @@ google_maps_api:
 #       driver_arguments:
 #         - "--headless"
 
-# You can select whether to be notified by telegram or via a mattermost
+# You can select whether to be notified by telegram, apprise or a mattermost
 # webhook. For all notifiers selected here a configuration must be provided
 # below.
 # notifiers:
 #   - telegram
+#   - apprise
 #   - mattermost
 notifiers:
     - telegram
     - mattermost
+    - apprise
 
 # Sending messages using Telegram requires a Telegram Bot configured. 
 # Telegram.org offers a good documentation about how to create a bot.
@@ -156,6 +158,15 @@ notifiers:
 # https://docs.mattermost.com/developer/webhooks-incoming.html
 # mattermost:
 #   webhook_url: https://mattermost.example.com/signup_user_complete/?id=abcdef12356
+
+# Sending messages using Apprise requires an Apprise url.
+# Apprise allows to send notifications to a wide variety of services.
+# You can find a description how to set up an Apprise url with the official
+# documentation: https://github.com/caronc/apprise 
+#
+# apprise:
+#   - gotifys://...
+#   - mailto://..
 
 # If you are running the web interface, you can configure Login with Telegram support
 # Follow the instructions here to register your domain with the Telegram bot:

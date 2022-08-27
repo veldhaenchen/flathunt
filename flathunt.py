@@ -89,6 +89,10 @@ def main():
             return
         if not config.get('telegram', {}).get('receiver_ids'):
             logger.warning("No Telegram receivers configured - nobody will get notifications.")
+    if 'apprise' in notifiers \
+            and not config.get('apprise', {}):
+        logger.error("No apprise url configured. Starting like this would be pointless...")
+        return
     if not config.get('urls'):
         logger.error("No URLs configured. Starting like this would be pointless...")
         return

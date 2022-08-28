@@ -6,7 +6,7 @@ from flathunter.idmaintainer import IdMaintainer
 from flathunter.googlecloud_idmaintainer import GoogleCloudIdMaintainer
 from flathunter.web_hunter import WebHunter
 from flathunter.config import Config
-from flathunter.logging import logger, wdm_logger
+from flathunter.logging import logger, wdm_logger, configure_logging
 
 from flathunter.web import app
 
@@ -21,11 +21,7 @@ else:
     # Use Google Cloud DB if we run on the cloud
     id_watch = GoogleCloudIdMaintainer()
 
-# adjust log level, if required
-if config.get('verbose'):
-    logger.setLevel(logging.DEBUG)
-    # Allow logging of "webdriver-manager" module on verbose mode
-    wdm_logger.setLevel(logging.INFO)
+configure_logging(config)
 
 # initialize search plugins for config
 config.init_searchers()
@@ -33,10 +29,10 @@ config.init_searchers()
 hunter = WebHunter(config, id_watch)
 
 app.config["HUNTER"] = hunter
-if 'website' in config:
-    app.secret_key = config['website']['session_key']
-    app.config["DOMAIN"] = config['website']['domain']
-    app.config["BOT_NAME"] = config['website']['bot_name']
+if config.has_website_config():
+    app.secret_key = config.website_session_key()
+    app.config["DOMAIN"] = config.website_domain()
+    app.config["BOT_NAME"] = config.website_bot_name()
 else:
     app.secret_key = b'Not a secret'
 notifiers = config.get("notifiers", [])

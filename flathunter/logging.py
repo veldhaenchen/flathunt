@@ -1,6 +1,7 @@
 """Provides logger"""
 import logging
 import os
+from pprint import pformat
 
 class LoggerHandler(logging.StreamHandler):
     """Formats logs and alters WebDriverManager's logs properties"""
@@ -50,3 +51,10 @@ wdm_logger = setup_wdm_logger(logger_handler)
 
 # Setup "requests" module's logger
 logging.getLogger("requests").setLevel(logging.WARNING)
+
+def configure_logging(config):
+    if config.verbose_logging():
+        logger.setLevel(logging.DEBUG)
+        # Allow logging of "webdriver-manager" module on verbose mode
+        wdm_logger.setLevel(logging.INFO)
+    logger.debug("Settings from config: %s", pformat(config))

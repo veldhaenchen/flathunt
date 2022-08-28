@@ -13,15 +13,15 @@ class SenderTelegram(Processor):
 
     def __init__(self, config, receivers=None):
         self.config = config
-        self.bot_token = self.config.get('telegram', {}).get('bot_token', '')
+        self.bot_token = self.config.telegram_bot_token()
         if receivers is None:
-            self.receiver_ids = self.config.get('telegram', {}).get('receiver_ids', [])
+            self.receiver_ids = self.config.telegram_receiver_ids()
         else:
             self.receiver_ids = receivers
 
     def process_expose(self, expose):
         """Send a message to a user describing the expose"""
-        message = self.config.get('message', "").format(
+        message = self.config.message_format().format(
             title=expose['title'],
             rooms=expose['rooms'],
             size=expose['size'],

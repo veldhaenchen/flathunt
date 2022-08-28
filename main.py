@@ -35,11 +35,11 @@ if config.has_website_config():
     app.config["BOT_NAME"] = config.website_bot_name()
 else:
     app.secret_key = b'Not a secret'
-notifiers = config.get("notifiers", [])
+notifiers = config.notifiers()
 if "telegram" in notifiers:
-    app.config["BOT_TOKEN"] = config['telegram']['bot_token']
+    app.config["BOT_TOKEN"] = config.telegram_bot_token()
 if "mattermost" in notifiers:
-    app.config["MM_WEBHOOK_URL"] = config['mattermost']['webhook_url']
+    app.config["MM_WEBHOOK_URL"] = config.mattermost_webhook_url()
 
 if __name__ == '__main__':
     listen = config['website'].get('listen', {})

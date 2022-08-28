@@ -10,12 +10,11 @@ class SenderMattermost(Processor):
 
     def __init__(self, config):
         self.config = config
-        self.webhook_url = self.config.get('mattermost', {}).get(
-            'webhook_url', '')
+        self.webhook_url = self.config.mattermost_webhook_url()
 
     def process_expose(self, expose):
         """Send a message to a user describing the expose"""
-        message = self.config.get('message', "").format(
+        message = self.config.message_format().format(
             title=expose['title'],
             rooms=expose['rooms'],
             size=expose['size'],

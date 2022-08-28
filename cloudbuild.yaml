@@ -1,14 +1,10 @@
 steps:
 # Build the container image
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/flathunters/flathunter', '.']
+  args: ['build', '-t', 'gcr.io/flathunters/flathunter-job', '-f', 'Dockerfile.gcloud.job', '.']
 # Push the container image to Container Registry
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/flathunters/flathunter']
-# Deploy container image to Cloud Run
-#- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-#  entrypoint: gcloud
-#  args: ['run', 'deploy', 'flathunter', '--image', 'gcr.io/flathunters/flathunter', '--region', 'europe-west1', '--project', 'flathunters']
+  args: ['push', 'gcr.io/flathunters/flathunter-job']
 images:
-- gcr.io/flathunters/flathunter
+- gcr.io/flathunters/flathunter-job
 

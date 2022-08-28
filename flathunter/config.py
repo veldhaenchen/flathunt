@@ -1,6 +1,7 @@
 """Wrap configuration options as an object"""
 import os
 import yaml
+from typing import Optional
 
 from dotenv import load_dotenv
 
@@ -29,19 +30,36 @@ class Env:
     # Captcha setup
     FLATHUNTER_2CAPTCHA_KEY = readenv("FLATHUNTER_2CAPTCHA_KEY")
     FLATHUNTER_IMAGETYPERZ_TOKEN = readenv("FLATHUNTER_IMAGETYPERZ_TOKEN")
+    FLATHUNTER_HEADLESS_BROWSER = readenv("FLATHUNTER_HEADLESS_BROWSER")
 
     # Generic Config
     FLATHUNTER_TARGET_URLS = readenv("FLATHUNTER_TARGET_URLS")
     FLATHUNTER_DATABASE_LOCATION = readenv("FLATHUNTER_DATABASE_LOCATION")
+    FLATHUNTER_GOOGLE_CLOUD_PROJECT_ID = readenv("FLATHUNTER_GOOGLE_CLOUD_PROJECT_ID")
     FLATHUNTER_VERBOSE_LOG = readenv("FLATHUNTER_VERBOSE_LOG")
     FLATHUNTER_LOOP_PERIOD_SECONDS = readenv("FLATHUNTER_LOOP_PERIOD_SECONDS")
+    FLATHUNTER_MESSAGE_FORMAT = readenv("FLATHUNTER_MESSAGE_FORMAT")
 
     # Website setup
     FLATHUNTER_WEBSITE_SESSION_KEY = readenv("FLATHUNTER_WEBSITE_SESSION_KEY")
     FLATHUNTER_WEBSITE_DOMAIN = readenv("FLATHUNTER_WEBSITE_DOMAIN")
 
+    # Notification setup
+    FLATHUNTER_NOTIFIERS = readenv("FLATHUNTER_NOTIFIERS")
+    FLATHUNTER_TELEGRAM_BOT_TOKEN = readenv("FLATHUNTER_TELEGRAM_BOT_TOKEN")
+    FLATHUNTER_TELEGRAM_RECEIVER_IDS = readenv("FLATHUNTER_TELEGRAM_RECEIVER_IDS")
+    FLATHUNTER_MATTERMOST_WEBHOOK_URL = readenv("FLATHUNTER_MATTERMOST_WEBHOOK_URL")
+
+
 class Config:
     """Class to represent flathunter configuration"""
+
+    DEFAULT_MESSAGE_FORMAT = """{title}
+Zimmer: {rooms}
+Größe: {size}
+Preis: {price}
+
+{url}"""
 
     def __init__(self, filename=None, string=None):
         self.useEnvironment = True
@@ -176,9 +194,48 @@ class Config:
 
     def captcha_enabled(self):
         """Check if captcha is configured"""
-        return "captcha" in self.config
+        return self._get_captcha_solver() is not None
 
-    def get_captcha_solver(self) -> CaptchaSolver:
+    def get_captcha_checkbox(self):
+        return self._read_yaml_path('captcha.checkbox', False)
+
+    def get_captcha_afterlogin_string(self):
+        return self._read_yaml_path('captcha.afterlogin_string', '')
+
+    def google_cloud_project_id(self):
+        if self.useEnvironment and Env.FLATHUNTER_GOOGLE_CLOUD_PROJECT_ID is not None:
+            return Env.FLATHUNTER_GOOGLE_CLOUD_PROJECT_ID
+        return self._read_yaml_path('google_cloud_project_id', None)
+
+    def message_format(self):
+        if self.useEnvironment and Env.FLATHUNTER_MESSAGE_FORMAT is not None:
+            return '\n'.join(Env.FLATHUNTER_MESSAGE_FORMAT.split('#CR#'))
+        config_format = self._read_yaml_path('message', None)
+        if config_format is not None:
+            return config_format
+        return self.DEFAULT_MESSAGE_FORMAT
+
+    def notifiers(self):
+        if self.useEnvironment and Env.FLATHUNTER_NOTIFIERS is not None:
+            return Env.FLATHUNTER_NOTIFIERS.split(",")
+        return self._read_yaml_path('notifiers', None)
+
+    def telegram_bot_token(self):
+        if self.useEnvironment and Env.FLATHUNTER_TELEGRAM_BOT_TOKEN is not None:
+            return Env.FLATHUNTER_TELEGRAM_BOT_TOKEN
+        return self._read_yaml_path('telegram.bot_token', None)
+
+    def telegram_receiver_ids(self):
+        if self.useEnvironment and Env.FLATHUNTER_TELEGRAM_RECEIVER_IDS is not None:
+            return Env.FLATHUNTER_TELEGRAM_RECEIVER_IDS.split(",")
+        return self._read_yaml_path('telegram.receiver_ids', [])
+
+    def mattermost_webhook_url(self):
+        if self.useEnvironment and Env.FLATHUNTER_MATTERMOST_WEBHOOK_URL is not None:
+            return Env.FLATHUNTER_MATTERMOST_WEBHOOK_URL
+        return self._read_yaml_path('mattermost.webhook_url', None)
+
+    def _get_captcha_solver(self) -> Optional[CaptchaSolver]:
         """Get configured captcha solver"""
         if self.useEnvironment and Env.FLATHUNTER_IMAGETYPERZ_TOKEN is not None:
             imagetyperz_token = Env.FLATHUNTER_IMAGETYPERZ_TOKEN
@@ -194,7 +251,25 @@ class Config:
         if twocaptcha_api_key:
             return TwoCaptchaSolver(twocaptcha_api_key)
 
+        return None
+
+    def get_captcha_solver(self) -> CaptchaSolver:
+        solver = self._get_captcha_solver()
+        if solver is not None:
+            return solver
         raise Exception("No captcha solver configured properly.")
+
+    def captcha_driver_arguments(self):
+        if self.useEnvironment and Env.FLATHUNTER_HEADLESS_BROWSER is not None:
+            return [
+                "--no-sandbox",
+                "--headless",
+                "--disable-gpu",
+                "--remote-debugging-port=9222",
+                "--disable-dev-shm-usage",
+                "window-size=1024,768"
+            ]
+        return self._read_yaml_path('captcha.driver_arguments', [])
 
 
     def use_proxy(self):

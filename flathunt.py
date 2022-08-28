@@ -76,18 +76,18 @@ def main():
     config.init_searchers()
 
     # check config
-    notifiers = config.get('notifiers', [])
+    notifiers = config.notifiers()
     if 'mattermost' in notifiers \
-            and not config.get('mattermost', {}).get('webhook_url'):
+            and not config.mattermost_webhook_url():
         logger.error("No Mattermost webhook configured. Starting like this would be pointless...")
         return
     if 'telegram' in notifiers:
-        if not config.get('telegram', {}).get('bot_token'):
+        if not config.telegram_bot_token():
             logger.error(
                 "No Telegram bot token configured. Starting like this would be pointless..."
             )
             return
-        if not config.get('telegram', {}).get('receiver_ids'):
+        if len(config.telegram_receiver_ids()) == 0:
             logger.warning("No Telegram receivers configured - nobody will get notifications.")
     if len(config.target_urls()) == 0:
         logger.error("No URLs configured. Starting like this would be pointless...")

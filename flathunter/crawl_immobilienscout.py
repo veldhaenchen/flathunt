@@ -23,17 +23,10 @@ class CrawlImmobilienscout(Crawler):
         self.afterlogin_string = None
 
         if config.captcha_enabled():
-            captcha_config = config.get('captcha')
-            driver_arguments = captcha_config.get('driver_arguments', [])
+            driver_arguments = config.captcha_driver_arguments()
 
-            if captcha_config.get('checkbox', '') == "":
-                self.checkbox = False
-            else:
-                self.checkbox = captcha_config.get('checkbox', '')
-            if captcha_config.get('afterlogin_string', '') == "":
-                self.afterlogin_string = ""
-            else:
-                self.afterlogin_string = captcha_config.get('afterlogin_string', '')
+            self.checkbox = config.get_captcha_checkbox()
+            self.afterlogin_string = config.get_captcha_afterlogin_string()
             if self.captcha_solver:
                 self.driver = self.configure_driver(driver_arguments)
 

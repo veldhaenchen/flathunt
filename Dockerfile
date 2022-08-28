@@ -2,6 +2,7 @@ FROM python:3.7
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV PORT 8080
 ARG PIP_NO_CACHE_DIR=1
 
 # Install Google Chrome
@@ -16,10 +17,10 @@ COPY . .
 
 # Upgrade pip, install pipenv
 RUN pip install --upgrade pip
-RUN pip install pipenv
 
 # Generate requirements.txt and install dependencies from there
-RUN pipenv requirements > requirements.txt
 RUN pip install -r requirements.txt
 
-CMD [ "python", "flathunt.py", "-c", "/config.yaml" ]
+RUN python chrome_driver_install.py
+
+CMD gunicorn -b 0.0.0.0:$PORT --workers 1 --threads 1 --timeout 0 main:app

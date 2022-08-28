@@ -26,6 +26,7 @@ pytz = "*"
 beautifulsoup4 = "*"
 pylint-runner = "*"
 webdriver-manager = "*"
+gunicorn = "*"
 
 [dev-packages]
 

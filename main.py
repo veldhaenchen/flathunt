@@ -1,5 +1,6 @@
 """ Startup file for Google Cloud deployment or local webserver"""
 import logging
+import os
 
 from flathunter.idmaintainer import IdMaintainer
 from flathunter.googlecloud_idmaintainer import GoogleCloudIdMaintainer
@@ -15,6 +16,8 @@ if __name__ == '__main__':
     # Use the SQLite DB file if we are running locally
     id_watch = IdMaintainer(f'{config.database_location()}/processed_ids.db')
 else:
+    # Load the driver manager from local cache (if chrome_driver_install.py has been run
+    os.environ['WDM_LOCAL'] = '1'
     # Use Google Cloud DB if we run on the cloud
     id_watch = GoogleCloudIdMaintainer()
 

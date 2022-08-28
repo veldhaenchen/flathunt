@@ -11,7 +11,7 @@ A bot to help people with their rental real-estate search. 🏠🤖
 
 Flathunter is a Python application which periodically [scrapes](https://en.wikipedia.org/wiki/Web_scraping) property listings sites, configured by the user, to find new rental real-estate listings, reporting them over messaging services.
 
-Currently available messaging services are [Telegram](https://telegram.org/) and [Mattermost](https://mattermost.com/).
+Currently available messaging services are [Telegram](https://telegram.org/), [Mattermost](https://mattermost.com/) and [Apprise](https://github.com/caronc/apprise).
 
 ## Table of Contents
 - [Background](#background)

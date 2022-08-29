@@ -16,7 +16,7 @@ from dummy_crawler import DummyCrawler
 DUMMY_CONFIG = """
 notifiers:
   - telegram
-  
+
 telegram:
   bot_token: 1234xxx.12345
 

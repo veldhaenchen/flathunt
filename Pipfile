@@ -27,7 +27,6 @@ beautifulsoup4 = "*"
 pylint-runner = "*"
 webdriver-manager = "*"
 apprise = "*"
-gunicorn = "*"
 python-dotenv = "*"
 
 [dev-packages]

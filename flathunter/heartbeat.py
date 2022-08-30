@@ -1,13 +1,15 @@
 """Providing heartbeat messages"""
+from typing import Union
+
 from flathunter.abstract_notifier import Notifier
 from flathunter.config import Config
 from flathunter.logging import logger
+from flathunter.sender_apprise import SenderApprise
 from flathunter.sender_mattermost import SenderMattermost
 from flathunter.sender_telegram import SenderTelegram
-from flathunter.sender_apprise import SenderApprise
 
 
-def interval2counter(interval):
+def interval2counter(interval: str) -> Union[None, int]:
     """Transform the string interval to sleeper counter frequencies"""
     if interval is None:
         return None
@@ -24,11 +26,10 @@ class Heartbeat:
     """Will inform the user on regular intervals whether the bot is still alive"""
     __notifier: Notifier
     __interval: int
+    __config: Config
 
-    def __init__(self, config, interval):
+    def __init__(self, config: Config, interval: str):
         self.config = config
-        if not isinstance(self.config, Config):
-            raise Exception("Invalid config for hunter - should be a 'Config' object")
         notifiers = self.config.notifiers()
 
         if 'mattermost' in notifiers:

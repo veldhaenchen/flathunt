@@ -1,24 +1,25 @@
 """Wrap configuration options as an object"""
 import os
-import yaml
 from typing import Optional
 
+import yaml
 from dotenv import load_dotenv
 
-from flathunter.logging import logger
+from flathunter.captcha.captcha_solver import CaptchaSolver
 from flathunter.captcha.imagetyperz_solver import ImageTyperzSolver
 from flathunter.captcha.twocaptcha_solver import TwoCaptchaSolver
-from flathunter.captcha.captcha_solver import CaptchaSolver
 from flathunter.crawl_ebaykleinanzeigen import CrawlEbayKleinanzeigen
-from flathunter.crawl_immobilienscout import CrawlImmobilienscout
-from flathunter.crawl_wggesucht import CrawlWgGesucht
-from flathunter.crawl_immowelt import CrawlImmowelt
-from flathunter.crawler_subito import CrawlSubito
-from flathunter.crawl_immobiliare import CrawlImmobiliare
 from flathunter.crawl_idealista import CrawlIdealista
+from flathunter.crawl_immobiliare import CrawlImmobiliare
+from flathunter.crawl_immobilienscout import CrawlImmobilienscout
+from flathunter.crawl_immowelt import CrawlImmowelt
+from flathunter.crawl_wggesucht import CrawlWgGesucht
+from flathunter.crawler_subito import CrawlSubito
 from flathunter.filter import Filter
+from flathunter.logging import logger
 
 load_dotenv()
+
 
 class Env:
 
@@ -280,7 +281,6 @@ Preis: {price}
                 "window-size=1024,768"
             ]
         return self._read_yaml_path('captcha.driver_arguments', [])
-
 
     def use_proxy(self):
         """Check if proxy is configured"""

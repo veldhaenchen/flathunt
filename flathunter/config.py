@@ -228,9 +228,10 @@ Preis: {price}
         return self._read_yaml_path('telegram.bot_token', None)
 
     def telegram_notify_with_images(self) -> bool:
+        flag = str(self._read_yaml_path("telegram.notify_with_images", 'false'))
+
         if self.useEnvironment and Env.FLATHUNTER_TELEGRAM_BOT_NOTIFY_WITH_IMAGES is not None:
             flag = str(Env.FLATHUNTER_TELEGRAM_BOT_NOTIFY_WITH_IMAGES)
-        flag = self._read_yaml_path("telegram.notify_with_images")
 
         return flag.lower() == 'true'
 

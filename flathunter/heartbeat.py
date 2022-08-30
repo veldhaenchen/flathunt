@@ -3,6 +3,7 @@ from flathunter.logging import logger
 from flathunter.config import Config
 from flathunter.sender_mattermost import SenderMattermost
 from flathunter.sender_telegram import SenderTelegram
+from flathunter.sender_apprise import SenderApprise
 
 def interval2counter(interval):
     """Transform the string interval to sleeper counter frequencies"""
@@ -28,6 +29,8 @@ class Heartbeat:
             self.notifier = SenderMattermost(config)
         elif 'telegram' in self.notifiers:
             self.notifier = SenderTelegram(config)
+        elif 'apprise' in self.notifiers:
+            self.notifier = SenderApprise(config)
         else:
             self.notifier = None
         self.interval = interval2counter(interval)

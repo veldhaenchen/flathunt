@@ -9,6 +9,7 @@ from flathunter.abstract_notifier import Notifier
 from flathunter.abstract_processor import Processor
 from flathunter.exceptions import BotBlockedException, UserDeactivatedException
 from flathunter.logging import logger
+from flathunter.utils import list
 
 
 class SenderTelegram(Processor, Notifier):
@@ -36,10 +37,23 @@ class SenderTelegram(Processor, Notifier):
         )
         return expose
 
-    def __broadcast(self, receivers: typing.List[int], message: str, images: typing.List[str]):
+    def __broadcast(self,
+                    receivers: typing.List[int],
+                    message: str,
+                    images: Union[None, typing.List[str]] = None) -> None:
+        """
+        Broadcast given message to the given receiver ids
+        :param receivers: list of user/group ids
+        :param message: text message to send to users
+        :param images: images to send to users as a reply to message
+        :return: None
+        """
         for receiver in receivers:
             msg = self.__send_text(receiver, message)
-            if self.__images_enabled and msg != {} and len(images):
+            if not msg:
+                continue
+
+            if self.__images_enabled and images:
                 self.__send_images(chat_id=receiver, msg=msg, images=images)
 
     def notify(self, message: str):
@@ -48,8 +62,7 @@ class SenderTelegram(Processor, Notifier):
         :param message: a message that should be sent to users
         :return: None
         """
-        for receiver in self.receiver_ids:
-            self.__send_text(chat_id=receiver, message=message)
+        self.__broadcast(self.receiver_ids, message, None)
 
     def __send_text(self, chat_id: int, message: str) -> typing.Dict:
         """
@@ -69,13 +82,13 @@ class SenderTelegram(Processor, Notifier):
         logger.debug("Retrieving URL %s, payload %s", self.__text_message_url, payload)
         response = requests.request("POST", self.__text_message_url, data=payload)
         logger.debug("Got response (%i): %s", response.status_code, response.content)
-        data = response.json()
 
         # handle error
         if response.status_code != 200:
             self.__handle_error("When sending bot text message, we got an error.", response, chat_id)
+            return {}
 
-        return data.get('result', {})
+        return response.json().get('result', {})
 
     def __send_images(self, chat_id: int, msg: Union[None, typing.Dict], images: typing.List[str]):
         """
@@ -86,20 +99,27 @@ class SenderTelegram(Processor, Notifier):
         :param images: list of urls
         :return: None
         """
+        # maximum number of images in a media group is 10.
+        # if there are more than 10 images, we need to divide it into multiple messages.
+        for chunk in list.chunk(images, 10):
+            payload = {
+                'chat_id': str(chat_id),
+                # media expected to be an array of objects in string format
+                'media': json.dumps([{"type": "photo", "media": url} for url in chunk]),
+                'disable_notification': True,
+            }
+            if msg.get('message_id', None):
+                payload['reply_to_message_id'] = msg.get('message_id')
 
-        payload = {
-            'chat_id': str(chat_id),
-            # media expected to be an array of objects in string format
-            'media': json.dumps([{"type": "photo", "media": url} for url in images[:min(10, len(images))]]),
-            'disable_notification': True,
-        }
-        if msg.get('message_id', None):
-            payload['reply_to_message_id'] = msg.get('message_id')
+            response = requests.request("POST", self.__media_group_url, data=payload)
 
-        response = requests.request("POST", self.__media_group_url, data=payload)
-
-        if response.status_code != 200:
-            self.__handle_error("When sending media group, we got an error.", response=response, chat_id=str(chat_id))
+            if response.status_code != 200:
+                self.__handle_error(
+                    "When sending media group, we got an error.",
+                    response=response,
+                    chat_id=str(chat_id)
+                )
+                return
 
     def __handle_error(self, msg: str, response, chat_id) -> None:
         """

@@ -7,6 +7,7 @@ import requests
 
 from flathunter.abstract_notifier import Notifier
 from flathunter.abstract_processor import Processor
+from flathunter.config import Config
 from flathunter.exceptions import BotBlockedException, UserDeactivatedException
 from flathunter.logging import logger
 from flathunter.utils import list
@@ -15,7 +16,7 @@ from flathunter.utils import list
 class SenderTelegram(Processor, Notifier):
     """Expose processor that sends Telegram messages"""
 
-    def __init__(self, config, receivers=None):
+    def __init__(self, config: Config, receivers=None):
         self.config = config
         self.bot_token = self.config.telegram_bot_token()
         self.__notify_with_images: bool = self.config.telegram_notify_with_images()

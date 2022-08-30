@@ -20,7 +20,7 @@ class ProcessorChainBuilder:
 
     def send_messages(self, receivers=None):
         """Add processor that sends messages for exposes"""
-        notifiers = self.config.get('notifiers', [])
+        notifiers = self.config.notifiers()
         if 'telegram' in notifiers:
             self.processors.append(SenderTelegram(self.config, receivers=receivers))
         if 'mattermost' in notifiers:

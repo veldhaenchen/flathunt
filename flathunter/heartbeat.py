@@ -24,7 +24,7 @@ class Heartbeat:
         self.config = config
         if not isinstance(self.config, Config):
             raise Exception("Invalid config for hunter - should be a 'Config' object")
-        self.notifiers = self.config.get('notifiers', [])
+        self.notifiers = self.config.notifiers()
         if 'mattermost' in self.notifiers:
             self.notifier = SenderMattermost(config)
         elif 'telegram' in self.notifiers:

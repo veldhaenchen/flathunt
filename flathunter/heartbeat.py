@@ -43,8 +43,10 @@ class Heartbeat:
 
     def send_heartbeat(self, counter) -> int:
         """Send a new heartbeat message"""
+        if not self.__notifier or not self.__interval:  # interval is disabled
+            return counter
         # it's time for a new heartbeat message and reset counter
-        if self.__notifier and counter % self.__interval == 0:
+        if counter % self.__interval == 0:
             logger.info('Sending heartbeat message.')
             self.__notifier.notify(
                 'Beep Boop. This is a heartbeat message. '

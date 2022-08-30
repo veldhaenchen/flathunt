@@ -43,11 +43,22 @@ class SenderTelegram(Processor, Notifier):
                 self.__send_images(chat_id=receiver, msg=msg, images=images)
 
     def notify(self, message: str):
-        """Send messages to each of the receivers in receiver_ids"""
+        """
+        Send messages to each of the receivers in receiver_ids
+        :param message: a message that should be sent to users
+        :return: None
+        """
         for receiver in self.receiver_ids:
             self.__send_text(chat_id=receiver, message=message)
 
     def __send_text(self, chat_id: int, message: str) -> typing.Dict:
+        """
+        Send bot text message, the message may contain a simple heartbeat message or an apartment information
+        :param chat_id: the receiver id
+        :param message: the body of the message
+        :return: sent message information
+        """
+
         payload = {
             'chat_id': str(chat_id),
             'text': message,

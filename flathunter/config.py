@@ -49,6 +49,7 @@ class Env:
     # Notification setup
     FLATHUNTER_NOTIFIERS = __readenv("FLATHUNTER_NOTIFIERS")
     FLATHUNTER_TELEGRAM_BOT_TOKEN = __readenv("FLATHUNTER_TELEGRAM_BOT_TOKEN")
+    FLATHUNTER_TELEGRAM_BOT_NOTIFY_WITH_IMAGES = __readenv("FLATHUNTER_TELEGRAM_BOT_NOTIFY_WITH_IMAGES")
     FLATHUNTER_TELEGRAM_RECEIVER_IDS = __readenv("FLATHUNTER_TELEGRAM_RECEIVER_IDS")
     FLATHUNTER_MATTERMOST_WEBHOOK_URL = __readenv("FLATHUNTER_MATTERMOST_WEBHOOK_URL")
 
@@ -226,6 +227,13 @@ Preis: {price}
         if self.useEnvironment and Env.FLATHUNTER_TELEGRAM_BOT_TOKEN is not None:
             return Env.FLATHUNTER_TELEGRAM_BOT_TOKEN
         return self._read_yaml_path('telegram.bot_token', None)
+
+    def telegram_notify_with_images(self) -> bool:
+        if self.useEnvironment and Env.FLATHUNTER_TELEGRAM_BOT_NOTIFY_WITH_IMAGES is not None:
+            flag = str(Env.FLATHUNTER_TELEGRAM_BOT_NOTIFY_WITH_IMAGES)
+        flag = self._read_yaml_path("telegram.notify_with_images")
+
+        return flag.lower() == 'true'
 
     def telegram_receiver_ids(self):
         if self.useEnvironment and Env.FLATHUNTER_TELEGRAM_RECEIVER_IDS is not None:

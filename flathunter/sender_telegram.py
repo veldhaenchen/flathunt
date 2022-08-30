@@ -7,8 +7,8 @@ import requests
 
 from flathunter.abstract_notifier import Notifier
 from flathunter.abstract_processor import Processor
-from flathunter.logging import logger
 from flathunter.exceptions import BotBlockedException, UserDeactivatedException
+from flathunter.logging import logger
 
 
 class SenderTelegram(Processor, Notifier):
@@ -60,19 +60,8 @@ class SenderTelegram(Processor, Notifier):
         data = response.json()
 
         # handle error
-
-        if response.status_code == 403:
-            if "description" in data:
-                if "bot was blocked by the user" in data["description"]:
-                    raise BotBlockedException("User %i blocked the bot" % chat_id)
-                if "user is deactivated" in data["description"]:
-                    raise UserDeactivatedException("User %i has been deactivated" % chat_id)
-
         if response.status_code != 200:
-            status_code = response.status_code
-            logger.error("When sending bot message, we got status %i with message: %s",
-                         status_code, data)
-            return {}
+            self.__handle_error("When sending bot text message, we got an error.", response, chat_id)
 
         return data.get('result', {})
 
@@ -98,11 +87,29 @@ class SenderTelegram(Processor, Notifier):
         response = requests.request("POST", self.__media_group_url, data=payload)
 
         if response.status_code != 200:
-            logger.error(
-                "when sending media group, we got status %i for images: %s",
-                response.status_code,
-                ', '.join(images),
-            )
+            self.__handle_error("When sending media group, we got an error.", response=response, chat_id=str(chat_id))
+
+    def __handle_error(self, msg: str, response, chat_id) -> None:
+        """
+        Handles telegram API error responses
+        :param msg: the message for logging
+        :param response: the response that is received form the API
+        :param chat_id: the receiver that was supposed to get the message
+        :return: None
+
+        :raise BotBlockedException: Happens when bot trys to send a message to a user that has already blocked the bot
+        :raise UserDeactivatedException: Happens when bot try to send a message to a deactivated user
+        """
+        status_code = response.status_code
+        data = response.json()
+
+        logger.error(f"{msg}, status code: %i, data: %s", status_code, data)
+
+        if response.status_code == 403:
+            if "bot was blocked by the user" in data.get("description", ""):
+                raise BotBlockedException("User %i blocked the bot" % chat_id)
+            if "user is deactivated" in data.get("description", ""):
+                raise UserDeactivatedException("User %i has been deactivated" % chat_id)
 
     def __get_images(self, expose: typing.Dict) -> typing.List[str]:
         return expose.get("images", [])

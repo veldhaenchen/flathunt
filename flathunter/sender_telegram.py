@@ -18,7 +18,7 @@ class SenderTelegram(Processor, Notifier):
     def __init__(self, config, receivers=None):
         self.config = config
         self.bot_token = self.config.telegram_bot_token()
-        self.__images_enabled = str(self.config.get('telegram', {}).get('images_enabled', 'false')).lower() == 'true'
+        self.__notify_with_images: bool = self.config.telegram_notify_with_images()
 
         self.__text_message_url = "https://api.telegram.org/bot%s/sendMessage" % self.bot_token
         self.__media_group_url = "https://api.telegram.org/bot%s/sendMediaGroup" % self.bot_token
@@ -53,7 +53,7 @@ class SenderTelegram(Processor, Notifier):
             if not msg:
                 continue
 
-            if self.__images_enabled and images:
+            if self.__notify_with_images and images:
                 self.__send_images(chat_id=receiver, msg=msg, images=images)
 
     def notify(self, message: str):

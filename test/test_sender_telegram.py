@@ -2,7 +2,7 @@ import json
 import unittest
 
 from requests_mock import Mocker
-from test.utils.request_matcher import RequestCounter
+from utils.request_matcher import RequestCounter
 
 from flathunter.config import Config
 from flathunter.sender_telegram import SenderTelegram
@@ -26,7 +26,7 @@ class SenderTelegramTest(unittest.TestCase):
             }
         }'''
         m.post('https://api.telegram.org/botdummy_token/sendMessage', text=mock_response)
-        self.assertEqual(None, sender.notify("result"), "Expected message to be sent")
+        self.assertIsNone(sender.notify("result"), "Expected message to be sent")
 
     @Mocker()
     def test_send_no_message_if_no_receivers(self, m: Mocker):

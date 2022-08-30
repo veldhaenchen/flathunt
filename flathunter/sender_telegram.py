@@ -122,11 +122,11 @@ class SenderTelegram(Processor, Notifier):
         """
 
         return self.config.message_format().format(
-            title=expose['title'],
-            rooms=expose['rooms'],
-            size=expose['size'],
-            price=expose['price'],
-            url=expose['url'],
-            address=expose['address'],
-            durations=expose.get('durations')
+            title=expose.get('title', 'N/A'),
+            rooms=expose.get('rooms', 'N/A'),
+            size=expose.get('size', 'N/A'),
+            price=expose.get('price', 'N/A'),
+            url=expose.get('url', 'N/A'),
+            address=expose.get('address', 'N/A'),
+            durations=expose.get('durations', 'N/A')
         ).strip()

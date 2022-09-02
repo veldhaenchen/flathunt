@@ -113,11 +113,12 @@ class CrawlImmobilienscout(Crawler):
         #
         # After: https://pictures.immobilienscout24.de/listings/$$IMAGE_ID$$.jpg
 
-        images = [image[:image.find(".jpg")+4] for image in self.JSON_PATH_PARSER_IMAGES.find(entry)]
+        images = [image[:image.find(".jpg") + 4] for image in self.JSON_PATH_PARSER_IMAGES.find(entry)]
 
+        object_id: int = int(entry.get("@id", 0))
         return {
-            'id': int(entry.get("@id", 0)),
-            'url': ("https://www.immobilienscout24.de/expose/" + str(entry.get("@id", 0))),
+            'id': object_id,
+            'url': f"https://www.immobilienscout24.de/expose/{str(object_id)}",
             'image': images[0] if len(images) else self.FALLBACK_IMAGE_URL,
             'images': images,
             'title': entry.get("title", ''),

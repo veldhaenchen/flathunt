@@ -13,7 +13,6 @@ class CrawlImmobilienscout(Crawler):
     """Implementation of Crawler interface for ImmobilienScout"""
 
     URL_PATTERN = re.compile(r'https://www\.immobilienscout24\.de')
-    IMAGE_URL_PATTERN = re.compile(r'(https://.*?/listings/.{32}.jpg)')
 
     JSON_PATH_PARSER_ENTRIES = parse("$..['resultlist.realEstate']")
     JSON_PATH_PARSER_IMAGES = parse("$..galleryAttachments..['@href']")
@@ -113,7 +112,7 @@ class CrawlImmobilienscout(Crawler):
         #
         # After: https://pictures.immobilienscout24.de/listings/$$IMAGE_ID$$.jpg
 
-        images = [image[:image.find(".jpg") + 4] for image in self.JSON_PATH_PARSER_IMAGES.find(entry)]
+        images = [image.value[:image.value.find(".jpg") + 4] for image in self.JSON_PATH_PARSER_IMAGES.find(entry)]
 
         object_id: int = int(entry.get("@id", 0))
         return {

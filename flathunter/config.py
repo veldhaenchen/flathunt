@@ -237,7 +237,7 @@ Preis: {price}
 
     def telegram_receiver_ids(self):
         if self.useEnvironment and Env.FLATHUNTER_TELEGRAM_RECEIVER_IDS is not None:
-            return Env.FLATHUNTER_TELEGRAM_RECEIVER_IDS.split(",") or []
+            return [ int(x) for x in Env.FLATHUNTER_TELEGRAM_RECEIVER_IDS.split(",") ]
         return self._read_yaml_path('telegram.receiver_ids') or []
 
     def mattermost_webhook_url(self):

@@ -1,54 +1,56 @@
 """Wrap configuration options as an object"""
 import os
-import yaml
 from typing import Optional
 
+import yaml
 from dotenv import load_dotenv
 
-from flathunter.logging import logger
+from flathunter.captcha.captcha_solver import CaptchaSolver
 from flathunter.captcha.imagetyperz_solver import ImageTyperzSolver
 from flathunter.captcha.twocaptcha_solver import TwoCaptchaSolver
-from flathunter.captcha.captcha_solver import CaptchaSolver
 from flathunter.crawl_ebaykleinanzeigen import CrawlEbayKleinanzeigen
-from flathunter.crawl_immobilienscout import CrawlImmobilienscout
-from flathunter.crawl_wggesucht import CrawlWgGesucht
-from flathunter.crawl_immowelt import CrawlImmowelt
-from flathunter.crawler_subito import CrawlSubito
-from flathunter.crawl_immobiliare import CrawlImmobiliare
 from flathunter.crawl_idealista import CrawlIdealista
+from flathunter.crawl_immobiliare import CrawlImmobiliare
+from flathunter.crawl_immobilienscout import CrawlImmobilienscout
+from flathunter.crawl_immowelt import CrawlImmowelt
+from flathunter.crawl_wggesucht import CrawlWgGesucht
+from flathunter.crawler_subito import CrawlSubito
 from flathunter.filter import Filter
+from flathunter.logging import logger
 
 load_dotenv()
 
+
+def _read_env(key, fallback=None):
+    """ read the given key from environment"""
+    return os.environ.get(key, fallback)
+
+
 class Env:
-
-    def readenv(key):
-        if key in os.environ:
-            return os.environ[key]
-        return None
-
     # Captcha setup
-    FLATHUNTER_2CAPTCHA_KEY = readenv("FLATHUNTER_2CAPTCHA_KEY")
-    FLATHUNTER_IMAGETYPERZ_TOKEN = readenv("FLATHUNTER_IMAGETYPERZ_TOKEN")
-    FLATHUNTER_HEADLESS_BROWSER = readenv("FLATHUNTER_HEADLESS_BROWSER")
+    FLATHUNTER_2CAPTCHA_KEY = _read_env("FLATHUNTER_2CAPTCHA_KEY")
+    FLATHUNTER_IMAGETYPERZ_TOKEN = _read_env("FLATHUNTER_IMAGETYPERZ_TOKEN")
+    FLATHUNTER_HEADLESS_BROWSER = _read_env("FLATHUNTER_HEADLESS_BROWSER")
 
     # Generic Config
-    FLATHUNTER_TARGET_URLS = readenv("FLATHUNTER_TARGET_URLS")
-    FLATHUNTER_DATABASE_LOCATION = readenv("FLATHUNTER_DATABASE_LOCATION")
-    FLATHUNTER_GOOGLE_CLOUD_PROJECT_ID = readenv("FLATHUNTER_GOOGLE_CLOUD_PROJECT_ID")
-    FLATHUNTER_VERBOSE_LOG = readenv("FLATHUNTER_VERBOSE_LOG")
-    FLATHUNTER_LOOP_PERIOD_SECONDS = readenv("FLATHUNTER_LOOP_PERIOD_SECONDS")
-    FLATHUNTER_MESSAGE_FORMAT = readenv("FLATHUNTER_MESSAGE_FORMAT")
+    FLATHUNTER_TARGET_URLS = _read_env("FLATHUNTER_TARGET_URLS")
+    FLATHUNTER_DATABASE_LOCATION = _read_env("FLATHUNTER_DATABASE_LOCATION")
+    FLATHUNTER_GOOGLE_CLOUD_PROJECT_ID = _read_env("FLATHUNTER_GOOGLE_CLOUD_PROJECT_ID")
+    FLATHUNTER_VERBOSE_LOG = _read_env("FLATHUNTER_VERBOSE_LOG")
+    FLATHUNTER_LOOP_PERIOD_SECONDS = _read_env("FLATHUNTER_LOOP_PERIOD_SECONDS")
+    FLATHUNTER_MESSAGE_FORMAT = _read_env("FLATHUNTER_MESSAGE_FORMAT")
 
     # Website setup
-    FLATHUNTER_WEBSITE_SESSION_KEY = readenv("FLATHUNTER_WEBSITE_SESSION_KEY")
-    FLATHUNTER_WEBSITE_DOMAIN = readenv("FLATHUNTER_WEBSITE_DOMAIN")
+    FLATHUNTER_WEBSITE_SESSION_KEY = _read_env("FLATHUNTER_WEBSITE_SESSION_KEY")
+    FLATHUNTER_WEBSITE_DOMAIN = _read_env("FLATHUNTER_WEBSITE_DOMAIN")
+    FLATHUNTER_WEBSITE_BOT_NAME = _read_env("FLATHUNTER_WEBSITE_BOT_NAME")
 
     # Notification setup
-    FLATHUNTER_NOTIFIERS = readenv("FLATHUNTER_NOTIFIERS")
-    FLATHUNTER_TELEGRAM_BOT_TOKEN = readenv("FLATHUNTER_TELEGRAM_BOT_TOKEN")
-    FLATHUNTER_TELEGRAM_RECEIVER_IDS = readenv("FLATHUNTER_TELEGRAM_RECEIVER_IDS")
-    FLATHUNTER_MATTERMOST_WEBHOOK_URL = readenv("FLATHUNTER_MATTERMOST_WEBHOOK_URL")
+    FLATHUNTER_NOTIFIERS = _read_env("FLATHUNTER_NOTIFIERS")
+    FLATHUNTER_TELEGRAM_BOT_TOKEN = _read_env("FLATHUNTER_TELEGRAM_BOT_TOKEN")
+    FLATHUNTER_TELEGRAM_BOT_NOTIFY_WITH_IMAGES = _read_env("FLATHUNTER_TELEGRAM_BOT_NOTIFY_WITH_IMAGES")
+    FLATHUNTER_TELEGRAM_RECEIVER_IDS = _read_env("FLATHUNTER_TELEGRAM_RECEIVER_IDS")
+    FLATHUNTER_MATTERMOST_WEBHOOK_URL = _read_env("FLATHUNTER_MATTERMOST_WEBHOOK_URL")
 
 
 class Config:
@@ -225,10 +227,18 @@ Preis: {price}
             return Env.FLATHUNTER_TELEGRAM_BOT_TOKEN
         return self._read_yaml_path('telegram.bot_token', None)
 
+    def telegram_notify_with_images(self) -> bool:
+        flag = str(self._read_yaml_path("telegram.notify_with_images", 'false'))
+
+        if self.useEnvironment and Env.FLATHUNTER_TELEGRAM_BOT_NOTIFY_WITH_IMAGES is not None:
+            flag = str(Env.FLATHUNTER_TELEGRAM_BOT_NOTIFY_WITH_IMAGES)
+
+        return flag.lower() == 'true'
+
     def telegram_receiver_ids(self):
         if self.useEnvironment and Env.FLATHUNTER_TELEGRAM_RECEIVER_IDS is not None:
             return [ int(x) for x in Env.FLATHUNTER_TELEGRAM_RECEIVER_IDS.split(",") ]
-        return self._read_yaml_path('telegram.receiver_ids', [])
+        return self._read_yaml_path('telegram.receiver_ids') or []
 
     def mattermost_webhook_url(self):
         if self.useEnvironment and Env.FLATHUNTER_MATTERMOST_WEBHOOK_URL is not None:
@@ -270,7 +280,6 @@ Preis: {price}
                 "window-size=1024,768"
             ]
         return self._read_yaml_path('captcha.driver_arguments', [])
-
 
     def use_proxy(self):
         """Check if proxy is configured"""

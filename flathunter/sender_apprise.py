@@ -1,14 +1,11 @@
 """Functions and classes related to sending Apprise messages"""
-import urllib.request
-import urllib.parse
-import urllib.error
-import requests
 import apprise
 
-from flathunter.logging import logger
+from flathunter.abstract_notifier import Notifier
 from flathunter.abstract_processor import Processor
 
-class SenderApprise(Processor):
+
+class SenderApprise(Processor, Notifier):
     """Expose processor that sends Apprise messages"""
 
     def __init__(self, config):
@@ -25,10 +22,14 @@ class SenderApprise(Processor):
             url=expose['url'],
             address=expose['address'],
             durations="" if 'durations' not in expose else expose['durations']).strip()
-        self.send_msg(message)
+        self.__send_msg(message)
         return expose
 
-    def send_msg(self, message):
+    def notify(self, message: str):
+        """ Send the given message to users """
+        self.__send_msg(message=message)
+
+    def __send_msg(self, message):
         apobj = apprise.Apprise()
         """Send messages to each of the Apprise urls"""
         if self.apprise_urls is None:
@@ -41,5 +42,3 @@ class SenderApprise(Processor):
             title='',
             body_format=apprise.NotifyFormat.TEXT,
         )
-
-        

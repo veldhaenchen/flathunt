@@ -2,7 +2,8 @@ import unittest
 import tempfile
 import os.path
 import os
-from flathunter.config import Config 
+from flathunter.config import Config
+from utils.config import StringConfig
 
 class ConfigTest(unittest.TestCase):
 
@@ -63,25 +64,25 @@ filters:
        self.assertTrue(len(config.get('urls')) > 0, "Expected URLs in config file")
 
     def test_loads_config_from_string(self):
-       config = Config(string=self.EMPTY_FILTERS_CONFIG)
+       config = StringConfig(string=self.EMPTY_FILTERS_CONFIG)
        self.assertIsNotNone(config)
        my_filter = config.get_filter()
        self.assertIsNotNone(my_filter)
 
     def test_loads_legacy_config_from_string(self):
-       config = Config(string=self.LEGACY_FILTERS_CONFIG)
+       config = StringConfig(string=self.LEGACY_FILTERS_CONFIG)
        self.assertIsNotNone(config)
        my_filter = config.get_filter()
        self.assertIsNotNone(my_filter)
        self.assertTrue(len(my_filter.filters) > 0)
 
     def test_loads_filters_config_from_string(self):
-       config = Config(string=self.FILTERS_CONFIG)
+       config = StringConfig(string=self.FILTERS_CONFIG)
        self.assertIsNotNone(config)
        my_filter = config.get_filter()
        self.assertIsNotNone(my_filter)
 
     def test_defaults_fields(self):
-       config = Config(string=self.FILTERS_CONFIG)
+       config = StringConfig(string=self.FILTERS_CONFIG)
        self.assertIsNotNone(config)
        self.assertEqual(config.database_location(), os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + "/.."))

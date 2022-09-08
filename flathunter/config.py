@@ -181,7 +181,7 @@ Preis: {price}
         return self.DEFAULT_MESSAGE_FORMAT
 
     def notifiers(self):
-        return self._read_yaml_path('notifiers', None)
+        return self._read_yaml_path('notifiers', [])
 
     def telegram_bot_token(self):
         return self._read_yaml_path('telegram.bot_token', None)

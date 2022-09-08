@@ -4,12 +4,12 @@ import re
 from mockfirestore import MockFirestore
 
 from flathunter.googlecloud_idmaintainer import GoogleCloudIdMaintainer
-from flathunter.config import Config
 from flathunter.hunter import Hunter
 from flathunter.web_hunter import WebHunter
 from flathunter.filter import Filter
 from dummy_crawler import DummyCrawler
 from test_util import count
+from utils.config import StringConfig
 
 class MockGoogleCloudIdMaintainer(GoogleCloudIdMaintainer):
 
@@ -41,7 +41,7 @@ def test_get_list_run_time_is_updated(id_watch):
     assert time == id_watch.get_last_run_time()
 
 def test_is_processed_works(id_watch):
-    config = Config(string=CONFIG_WITH_FILTERS)
+    config = StringConfig(string=CONFIG_WITH_FILTERS)
     config.set_searchers([DummyCrawler()])
     hunter = Hunter(config, id_watch)
     exposes = hunter.hunt_flats()
@@ -50,7 +50,7 @@ def test_is_processed_works(id_watch):
         assert id_watch.is_processed(expose['id'])
 
 def test_exposes_are_saved_to_maintainer(id_watch):
-    config = Config(string=CONFIG_WITH_FILTERS)
+    config = StringConfig(string=CONFIG_WITH_FILTERS)
     config.set_searchers([DummyCrawler()])
     hunter = Hunter(config, id_watch)
     exposes = hunter.hunt_flats()
@@ -60,7 +60,7 @@ def test_exposes_are_saved_to_maintainer(id_watch):
     assert count(exposes) < len(saved)
 
 def test_exposes_are_returned_as_dictionaries(id_watch):
-    config = Config(string=CONFIG_WITH_FILTERS)
+    config = StringConfig(string=CONFIG_WITH_FILTERS)
     config.set_searchers([DummyCrawler()])
     hunter = Hunter(config, id_watch)
     hunter.hunt_flats()
@@ -71,7 +71,7 @@ def test_exposes_are_returned_as_dictionaries(id_watch):
     assert expose['created_at'] is not None
 
 def test_exposes_are_returned_with_limit(id_watch):
-    config = Config(string=CONFIG_WITH_FILTERS)
+    config = StringConfig(string=CONFIG_WITH_FILTERS)
     config.set_searchers([DummyCrawler()])
     hunter = Hunter(config, id_watch)
     hunter.hunt_flats()
@@ -81,7 +81,7 @@ def test_exposes_are_returned_with_limit(id_watch):
     assert expose['title'] is not None
 
 def test_exposes_are_returned_filtered(id_watch):
-    config = Config(string=CONFIG_WITH_FILTERS)
+    config = StringConfig(string=CONFIG_WITH_FILTERS)
     config.set_searchers([DummyCrawler()])
     hunter = Hunter(config, id_watch)
     hunter.hunt_flats()
@@ -94,20 +94,20 @@ def test_exposes_are_returned_filtered(id_watch):
 
 def test_filters_for_user_are_saved(id_watch):
     filter = { 'fish': 'cat' }
-    config = Config(string=CONFIG_WITH_FILTERS)
+    config = StringConfig(string=CONFIG_WITH_FILTERS)
     hunter = WebHunter(config, id_watch)
     hunter.set_filters_for_user(123, filter)
     assert hunter.get_filters_for_user(123) == filter
 
 def test_filters_for_user_returns_none_if_none_present(id_watch):
-    config = Config(string=CONFIG_WITH_FILTERS)
+    config = StringConfig(string=CONFIG_WITH_FILTERS)
     hunter = WebHunter(config, id_watch)
     assert hunter.get_filters_for_user(123) == None
     assert hunter.get_filters_for_user(None) == None
 
 def test_all_filters_can_be_loaded(id_watch):
     filter = { 'fish': 'cat' }
-    config = Config(string=CONFIG_WITH_FILTERS)
+    config = StringConfig(string=CONFIG_WITH_FILTERS)
     hunter = WebHunter(config, id_watch)
     hunter.set_filters_for_user(123, filter)
     hunter.set_filters_for_user(124, filter)

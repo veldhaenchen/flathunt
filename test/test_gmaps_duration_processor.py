@@ -3,10 +3,10 @@ import yaml
 import re
 import requests_mock
 from flathunter.hunter import Hunter
-from flathunter.config import Config
 from flathunter.idmaintainer import IdMaintainer
 from dummy_crawler import DummyCrawler
 from test_util import count
+from utils.config import StringConfig
 
 class GMapsDurationProcessorTest(unittest.TestCase):
 
@@ -36,7 +36,7 @@ durations:
 
     @requests_mock.Mocker()
     def test_resolve_durations(self, m):
-        config = Config(string=self.DUMMY_CONFIG)
+        config = StringConfig(string=self.DUMMY_CONFIG)
         config.set_searchers([DummyCrawler()])
         hunter = Hunter(config, IdMaintainer(":memory:"))
         matcher = re.compile('maps.googleapis.com/maps/api/distancematrix/json')

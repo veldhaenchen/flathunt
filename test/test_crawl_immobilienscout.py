@@ -29,7 +29,7 @@ def test_parse_exposes_from_json(crawler):
 def test_crawl_works(crawler):
     if not test_config.captcha_enabled():
         pytest.skip("Captcha solving is not enabled - skipping immoscout tests. Setup captcha solving")
-    soup = crawler.get_page(TEST_URL, page_no=1)
+    soup = crawler.get_page(TEST_URL, crawler.driver, page_no=1)
     assert soup is not None
     entries = crawler.extract_data(soup)
     assert entries is not None
@@ -42,7 +42,7 @@ def test_crawl_works(crawler):
 def test_process_expose_fetches_details(crawler):
     if not test_config.captcha_enabled():
         pytest.skip("Captcha solving is not enabled - skipping immoscout tests. Setup captcha solving")
-    soup = crawler.get_page(TEST_URL, page_no=1)
+    soup = crawler.get_page(TEST_URL, crawler.driver, page_no=1)
     assert soup is not None
     entries = crawler.extract_data(soup)
     assert entries is not None

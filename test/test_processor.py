@@ -3,11 +3,11 @@ import yaml
 import re
 from flathunter.crawl_immowelt import CrawlImmowelt
 from flathunter.hunter import Hunter
-from flathunter.config import Config
 from flathunter.idmaintainer import IdMaintainer
 from flathunter.processor import ProcessorChain
 from dummy_crawler import DummyCrawler
 from test_util import count
+from utils.config import StringConfig
 
 class ProcessorTest(unittest.TestCase):
 
@@ -22,7 +22,7 @@ google_maps_api:
     """
 
     def test_addresses_are_processed_by_hunter(self):
-        config = Config(string=self.DUMMY_CONFIG)
+        config = StringConfig(string=self.DUMMY_CONFIG)
         config.set_searchers([DummyCrawler(addresses_as_links=True)])
         hunter = Hunter(config, IdMaintainer(":memory:"))
         exposes = hunter.hunt_flats()
@@ -32,7 +32,7 @@ google_maps_api:
 
     def test_address_processor(self):
         crawler = DummyCrawler(addresses_as_links=True)
-        config = Config(string=self.DUMMY_CONFIG)
+        config = StringConfig(string=self.DUMMY_CONFIG)
         config.set_searchers([crawler])
         exposes = crawler.get_results("https://www.example.com/search")
         for expose in exposes:

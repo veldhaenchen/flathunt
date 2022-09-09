@@ -51,14 +51,15 @@ class Crawler:
     def configure_driver(self, driver_arguments):
         """Configure Chrome WebDriver"""
         logger.info('Initializing Chrome WebDriver for crawler "%s"...', self.get_name())
-        chrome_options = uc.ChromeOptions()
+        chrome_options = uc.ChromeOptions() # pylint: disable=no-member
         if driver_arguments is not None:
             for driver_argument in driver_arguments:
                 chrome_options.add_argument(driver_argument)
 
-        driver = uc.Chrome(options=chrome_options)
+        driver = uc.Chrome(options=chrome_options) # pylint: disable=no-member
 
-        driver.execute_cdp_cmd('Network.setBlockedURLs', {"urls": ["https://api.geetest.com/get.*"]})
+        driver.execute_cdp_cmd('Network.setBlockedURLs',
+            {"urls": ["https://api.geetest.com/get.*"]})
         driver.execute_cdp_cmd('Network.enable', {})
 
         return driver
@@ -79,7 +80,7 @@ class Crawler:
         """Creates a Soup object from the HTML at the provided URL"""
 
         self.rotate_user_agent()
-        resp = requests.get(url, headers=self.HEADERS)
+        resp = requests.get(url, headers=self.HEADERS, timeout=30)
 
         if resp.status_code not in (200, 405):
             logger.error("Got response (%i): %s", resp.status_code, resp.content)

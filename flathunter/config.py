@@ -27,6 +27,8 @@ def _read_env(key, fallback=None):
 
 
 class Env:
+    """Registers and freezes environment variables"""
+
     # Captcha setup
     FLATHUNTER_2CAPTCHA_KEY = _read_env("FLATHUNTER_2CAPTCHA_KEY")
     FLATHUNTER_IMAGETYPERZ_TOKEN = _read_env("FLATHUNTER_IMAGETYPERZ_TOKEN")
@@ -48,12 +50,14 @@ class Env:
     # Notification setup
     FLATHUNTER_NOTIFIERS = _read_env("FLATHUNTER_NOTIFIERS")
     FLATHUNTER_TELEGRAM_BOT_TOKEN = _read_env("FLATHUNTER_TELEGRAM_BOT_TOKEN")
-    FLATHUNTER_TELEGRAM_BOT_NOTIFY_WITH_IMAGES = _read_env("FLATHUNTER_TELEGRAM_BOT_NOTIFY_WITH_IMAGES")
+    FLATHUNTER_TELEGRAM_BOT_NOTIFY_WITH_IMAGES = \
+        _read_env("FLATHUNTER_TELEGRAM_BOT_NOTIFY_WITH_IMAGES")
     FLATHUNTER_TELEGRAM_RECEIVER_IDS = _read_env("FLATHUNTER_TELEGRAM_RECEIVER_IDS")
     FLATHUNTER_MATTERMOST_WEBHOOK_URL = _read_env("FLATHUNTER_MATTERMOST_WEBHOOK_URL")
 
 
-class YamlConfig:
+class YamlConfig: # pylint: disable=too-many-public-methods
+    """Generic config object constructed from nested dictionaries"""
 
     DEFAULT_MESSAGE_FORMAT = """{title}
 Zimmer: {rooms}
@@ -62,7 +66,9 @@ Preis: {price}
 
 {url}"""
 
-    def __init__(self, config={}):
+    def __init__(self, config=None):
+        if config is None:
+            config = {}
         self.config = config
         self.__searchers__ = []
         self.check_deprecated()
@@ -109,6 +115,7 @@ Preis: {price}
         return self.config.get(key, value)
 
     def _read_yaml_path(self, path, default_value=None):
+        """Resolve a dotted variable path in nested dictionaries"""
         config = self.config
         parts = path.split('.')
         while len(parts) > 1:
@@ -135,9 +142,11 @@ Preis: {price}
         return self._get_captcha_solver() is not None
 
     def get_captcha_checkbox(self):
+        """Check if captcha checkbox support is needed"""
         return self._read_yaml_path('captcha.checkbox', False)
 
     def get_captcha_afterlogin_string(self):
+        """Check if afterlogin string should be presented"""
         return self._read_yaml_path('captcha.afterlogin_string', '')
 
     def database_location(self):
@@ -148,58 +157,75 @@ Preis: {price}
         return os.path.abspath(os.path.dirname(os.path.abspath(__file__)) + "/..")
 
     def target_urls(self):
+        """List of target URLs for crawling"""
         return self._read_yaml_path('urls', [])
 
     def verbose_logging(self):
+        """Return true if logging should be verbose"""
         return self._read_yaml_path('verbose') is not None
 
     def loop_is_active(self):
+        """Return true if flathunter should be crawling in a loop"""
         return self._read_yaml_path('loop.active', False)
 
     def loop_period_seconds(self):
+        """Number of seconds to wait between crawls when looping"""
         return self._read_yaml_path('loop.sleeping_time', 60 * 10)
 
     def has_website_config(self):
+        """True if the flathunter website configuration is present"""
         return 'website' in self.config
 
     def website_session_key(self):
+        """Secret session key for the flathunter website"""
         return self._read_yaml_path('website.session_key', None)
 
     def website_domain(self):
+        """Domain that the flathunter website is hosted at"""
         return self._read_yaml_path('website.domain', None)
 
     def website_bot_name(self):
+        """Name of the telegram bot used by the flathunter website to send messages"""
         return self._read_yaml_path('website.bot_name', None)
 
     def google_cloud_project_id(self):
+        """Google Cloud project ID for App Engine / Cloud Run deployments"""
         return self._read_yaml_path('google_cloud_project_id', None)
 
     def message_format(self):
+        """Format of the message to send in user notifications"""
         config_format = self._read_yaml_path('message', None)
         if config_format is not None:
             return config_format
         return self.DEFAULT_MESSAGE_FORMAT
 
     def notifiers(self):
+        """List of currently-active notifiers"""
         return self._read_yaml_path('notifiers', [])
 
     def telegram_bot_token(self):
+        """API Token to authenticate to the Telegram bot"""
         return self._read_yaml_path('telegram.bot_token', None)
 
     def telegram_notify_with_images(self) -> bool:
+        """True if images should be sent along with notifications"""
         flag = str(self._read_yaml_path("telegram.notify_with_images", 'false'))
         return flag.lower() == 'true'
 
     def telegram_receiver_ids(self):
+        """Static list of receiver IDs for notification messages"""
         return self._read_yaml_path('telegram.receiver_ids') or []
 
     def mattermost_webhook_url(self):
+        """Webhook for sending Mattermost messages"""
         return self._read_yaml_path('mattermost.webhook_url', None)
 
     def _get_imagetyperz_token(self):
+        """API Token for Imagetyperz"""
         return self._read_yaml_path("captcha.imagetyperz.token", "")
 
     def _get_twocaptcha_key(self):
+        """API Token for 2captcha"""
         return self._read_yaml_path("captcha.2captcha.api_key", "")
 
     def _get_captcha_solver(self) -> Optional[CaptchaSolver]:
@@ -215,31 +241,35 @@ Preis: {price}
         return None
 
     def get_captcha_solver(self) -> CaptchaSolver:
+        """Return the configured captcha solver (or raise exception)"""
         solver = self._get_captcha_solver()
         if solver is not None:
             return solver
         raise Exception("No captcha solver configured properly.")
 
     def captcha_driver_arguments(self):
-       return self._read_yaml_path('captcha.driver_arguments', [])
+        """The list of driver arguments for Selenium / Webdriver"""
+        return self._read_yaml_path('captcha.driver_arguments', [])
 
     def use_proxy(self):
         """Check if proxy is configured"""
         return "use_proxy_list" in self.config and self.config["use_proxy_list"]
 
 class CaptchaEnvironmentConfig():
+    """Mixin to add environment-variable captcha support to config object"""
 
     def _get_imagetyperz_token(self):
         if Env.FLATHUNTER_IMAGETYPERZ_TOKEN is not None:
             return Env.FLATHUNTER_IMAGETYPERZ_TOKEN
-        return super()._get_imagetyperz_token()
+        return super()._get_imagetyperz_token() # pylint: disable=no-member
 
     def _get_twocaptcha_key(self):
         if Env.FLATHUNTER_2CAPTCHA_KEY is not None:
             return Env.FLATHUNTER_2CAPTCHA_KEY
-        return super()._get_twocaptcha_key()
+        return super()._get_twocaptcha_key() # pylint: disable=no-member
 
     def captcha_driver_arguments(self):
+        """The list of driver arguments for Selenium / Webdriver"""
         if Env.FLATHUNTER_HEADLESS_BROWSER is not None:
             return [
                 "--no-sandbox",
@@ -249,14 +279,17 @@ class CaptchaEnvironmentConfig():
                 "--disable-dev-shm-usage",
                 "window-size=1024,768"
             ]
-        return super().captcha_driver_arguments()
+        return super().captcha_driver_arguments() # pylint: disable=no-member
 
 class Config(CaptchaEnvironmentConfig,YamlConfig):
-    """Class to represent flathunter configuration"""
+    """Class to represent flathunter configuration, built from a file, supporting
+    environment variable overrides
+    """
 
     def __init__(self, filename=None):
         if filename is None and Env.FLATHUNTER_TARGET_URLS is None:
-            raise Exception("Config file loaction must be specified, or FLATHUNTER_TARGET_URLS must be set")
+            raise Exception(
+                "Config file loaction must be specified, or FLATHUNTER_TARGET_URLS must be set")
         if filename is not None:
             logger.info("Using config path %s", filename)
             if not os.path.exists(filename):
@@ -347,4 +380,3 @@ class Config(CaptchaEnvironmentConfig,YamlConfig):
         if Env.FLATHUNTER_MATTERMOST_WEBHOOK_URL is not None:
             return Env.FLATHUNTER_MATTERMOST_WEBHOOK_URL
         return super().mattermost_webhook_url()
-

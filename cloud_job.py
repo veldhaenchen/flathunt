@@ -1,13 +1,10 @@
 """ Startup file for Google Cloud deployment or local webserver"""
-import logging
 import os
 
 from flathunter.googlecloud_idmaintainer import GoogleCloudIdMaintainer
 from flathunter.web_hunter import WebHunter
 from flathunter.config import Config
-from flathunter.logging import logger, wdm_logger, configure_logging
-
-from flathunter.web import app
+from flathunter.logging import configure_logging
 
 config = Config()
 

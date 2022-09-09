@@ -39,7 +39,8 @@ class SenderMattermost(Processor, Notifier):
         logger.debug(('message', message))
         resp = requests.post(
             self.webhook_url,
-            data=json.dumps({"text": message})
+            data=json.dumps({"text": message}),
+            timeout=30
         )
         logger.debug("Got response (%i): %s", resp.status_code, resp.content)
 

@@ -61,7 +61,7 @@ class ImageTyperzSolver(CaptchaSolver):
 
     @backoff.on_exception(**CaptchaSolver.backoff_options)
     def __submit_imagetyperz_request(self, submit_url: str, params: Dict[str, str]) -> str:
-        submit_response = requests.get(submit_url, params=params)
+        submit_response = requests.get(submit_url, params=params, timeout=30)
         logger.debug("Got response from imagetyperz/request: %s:", submit_response.text)
 
         if "error" in submit_response.text.lower():
@@ -83,7 +83,7 @@ class ImageTyperzSolver(CaptchaSolver):
         }
 
         while True:
-            retrieve_response = requests.get(retrieve_url, params=params)
+            retrieve_response = requests.get(retrieve_url, params=params, timeout=30)
             logger.debug("Got response from imagetyperz: %s:", retrieve_response.text)
             response = json.loads(retrieve_response.text)[0]
             if response["Status"] == "Pending":

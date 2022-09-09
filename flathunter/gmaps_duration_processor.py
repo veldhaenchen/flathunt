@@ -64,7 +64,7 @@ class GMapsDurationProcessor(Processor):
         # retrieve the result
         url = base_url.format(dest=dest, mode=mode, origin=address,
                               key=gm_key, arrival=arrival_time)
-        result = requests.get(url).json()
+        result = requests.get(url, timeout=30).json()
         if result['status'] != 'OK':
             logger.error("Failed retrieving distance to address %s: %s", address, result)
             return None

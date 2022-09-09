@@ -97,13 +97,15 @@ class CrawlImmobilienscout(Crawler):
     def get_entries_from_json(self, json):
         """Get entries from JSON"""
         return [
-            self.extract_entry_from_javascript(entry.value) for entry in self.JSON_PATH_PARSER_ENTRIES.find(json)
+            self.extract_entry_from_javascript(entry.value)
+                for entry in self.JSON_PATH_PARSER_ENTRIES.find(json)
         ]
 
     def extract_entry_from_javascript(self, entry):
         """Get single entry from JavaScript"""
 
-        # the url that is being returned to the frontend has a placeholder for screen size. (%WIDTH% and %HEIGHT%)
+        # the url that is being returned to the frontend has a placeholder for screen size.
+        # i.e. (%WIDTH% and %HEIGHT%)
         # The website's frontend fills these variables based on the user's screen size.
         # If we remove this part, the API will return the original size of the image.
         #
@@ -112,7 +114,10 @@ class CrawlImmobilienscout(Crawler):
         #
         # After: https://pictures.immobilienscout24.de/listings/$$IMAGE_ID$$.jpg
 
-        images = [image.value[:image.value.find(".jpg") + 4] for image in self.JSON_PATH_PARSER_IMAGES.find(entry)]
+        images = [
+            image.value[:image.value.find(".jpg") + 4]
+                for image in self.JSON_PATH_PARSER_IMAGES.find(entry)
+            ]
 
         object_id: int = int(entry.get("@id", 0))
         return {
@@ -124,7 +129,8 @@ class CrawlImmobilienscout(Crawler):
             'address': entry.get("address", {}).get("description", {}).get("text", ''),
             'crawler': self.get_name(),
             'price': str(entry.get("price", {}).get("value", '')),
-            'total_price': str(entry.get('calculatedTotalRent', {}).get("totalRent", {}).get('value', '')),
+            'total_price':
+                str(entry.get('calculatedTotalRent', {}).get("totalRent", {}).get('value', '')),
             'size': str(entry.get("livingSpace", '')),
             'rooms': str(entry.get("numberOfRooms", ''))
         }

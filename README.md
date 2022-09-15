@@ -18,17 +18,17 @@ Currently available messaging services are [Telegram](https://telegram.org/), [M
 - [Install](#install)
   - [Prerequisites](#prerequisites)
   - [Installation on Linux](#installation-on-linux)
+- [Usage](#usage)
   - [Configuration](#configuration)
     - [URLs](#urls)
     - [Telegram](#telegram)
     - [2Captcha](#2captcha)
     - [Proxy](#proxy)
     - [Google API](#google-api)
-  - [Docker](#docker)
-  - [Google Cloud Deployment](#google-cloud-deployment)
-- [Usage](#usage)
   - [Command-line Interface](#command-line-interface)
   - [Web Interface](#web-interface)
+  - [Docker](#docker)
+  - [Google Cloud Deployment](#google-cloud-deployment)
 - [Testing](#testing)
 - [Maintainers](#maintainers)
 - [Credits](#credits)
@@ -43,7 +43,7 @@ In Italy on the other hand, [idealista](https://www.idealista.it), [Subito](http
 With ```Flathunter```, instead of visiting the same pages on the same  sites every day, you can set the system up to scan every site, filtering by your search criteria, and notify you when new rental property becomes available that meets your criteria.
 
 ## Prerequisites
-* [Python 3.7+](https://www.python.org/)
+* [Python 3.8+](https://www.python.org/)
 * [pipenv](https://pipenv.pypa.io/en/latest/)
 * [Docker]() (*optional*)
 * [GCloud CLI]() (*optional*)
@@ -112,6 +112,8 @@ If you're using SELinux the following policy needs to be added:
 $ chcon -R -t bin_t /home/flathunter/.local/bin/pipenv
 ```
 
+## Usage
+
 ### Configuration
 
 Before running the project for the first time, copy `config.yaml.dist` to `config.yaml`. The `urls` and `telegram` sections of the config file must be configured according to your requirements before the project will run. 
@@ -131,7 +133,6 @@ To configure the searches, simply visit the property portal of your choice (e.g.
 To be able to send messages to you over Telegram, you need to register a new bot with the [BotFather](https://telegram.me/BotFather) for `Flathunter` to use. Through this process, a "Bot Token" will be created for you, which should be configured under `bot_token` in the config file.
 
 To know who should Telegram messages should be sent to, the "Chat IDs" of the recipients must be added to the config file under `receiver_ids`. To work out your own Chat ID, send a message to your new bot, then run:
-
 
 ```
 $ curl https://api.telegram.org/bot[BOT-TOKEN]/getUpdates
@@ -153,6 +154,42 @@ Flathunt will crawl a [free-proxy list website](https://free-proxy-list.net/) to
 #### Google API
 
 To use the distance calculation feature a [Google API-Key](https://developers.google.com/maps/documentation/javascript/get-api-key) is needed, as well as to enable the [Distance Matrix API](https://developers.google.com/maps/documentation/distance-matrix/overview) (This is NOT free).
+
+### Command-line Interface
+
+By default, the application runs on the commandline and outputs logs to `stdout`. It will poll in a loop and send updates after each run. The `processed_ids.db` file contains details of which listings have already been sent to the Telegram bot - if you delete that, it will be recreated, and you may receive duplicate listings.
+
+```
+usage: flathunt.py [-h] [--config CONFIG]
+
+Searches for flats on Immobilienscout24.de and wg-gesucht.de and sends results
+to Telegram User
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --config CONFIG, -c CONFIG
+                        Config file to use. If not set, try to use
+                        '~git-clone-dir/config.yaml'
+  --heartbeat INTERVAL, -hb INTERVAL
+			Set the interval time to receive heartbeat messages to check that the bot is
+                        alive. Accepted strings are "hour", "day", "week". Defaults to None.
+```
+
+### Web Interface
+
+You can alternatively launch the web interface by running the `main.py` application:
+
+```
+$ python main.py
+```
+
+This uses the same config file as the Command-line Interface, and launches a web page at [http://localhost:8080](http://localhost:8080).
+
+Alternatively, run the server directly with Flask:
+
+```
+$ FLASK_APP=flathunter.web flask run
+```
 
 ### Docker
 
@@ -252,44 +289,6 @@ https://[REGION]-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/[PROJE
 For more information checkout [the Cloud Scheduler documentation](https://cloud.google.com/run/docs/execute/jobs-on-schedule).
 
 Because the image uses Firestore to read details of user notification preferences and store crawled exposes, the job can run without any additional configuration. If you are hosting the webinterface somewhere on Google Cloud (either App Engine or Google Cloud Run), the job here will find the appropriate Firebase database.
-
-## Usage
-
-### Command-line Interface
-
-By default, the application runs on the commandline and outputs logs to `stdout`. It will poll in a loop and send updates after each run. The `processed_ids.db` file contains details of which listings have already been sent to the Telegram bot - if you delete that, it will be recreated, and you may receive duplicate listings.
-
-```
-usage: flathunt.py [-h] [--config CONFIG]
-
-Searches for flats on Immobilienscout24.de and wg-gesucht.de and sends results
-to Telegram User
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --config CONFIG, -c CONFIG
-                        Config file to use. If not set, try to use
-                        '~git-clone-dir/config.yaml'
-  --heartbeat INTERVAL, -hb INTERVAL
-			Set the interval time to receive heartbeat messages to check that the bot is
-                        alive. Accepted strings are "hour", "day", "week". Defaults to None.
-```
-
-### Web Interface
-
-You can alternatively launch the web interface by running the `main.py` application:
-
-```
-$ python main.py
-```
-
-This uses the same config file as the Command-line Interface, and launches a web page at [http://localhost:8080](http://localhost:8080).
-
-Alternatively, run the server directly with Flask:
-
-```
-$ FLASK_APP=flathunter.web flask run
-```
 
 ## Testing
 

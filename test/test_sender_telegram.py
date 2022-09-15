@@ -3,8 +3,8 @@ import unittest
 
 from requests_mock import Mocker
 from utils.request_matcher import RequestCounter
+from utils.config import StringConfig
 
-from flathunter.config import Config
 from flathunter.sender_telegram import SenderTelegram
 
 
@@ -12,7 +12,7 @@ class SenderTelegramTest(unittest.TestCase):
 
     @Mocker()
     def test_send_message(self, m: Mocker):
-        config = Config(string=json.dumps({"telegram": {"bot_token": "dummy_token", "receiver_ids": [123]}}))
+        config = StringConfig(string=json.dumps({"telegram": {"bot_token": "dummy_token", "receiver_ids": [123]}}))
         sender = SenderTelegram(config=config)
 
         mock_response = '''{
@@ -30,13 +30,13 @@ class SenderTelegramTest(unittest.TestCase):
 
     @Mocker()
     def test_send_no_message_if_no_receivers(self, m: Mocker):
-        config = Config(string=json.dumps({"telegram": {"bot_token": "dummy_token", "receiver_ids": None}}))
+        config = StringConfig(string=json.dumps({"telegram": {"bot_token": "dummy_token", "receiver_ids": None}}))
         sender = SenderTelegram(config=config)
         self.assertEqual(None, sender.notify("result"), "Expected no message to be sent")
 
     @Mocker()
     def test_send_message_with_image(self, m: Mocker):
-        c = Config(string=json.dumps(
+        c = StringConfig(string=json.dumps(
             {"telegram": {"bot_token": "dummy_token", "receiver_ids": [1234567], "notify_with_images": "true"}}
         ))
         sender = SenderTelegram(config=c)
@@ -63,7 +63,7 @@ class SenderTelegramTest(unittest.TestCase):
 
     @Mocker()
     def test_images_will_be_chunked(self, m: Mocker):
-        c = Config(string=json.dumps(
+        c = StringConfig(string=json.dumps(
             {"telegram": {"bot_token": "dummy_token", "receiver_ids": [1234567], "notify_with_images": "true"}}
         ))
 

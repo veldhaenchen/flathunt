@@ -9,9 +9,9 @@ from flask import session
 from flathunter.web import app
 from flathunter.web_hunter import WebHunter
 from flathunter.idmaintainer import IdMaintainer
-from flathunter.config import Config
 
 from dummy_crawler import DummyCrawler
+from utils.config import StringConfig
 
 DUMMY_CONFIG = """
 notifiers:
@@ -30,7 +30,7 @@ urls:
 def hunt_client():
     app.config['TESTING'] = True
     with tempfile.NamedTemporaryFile(mode='w+') as temp_db:
-        config = Config(string=DUMMY_CONFIG)
+        config = StringConfig(string=DUMMY_CONFIG)
         config.set_searchers([DummyCrawler()])
         app.config['HUNTER'] = WebHunter(config, IdMaintainer(temp_db.name))
         app.config['BOT_TOKEN'] = "1234xxx.12345"
@@ -61,7 +61,7 @@ def test_hunt_with_users(hunt_client, **kwargs):
     m = kwargs['m']
     mock_response = '{"ok":true,"result":{"message_id":456,"from":{"id":1,"is_bot":true,"first_name":"Wohnbot","username":"wohnung_search_bot"},"chat":{"id":5,"first_name":"Arthur","last_name":"Taylor","type":"private"},"date":1589813130,"text":"hello arthur"}}'
     for title in [ 'wg', 'ruhig', 'gruen', 'tausch', 'flat' ]:
-        m.get('https://api.telegram.org/bot1234xxx.12345/sendMessage?chat_id=1234&text=Great+flat+' + title + '+terrible+landlord', text=mock_response)
+        m.post('https://api.telegram.org/bot1234xxx.12345/sendMessage', text=mock_response)
     app.config['HUNTER'].set_filters_for_user(1234, {})
     assert app.config['HUNTER'].get_filters_for_user(1234) == {}
     app.config['HUNTER'].hunt_flats()
@@ -74,7 +74,7 @@ def test_hunt_via_post(hunt_client, **kwargs):
     m = kwargs['m']
     mock_response = '{"ok":true,"result":{"message_id":456,"from":{"id":1,"is_bot":true,"first_name":"Wohnbot","username":"wohnung_search_bot"},"chat":{"id":5,"first_name":"Arthur","last_name":"Taylor","type":"private"},"date":1589813130,"text":"hello arthur"}}'
     for title in [ 'wg', 'ruhig', 'gruen', 'tausch', 'flat' ]:
-        m.get('https://api.telegram.org/bot1234xxx.12345/sendMessage?chat_id=1234&text=Great+flat+' + title + '+terrible+landlord', text=mock_response)
+        m.post('https://api.telegram.org/bot1234xxx.12345/sendMessage', text=mock_response)
     app.config['HUNTER'].set_filters_for_user(1234, {})
     assert app.config['HUNTER'].get_filters_for_user(1234) == {}
     rv = hunt_client.get('/hunt')
@@ -86,8 +86,7 @@ def test_multi_user_hunt_via_post(hunt_client, **kwargs):
     m = kwargs['m']
     mock_response = '{"ok":true,"result":{"message_id":456,"from":{"id":1,"is_bot":true,"first_name":"Wohnbot","username":"wohnung_search_bot"},"chat":{"id":5,"first_name":"Arthur","last_name":"Taylor","type":"private"},"date":1589813130,"text":"hello arthur"}}'
     for title in [ 'wg', 'ruhig', 'gruen', 'tausch', 'flat' ]:
-        m.get('https://api.telegram.org/bot1234xxx.12345/sendMessage?chat_id=1234&text=Great+flat+' + title + '+terrible+landlord', text=mock_response)
-        m.get('https://api.telegram.org/bot1234xxx.12345/sendMessage?chat_id=1235&text=Great+flat+' + title + '+terrible+landlord', text=mock_response)
+        m.post('https://api.telegram.org/bot1234xxx.12345/sendMessage', text=mock_response)
     app.config['HUNTER'].set_filters_for_user(1234, {})
     app.config['HUNTER'].set_filters_for_user(1235, {})
     assert app.config['HUNTER'].get_filters_for_user(1234) == {}
@@ -100,7 +99,7 @@ def test_hunt_via_post_with_filters(hunt_client, **kwargs):
     m = kwargs['m']
     mock_response = '{"ok":true,"result":{"message_id":456,"from":{"id":1,"is_bot":true,"first_name":"Wohnbot","username":"wohnung_search_bot"},"chat":{"id":5,"first_name":"Arthur","last_name":"Taylor","type":"private"},"date":1589813130,"text":"hello arthur"}}'
     for title in [ 'wg', 'gruen', 'flat' ]:
-        m.get('https://api.telegram.org/bot1234xxx.12345/sendMessage?chat_id=1234&text=Great+flat+' + title + '+terrible+landlord', text=mock_response)
+        m.post('https://api.telegram.org/bot1234xxx.12345/sendMessage', text=mock_response)
     app.config['HUNTER'].set_filters_for_user(1234, { 'excluded_titles': [ 'ruhig', 'tausch' ] })
     assert app.config['HUNTER'].get_filters_for_user(1234) == { 'excluded_titles': [ 'ruhig', 'tausch' ]}
     rv = hunt_client.get('/hunt')

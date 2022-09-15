@@ -4,7 +4,7 @@ from itertools import chain
 import requests
 
 from flathunter.logging import logger
-from flathunter.config import Config
+from flathunter.config import YamlConfig
 from flathunter.filter import Filter
 from flathunter.processor import ProcessorChain
 from flathunter.captcha.captcha_solver import CaptchaUnsolvableError
@@ -12,9 +12,9 @@ from flathunter.captcha.captcha_solver import CaptchaUnsolvableError
 class Hunter:
     """Basic methods for crawling and processing / filtering exposes"""
 
-    def __init__(self, config: Config, id_watch):
+    def __init__(self, config: YamlConfig, id_watch):
         self.config = config
-        if not isinstance(self.config, Config):
+        if not isinstance(self.config, YamlConfig):
             raise Exception("Invalid config for hunter - should be a 'Config' object")
         self.id_watch = id_watch
 

@@ -9,9 +9,9 @@ from flask import session
 from flathunter.web import app
 from flathunter.web_hunter import WebHunter
 from flathunter.idmaintainer import IdMaintainer
-from flathunter.config import Config
 
 from dummy_crawler import DummyCrawler
+from utils.config import StringConfig
 
 DUMMY_CONFIG = """
 telegram:
@@ -27,7 +27,7 @@ urls:
 def hunt_client():
     app.config['TESTING'] = True
     with tempfile.NamedTemporaryFile(mode='w+') as temp_db:
-        config = Config(string=DUMMY_CONFIG)
+        config = StringConfig(string=DUMMY_CONFIG)
         config.set_searchers([DummyCrawler()])
         app.config['HUNTER'] = WebHunter(config, IdMaintainer(temp_db.name))
         app.config['BOT_TOKEN'] = "1234xxx.12345"

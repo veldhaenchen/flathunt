@@ -2,7 +2,7 @@ import pytest
 
 from flathunter.crawl_immowelt import CrawlImmowelt
 from test_util import count
-from flathunter.config import Config
+from utils.config import StringConfig
 
 DUMMY_CONFIG = """
 urls:
@@ -13,7 +13,7 @@ TEST_URL = 'https://www.immowelt.de/liste/berlin/wohnungen/mieten?roomi=2&prima=
 
 @pytest.fixture
 def crawler():
-    return CrawlImmowelt(Config(string=DUMMY_CONFIG))
+    return CrawlImmowelt(StringConfig(string=DUMMY_CONFIG))
 
 
 def test_crawler(crawler):
@@ -24,7 +24,7 @@ def test_crawler(crawler):
     assert len(entries) > 0
     assert entries[0]['id']
     assert entries[0]['url'].startswith("https://www.immowelt.de/expose")
-    for attr in [ 'title', 'price', 'size', 'rooms', 'address', 'image' ]:
+    for attr in [ 'title', 'price', 'size', 'rooms', 'address' ]:
         assert entries[0][attr] is not None
 
 def test_dont_crawl_other_urls(crawler):

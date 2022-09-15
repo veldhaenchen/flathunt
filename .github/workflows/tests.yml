@@ -35,6 +35,12 @@ jobs:
           python --version; pip --version; pipenv --version
           pipenv requirements > requirements.txt
           pip install -r requirements.txt
+      - name: Debug env
+        run: env | grep FLATHUNTER
+        env:
+          FLATHUNTER_HEADLESS_BROWSER: true
+          FLATHUNTER_2CAPTCHA_KEY: ${{ secrets.TWOCAPTCHA_API_KEY }}
+          WDM_LOCAL: 1
       - name: Run tests
         run: coverage run
         env:

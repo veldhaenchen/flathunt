@@ -59,7 +59,7 @@ class CrawlEbayKleinanzeigen(Crawler):
 
         for idx, title_el in enumerate(title_elements):
             try:
-                price = expose_ids[idx].find(class_="aditem-main--middle--price").text.strip()
+                price = expose_ids[idx].find(class_="aditem-main--middle--price-shipping--price").text.strip()
                 tags = expose_ids[idx].find_all(class_="simpletag tag-small")
                 address = expose_ids[idx].find("div", {"class": "aditem-main--top--left"})
                 image_element = expose_ids[idx].find("div", {"class": "galleryimage-element"})

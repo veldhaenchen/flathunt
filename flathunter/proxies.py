@@ -7,7 +7,7 @@ def get_proxies():
     Gets random, free proxies
     """
     url = "https://free-proxy-list.net/"
-    response = requests.get(url)
+    response = requests.get(url, timeout=30)
     parser = fromstring(response.text)
     proxies = set()
     for i in parser.xpath('//tbody/tr')[:250]:

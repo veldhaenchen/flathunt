@@ -6,10 +6,9 @@
 
 import argparse
 import os
-import logging
 import time
 
-from flathunter.logging import logger, wdm_logger, configure_logging
+from flathunter.logging import logger, configure_logging
 from flathunter.idmaintainer import IdMaintainer
 from flathunter.hunter import Hunter
 from flathunter.config import Config, Env

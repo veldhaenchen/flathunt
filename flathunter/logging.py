@@ -56,6 +56,7 @@ wdm_logger = setup_wdm_logger(logger_handler)
 logging.getLogger("requests").setLevel(logging.WARNING)
 
 def configure_logging(config):
+    """Setup the logging classes based on verbose config flag"""
     if config.verbose_logging():
         logger.setLevel(logging.DEBUG)
         # Allow logging of "webdriver-manager" module on verbose mode

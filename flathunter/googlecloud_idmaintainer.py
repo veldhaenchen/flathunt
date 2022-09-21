@@ -23,12 +23,12 @@ class GoogleCloudIdMaintainer:
     def mark_processed(self, expose_id):
         """Mark exposes as processed when we have processed them"""
         logger.debug('mark_processed(%d)', expose_id)
-        self.database.collection(u'processed').document(str(expose_id)).set({u'id': expose_id})
+        self.database.collection('processed').document(str(expose_id)).set({'id': expose_id})
 
     def is_processed(self, expose_id):
         """Returns true if an expose has already been marked as processed"""
         logger.debug('is_processed(%d)', expose_id)
-        doc = self.database.collection(u'processed').document(str(expose_id))
+        doc = self.database.collection('processed').document(str(expose_id))
         return doc.get().exists
 
     def save_expose(self, expose):
@@ -36,15 +36,15 @@ class GoogleCloudIdMaintainer:
         record = expose.copy()
         record.update({'created_at': pytz.utc.localize(datetime.datetime.now()),
                        'created_sort': (0 - datetime.datetime.now().timestamp())})
-        self.database.collection(u'exposes').document(str(expose[u'id'])).set(record)
+        self.database.collection('exposes').document(str(expose['id'])).set(record)
 
     def get_exposes_since(self, min_datetime):
         """Returns all exposes since the supplied datetime"""
         localized_datetime = min_datetime.replace(tzinfo=pytz.UTC)
         res = []
-        for doc in self.database.collection(u'exposes')\
+        for doc in self.database.collection('exposes')\
                        .order_by('created_sort').limit(10000).stream():
-            if doc.to_dict()[u'created_at'] < localized_datetime:
+            if doc.to_dict()['created_at'] < localized_datetime:
                 break
             res.append(doc.to_dict())
         return res
@@ -53,7 +53,7 @@ class GoogleCloudIdMaintainer:
         """Returns recent exposes (no more than 'count'), conforming to
            the provided filter if supplied"""
         res = []
-        for doc in self.database.collection(u'exposes')\
+        for doc in self.database.collection('exposes')\
                        .order_by('created_sort').limit(100).stream():
             expose = doc.to_dict()
             if filter_set is None or filter_set.is_interesting_expose(expose):
@@ -64,17 +64,17 @@ class GoogleCloudIdMaintainer:
 
     def get_settings_for_user(self, user_id):
         """Loads the user settings from the database"""
-        doc = self.database.collection(u'users').document(str(user_id)).get()
+        doc = self.database.collection('users').document(str(user_id)).get()
         return doc.to_dict()
 
     def save_settings_for_user(self, user_id, settings):
         """Saves the user settings to the database"""
-        self.database.collection(u'users').document(str(user_id)).set(settings)
+        self.database.collection('users').document(str(user_id)).set(settings)
 
     def get_user_settings(self):
         """Loads all users' settings from the database"""
         res = []
-        for doc in self.database.collection(u'users').stream():
+        for doc in self.database.collection('users').stream():
             settings = doc.to_dict()
             if settings is not None:
                 res.append((int(doc.id), settings))
@@ -83,13 +83,13 @@ class GoogleCloudIdMaintainer:
     def get_last_run_time(self):
         """Returns the datetime of the last run"""
         # pylint: disable=no-member
-        for doc in self.database.collection(u'executions')\
-                        .order_by(u'timestamp', direction=firestore.Query.DESCENDING)\
+        for doc in self.database.collection('executions')\
+                        .order_by('timestamp', direction=firestore.Query.DESCENDING)\
                         .limit(1).stream():
-            return doc.to_dict()[u'timestamp']
+            return doc.to_dict()['timestamp']
 
     def update_last_run_time(self):
         """Updates the time of the last run in the database"""
         time = datetime.datetime.now()
-        self.database.collection(u'executions').add({u'timestamp': time})
+        self.database.collection('executions').add({'timestamp': time})
         return time

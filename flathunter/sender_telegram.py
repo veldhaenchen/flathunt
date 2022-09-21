@@ -10,7 +10,7 @@ from flathunter.abstract_processor import Processor
 from flathunter.config import Config
 from flathunter.exceptions import BotBlockedException, UserDeactivatedException
 from flathunter.logging import logger
-from flathunter.utils import list
+from flathunter.utils.list import chunk_list
 
 
 class SenderTelegram(Processor, Notifier):
@@ -21,8 +21,8 @@ class SenderTelegram(Processor, Notifier):
         self.bot_token = self.config.telegram_bot_token()
         self.__notify_with_images: bool = self.config.telegram_notify_with_images()
 
-        self.__text_message_url = "https://api.telegram.org/bot%s/sendMessage" % self.bot_token
-        self.__media_group_url = "https://api.telegram.org/bot%s/sendMediaGroup" % self.bot_token
+        self.__text_message_url = f"https://api.telegram.org/bot{self.bot_token}/sendMessage"
+        self.__media_group_url = f"https://api.telegram.org/bot{self.bot_token}/sendMediaGroup"
 
         if receivers is None:
             self.receiver_ids = self.config.telegram_receiver_ids()
@@ -67,7 +67,8 @@ class SenderTelegram(Processor, Notifier):
 
     def __send_text(self, chat_id: int, message: str) -> typing.Dict:
         """
-        Send bot text message, the message may contain a simple heartbeat message or an apartment information
+        Send bot text message, the message may contain a simple
+        heartbeat message or an apartment information
         :param chat_id: the receiver id
         :param message: the body of the message
         :return: sent message information
@@ -81,12 +82,13 @@ class SenderTelegram(Processor, Notifier):
         logger.debug(('chat_id:', chat_id))
         logger.debug(('text:', message))
         logger.debug("Retrieving URL %s, payload %s", self.__text_message_url, payload)
-        response = requests.request("POST", self.__text_message_url, data=payload)
+        response = requests.request("POST", self.__text_message_url, data=payload, timeout=30)
         logger.debug("Got response (%i): %s", response.status_code, response.content)
 
         # handle error
         if response.status_code != 200:
-            self.__handle_error("When sending bot text message, we got an error.", response, chat_id)
+            self.__handle_error("When sending bot text message, we got an error.",
+                response, chat_id)
             return {}
 
         return response.json().get('result', {})
@@ -102,7 +104,7 @@ class SenderTelegram(Processor, Notifier):
         """
         # maximum number of images in a media group is 10.
         # if there are more than 10 images, we need to divide it into multiple messages.
-        for chunk in list.chunk(images, 10):
+        for chunk in chunk_list(images, 10):
             payload = {
                 'chat_id': str(chat_id),
                 # media expected to be an array of objects in string format
@@ -112,7 +114,7 @@ class SenderTelegram(Processor, Notifier):
             if msg.get('message_id', None):
                 payload['reply_to_message_id'] = msg.get('message_id')
 
-            response = requests.request("POST", self.__media_group_url, data=payload)
+            response = requests.request("POST", self.__media_group_url, data=payload, timeout=30)
 
             if response.status_code != 200:
                 self.__handle_error(
@@ -130,19 +132,21 @@ class SenderTelegram(Processor, Notifier):
         :param chat_id: the receiver that was supposed to get the message
         :return: None
 
-        :raise BotBlockedException: Happens when bot trys to send a message to a user that has already blocked the bot
-        :raise UserDeactivatedException: Happens when bot try to send a message to a deactivated user
+        :raise BotBlockedException: Happens when bot trys to send a message to a user that
+            has already blocked the bot
+        :raise UserDeactivatedException: Happens when bot try to send a message to a
+            deactivated user
         """
         status_code = response.status_code
         data = response.json()
 
-        logger.error(f"{msg}, status code: %i, data: %s", status_code, data)
+        logger.error("%s, status code: %i, data: %s" , msg, status_code, data)
 
         if response.status_code == 403:
             if "bot was blocked by the user" in data.get("description", ""):
-                raise BotBlockedException("User %i blocked the bot" % chat_id)
+                raise BotBlockedException(f"User {chat_id} blocked the bot")
             if "user is deactivated" in data.get("description", ""):
-                raise UserDeactivatedException("User %i has been deactivated" % chat_id)
+                raise UserDeactivatedException(f"User {chat_id} has been deactivated")
 
     def __get_images(self, expose: typing.Dict) -> typing.List[str]:
         return expose.get("images", [])

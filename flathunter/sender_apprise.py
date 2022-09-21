@@ -30,8 +30,8 @@ class SenderApprise(Processor, Notifier):
         self.__send_msg(message=message)
 
     def __send_msg(self, message):
-        apobj = apprise.Apprise()
         """Send messages to each of the Apprise urls"""
+        apobj = apprise.Apprise()
         if self.apprise_urls is None:
             return
         for apprise_url in self.apprise_urls:

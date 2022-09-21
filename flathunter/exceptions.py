@@ -1,3 +1,5 @@
+"""Some user-defined exception classes"""
+
 class BotBlockedException(Exception):
     """
     A small class that defines a Bot Blocked Exception.

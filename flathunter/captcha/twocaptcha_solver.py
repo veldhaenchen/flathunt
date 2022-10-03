@@ -8,6 +8,7 @@ import requests
 from flathunter.logging import logger
 from flathunter.captcha.captcha_solver import (
     CaptchaSolver,
+    CaptchaBalanceEmpty,
     CaptchaUnsolvableError,
     GeetestResponse,
     RecaptchaResponse,
@@ -78,6 +79,11 @@ class TwoCaptchaSolver(CaptchaSolver):
             if "ERROR_CAPTCHA_UNSOLVABLE" in retrieve_response.text:
                 logger.info("The captcha was unsolvable.")
                 raise CaptchaUnsolvableError()
+
+            if "ERROR_ZERO_BALANCE" in retrieve_response.text:
+                logger.info("2captcha account out of credit - buy more captchas.")
+                raise CaptchaBalanceEmpty()
+
             if not retrieve_response.text.startswith("OK"):
                 raise requests.HTTPError(response=retrieve_response)
 

@@ -1011,10 +1011,10 @@
         },
         "selenium": {
             "hashes": [
-                "sha256:ca6ed4a58a426bb40bf5aa2b027ce211cc5200f1acdcdfb8258b32b24624150c"
+                "sha256:a733dd77d3171b846893f4d51b18967d809313f547a10974e26579f9ce797462"
             ],
             "index": "pypi",
-            "version": "==4.4.3"
+            "version": "==4.5.0"
         },
         "six": {
             "hashes": [

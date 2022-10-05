@@ -19,11 +19,14 @@ class CrawlImmobiliare(Crawler):
         """Extracts all exposes from a provided Soup object"""
         entries = []
 
-        findings = soup.find(
-            'ul', {"class": "in-realEstateResults"}).find_all(lambda l: l.has_attr('class') and "in-realEstateResults__item" in l['class'])
+        results = soup.find(
+            'ul', {"class": "in-realEstateResults"})
 
-        for row in findings:
-            id = row['id'].replace("link_ad_", "")
+        items = results.find_all(lambda l: l.has_attr(
+            'class') and "in-realEstateResults__item" in l['class'])
+
+        for row in items:
+            flat_id = row['id'].replace("link_ad_", "")
             title_row = row.find('a', {"class": "in-card__title"})
             title = title_row.text.strip()
             url = title_row['href']
@@ -58,7 +61,7 @@ class CrawlImmobiliare(Crawler):
             address = address_match[1] if address_match else ""
 
             details = {
-                'id': int(id),
+                'id': int(flat_id),
                 'image': image,
                 'url': url,
                 'title': title,

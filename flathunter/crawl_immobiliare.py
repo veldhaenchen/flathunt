@@ -4,6 +4,7 @@ import re
 from flathunter.logging import logger
 from flathunter.abstract_crawler import Crawler
 
+
 class CrawlImmobiliare(Crawler):
     """Implementation of Crawler interface for Immobiliare"""
 
@@ -18,40 +19,46 @@ class CrawlImmobiliare(Crawler):
         """Extracts all exposes from a provided Soup object"""
         entries = []
 
-        findings = soup.find_all(lambda e: e.has_attr('data-id') \
-            and e.has_attr('class') \
-            and "listing-item" in e['class'])
+        findings = soup.find(
+            'ul', {"class": "in-realEstateResults"}).find_all(lambda l: l.has_attr('class') and "in-realEstateResults__item" in l['class'])
 
         for row in findings:
-            title_row = row.find('p', {"class": "titolo text-primary"})
+            id = row['id'].replace("link_ad_", "")
+            title_row = row.find('a', {"class": "in-card__title"})
             title = title_row.text.strip()
-            url = title_row.find('a')['href']
-            image_item = row.find('div', {"class": "showcase__item"})
-            image = image_item.find('img')['src'] if image_item else ""
+            url = title_row['href']
+
+            image_item = row.find_all('img')
+            image = image_item[0]['src'] if image_item else ""
 
             # the items arrange like so:
             # 0: price
             # 1: number of rooms
             # 2: size of the apartment
-            price_li = row.find("li", {"class": "lif__pricing"})
+            details_list = row.find(
+                "ul", {"class": "in-realEstateListCard__features"})
+
+            price_li = details_list.find(
+                "li", {"class": "in-realEstateListCard__features--main"})
 
             price = re.match(
                 r".*\s([0-9]+.*)$",
                 # if there is a discount on the price, then there will be a <div>,
                 # otherwise the text we are looking for is directly inside the <li>
-                (price_li.find("div") if price_li.find("div") else price_li).text.strip()
+                (price_li.find("div") if price_li.find(
+                    "div") else price_li).text.strip()
             )[1]
 
-            details_list = row.find_all("li", {"class": "lif__item"})
-
-            rooms = details_list[1].find("span").text.strip() if len(details_list) > 1 else "?"
-            size = details_list[2].find("span").text.strip() if len(details_list) > 2 else "?"
+            rooms = details_list.find(
+                "li", {"aria-label": "locali"}).text.strip()
+            size = details_list.find(
+                "li", {"aria-label": "superficie"}).text.strip()
 
             address_match = re.match(r"\w+\s(.*)$", title)
             address = address_match[1] if address_match else ""
 
             details = {
-                'id': int(row['data-id']),
+                'id': int(id),
                 'image': image,
                 'url': url,
                 'title': title,

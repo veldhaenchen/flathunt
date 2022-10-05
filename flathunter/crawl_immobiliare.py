@@ -23,7 +23,8 @@ class CrawlImmobiliare(Crawler):
             'ul', {"class": "in-realEstateResults"})
 
         items = results.find_all(lambda l: l.has_attr(
-            'class') and "in-realEstateResults__item" in l['class'])
+            'class') and "in-realEstateResults__item" in l['class']
+            and "in-realEstateResults__carouselAgency" not in l["class"])
 
         for row in items:
             flat_id = row['id'].replace("link_ad_", "")
@@ -52,10 +53,11 @@ class CrawlImmobiliare(Crawler):
                     "div") else price_li).text.strip()
             )[1]
 
-            rooms = details_list.find(
-                "li", {"aria-label": "locali"}).text.strip()
-            size = details_list.find(
-                "li", {"aria-label": "superficie"}).text.strip()
+            other_details = details_list.find_all(
+                lambda l: l.has_attr('aria-label'))
+
+            rooms = other_details[0].text.strip()
+            size = other_details[1].text.strip()
 
             address_match = re.match(r"\w+\s(.*)$", title)
             address = address_match[1] if address_match else ""

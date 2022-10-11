@@ -45,19 +45,25 @@ class CrawlImmobiliare(Crawler):
             price_li = details_list.find(
                 "li", {"class": "in-realEstateListCard__features--main"})
 
-            price = re.match(
+            price_re = re.match(
                 r".*\s([0-9]+.*)$",
                 # if there is a discount on the price, then there will be a <div>,
                 # otherwise the text we are looking for is directly inside the <li>
                 (price_li.find("div") if price_li.find(
                     "div") else price_li).text.strip()
-            )[1]
+            )
+            price = "???"
+            if price_re is not None:
+                price = price_re[1]
 
-            other_details = details_list.find_all(
-                lambda l: l.has_attr('aria-label'))
-
-            rooms = other_details[0].text.strip()
-            size = other_details[1].text.strip()
+            rooms_el = details_list.find(attrs={"aria-label":re.compile(r'local[ie]')})
+            rooms = None
+            if rooms_el is not None:
+                rooms = rooms_el.text.strip()
+            size_el = details_list.find(attrs={"aria-label":"superficie"})
+            size = None
+            if size_el is not None:
+                size = size_el.text.strip()
 
             address_match = re.match(r"\w+\s(.*)$", title)
             address = address_match[1] if address_match else ""

@@ -5,7 +5,6 @@ from time import sleep
 import backoff
 import requests
 import selenium
-import undetected_chromedriver.v2 as uc
 from bs4 import BeautifulSoup
 from random_user_agent.params import HardwareType, Popularity
 from random_user_agent.user_agent import UserAgent
@@ -17,8 +16,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from flathunter import proxies
 from flathunter.captcha.captcha_solver import CaptchaUnsolvableError
 from flathunter.logging import logger
-
-import subproccess
+from flathunter.chrome_wrapper import get_chrome_driver
 
 class Crawler:
     """Defines the Crawler interface"""
@@ -48,25 +46,6 @@ class Crawler:
         self.config = config
         if config.captcha_enabled():
             self.captcha_solver = config.get_captcha_solver()
-
-    def configure_driver(self, driver_arguments):
-        """Configure Chrome WebDriver"""
-        logger.info('Initializing Chrome WebDriver for crawler "%s"...', self.get_name())
-        chrome_options = uc.ChromeOptions() # pylint: disable=no-member
-        if driver_arguments is not None:
-            for driver_argument in driver_arguments:
-                chrome_options.add_argument(driver_argument)
-        chrome_version = subprocess.Popen(['google-chrome', '--version'],
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                universal_newlines=True).stdout.readline().split(' '
-                )[2].split('.')[0]
-        driver = uc.Chrome(version_main=chrome_version, options=chrome_options) # pylint: disable=no-member
-
-        driver.execute_cdp_cmd('Network.setBlockedURLs',
-            {"urls": ["https://api.geetest.com/get.*"]})
-        driver.execute_cdp_cmd('Network.enable', {})
-
-        return driver
 
     def rotate_user_agent(self):
         """Choose a new random user agent"""

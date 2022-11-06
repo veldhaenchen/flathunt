@@ -1,9 +1,13 @@
+"""Chrome needs some special handling to work out where the correct
+binary is, to attach the correct selenium chromedriver, and to set
+the correct version number"""
 import subprocess
 import undetected_chromedriver.v2 as uc
 
 from flathunter.logging import logger
 
 def get_chrome_version():
+    """Determine the correct name for the chrome binary"""
     for binary_name in ['google-chrome', 'chromium', 'chrome']:
         try:
             return subprocess.Popen([binary_name, '--version'],

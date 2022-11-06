@@ -16,7 +16,6 @@ from selenium.webdriver.support.wait import WebDriverWait
 from flathunter import proxies
 from flathunter.captcha.captcha_solver import CaptchaUnsolvableError
 from flathunter.logging import logger
-from flathunter.chrome_wrapper import get_chrome_driver
 
 class Crawler:
     """Defines the Crawler interface"""

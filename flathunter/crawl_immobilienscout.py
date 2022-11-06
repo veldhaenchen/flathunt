@@ -7,6 +7,7 @@ from selenium.common.exceptions import JavascriptException
 
 from flathunter.abstract_crawler import Crawler
 from flathunter.logging import logger
+from flathunter.chrome_wrapper import get_chrome_driver
 
 
 class CrawlImmobilienscout(Crawler):
@@ -36,7 +37,7 @@ class CrawlImmobilienscout(Crawler):
             self.checkbox = config.get_captcha_checkbox()
             self.afterlogin_string = config.get_captcha_afterlogin_string()
             if self.captcha_solver:
-                self.driver = self.configure_driver(driver_arguments)
+                self.driver = get_chrome_driver(driver_arguments)
 
     def get_results(self, search_url, max_pages=None):
         """Loads the exposes from the ImmoScout site, starting at the provided URL"""

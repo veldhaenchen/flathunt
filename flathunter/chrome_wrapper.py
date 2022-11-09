@@ -10,6 +10,7 @@ from flathunter.logging import logger
 CHROME_VERSION_REGEXP = re.compile(r'.* (((\d+).)+(\d+))( .*)?')
 
 def get_command_output(args):
+    """Run a command and return the first line of stdout"""
     try:
         return subprocess.Popen(args,
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE,

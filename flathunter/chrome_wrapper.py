@@ -1,19 +1,34 @@
 """Chrome needs some special handling to work out where the correct
 binary is, to attach the correct selenium chromedriver, and to set
 the correct version number"""
+import re
 import subprocess
 import undetected_chromedriver.v2 as uc
 
 from flathunter.logging import logger
 
+CHROME_VERSION_REGEXP = re.compile(r'.* (((\d+).)+(\d+))( .*)?')
+
+def get_command_output(args):
+    """Run a command and return the first line of stdout"""
+    try:
+        return subprocess.Popen(args,
+                    stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                    universal_newlines=True).stdout.readline()
+    except FileNotFoundError:
+        return None
+
 def get_chrome_version():
     """Determine the correct name for the chrome binary"""
     for binary_name in ['google-chrome', 'chromium', 'chrome']:
         try:
-            return subprocess.Popen([binary_name, '--version'],
-                        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                        universal_newlines=True).stdout.readline().split(' '
-                    )[2].split('.')[0]
+            version = get_command_output([binary_name, '--version'])
+            if version is None:
+                continue
+            match = CHROME_VERSION_REGEXP.match(version)
+            if match is None:
+                continue
+            return match.group(1).split('.')[0]
         except FileNotFoundError:
             pass
     return None

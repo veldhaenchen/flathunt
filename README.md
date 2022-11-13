@@ -51,6 +51,7 @@ With ```Flathunter```, instead of visiting the same pages on the same  sites eve
 ## Prerequisites
 * [Python 3.8+](https://www.python.org/)
 * [pipenv](https://pipenv.pypa.io/en/latest/)
+* [Google Chrome](https://www.google.com/chrome/)
 * [Docker]() (*optional*)
 * [GCloud CLI]() (*optional*)
 

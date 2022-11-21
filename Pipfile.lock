@@ -1165,11 +1165,10 @@
         },
         "undetected-chromedriver": {
             "hashes": [
-                "sha256:58e1a3d27f09145894a69300bde812ad06e395b792912acc1b5418593564948f",
-                "sha256:a1470fd0a2b06905824a40c6063dcee3f12b7ebe38cdc41d1912b7cae19b25e5"
+                "sha256:ed159186828092635f2acc4ecdf02835e3d924947546e1aab9f71b3ba5a910b5"
             ],
             "index": "pypi",
-            "version": "==3.1.6"
+            "version": "==3.1.7"
         },
         "uritemplate": {
             "hashes": [

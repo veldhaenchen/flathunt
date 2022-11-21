@@ -1189,11 +1189,11 @@
         },
         "webdriver-manager": {
             "hashes": [
-                "sha256:1a0fb9f12ebaa0e6b86aa38cef8a02c97c69e379f23e27c581eeef3115f6ef9e",
-                "sha256:56855847fbf5b524b5722be5a2095378666768e2e9d438c5122fe623446c7a38"
+                "sha256:2d807ec270d2d990022b86efabd4096053e0a1e7a34c6174f9937320dfdc6826",
+                "sha256:e671f3b738af52351341d6df6674c2f0b959db0fe978e9a7135cfa36d1ad9560"
             ],
             "index": "pypi",
-            "version": "==3.8.4"
+            "version": "==3.8.5"
         },
         "websockets": {
             "hashes": [

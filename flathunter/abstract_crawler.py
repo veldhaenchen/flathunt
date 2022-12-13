@@ -232,14 +232,14 @@ class Crawler:
                     EC.visibility_of_element_located((By.CLASS_NAME, "recaptcha-checkbox-checked"))
                 )
             except selenium.common.exceptions.TimeoutException:
-                print("Selenium.Timeoutexception")
+                logger.warning("Selenium.Timeoutexception when waiting for captcha to appear")
         else:
             xpath_string = f"//*[contains(text(), '{afterlogin_string}')]"
             try:
                 WebDriverWait(driver, 120) \
                     .until(EC.visibility_of_element_located((By.XPATH, xpath_string)))
             except selenium.common.exceptions.TimeoutException:
-                print("Selenium.Timeoutexception")
+                logger.warning("Selenium.Timeoutexception when waiting for captcha to disappear")
 
     def _wait_for_iframe(self, driver: selenium.webdriver.Chrome):
         """Wait for iFrame to appear"""
@@ -248,10 +248,10 @@ class Crawler:
                 (By.CSS_SELECTOR, "iframe[src^='https://www.google.com/recaptcha/api2/anchor?']")))
             return iframe
         except NoSuchElementException:
-            print("No iframe found, therefore no chaptcha verification necessary")
+            logger.info("No iframe found, therefore no chaptcha verification necessary")
             return None
         except TimeoutException:
-            print("Timeout waiting for iframe element - no captcha verification necessary?")
+            logger.info("Timeout waiting for iframe element - no captcha verification necessary?")
             return None
 
     def _wait_until_iframe_disappears(self, driver: selenium.webdriver.Chrome):
@@ -260,4 +260,4 @@ class Crawler:
             WebDriverWait(driver, 10).until(EC.invisibility_of_element(
                 (By.CSS_SELECTOR, "iframe[src^='https://www.google.com/recaptcha/api2/anchor?']")))
         except NoSuchElementException:
-            print("Element not found")
+            logger.warning("Element not found")

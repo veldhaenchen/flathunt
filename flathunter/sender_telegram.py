@@ -1,5 +1,6 @@
 """Functions and classes related to sending Telegram messages"""
 import json
+import time
 import typing
 from typing import Union
 
@@ -8,7 +9,9 @@ import requests
 from flathunter.abstract_notifier import Notifier
 from flathunter.abstract_processor import Processor
 from flathunter.config import Config
-from flathunter.exceptions import BotBlockedException, UserDeactivatedException
+from flathunter.exceptions import BotBlockedException
+from flathunter.exceptions import UserDeactivatedException
+from flathunter.exceptions import StampedeProtectionException
 from flathunter.logging import logger
 from flathunter.utils.list import chunk_list
 
@@ -117,6 +120,7 @@ class SenderTelegram(Processor, Notifier):
             response = requests.request("POST", self.__media_group_url, data=payload, timeout=30)
 
             if response.status_code != 200:
+                logger.warning("Error sending media group: %s", json.dumps(payload))
                 self.__handle_error(
                     "When sending media group, we got an error.",
                     response=response,
@@ -147,6 +151,14 @@ class SenderTelegram(Processor, Notifier):
                 raise BotBlockedException(f"User {chat_id} blocked the bot")
             if "user is deactivated" in data.get("description", ""):
                 raise UserDeactivatedException(f"User {chat_id} has been deactivated")
+        if response.status_code == 429:
+            if "Too Many Requests" in data.get("description", ""):
+                backoff = data.get("parameters", {}).get("retry_after", None)
+                if backoff is not None:
+                    time.sleep(min(backoff, 30))
+                    raise StampedeProtectionException(
+                        f"Too many messages too fast - backoff {backoff} seconds"
+                    )
 
     def __get_images(self, expose: typing.Dict) -> typing.List[str]:
         return expose.get("images", [])

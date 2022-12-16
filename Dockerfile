@@ -10,16 +10,20 @@ RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable 
 RUN apt-get -y update
 RUN apt-get install -y google-chrome-stable
 
-# Copy files
-WORKDIR /usr/src/app
-COPY . .
-
 # Upgrade pip, install pipenv
 RUN pip install --upgrade pip
 RUN pip install pipenv
 
+WORKDIR /usr/src/app
+
+# Copy files that list dependencies
+COPY Pipfile.lock Pipfile ./
+
 # Generate requirements.txt and install dependencies from there
 RUN pipenv requirements > requirements.txt
 RUN pip install -r requirements.txt
+
+# Copy all other files, including source files
+COPY . .
 
 CMD [ "python", "flathunt.py", "-c", "/config.yaml" ]

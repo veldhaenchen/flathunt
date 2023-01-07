@@ -92,6 +92,10 @@ class CrawlImmobilienscout(Crawler):
             result_json = self.driver.execute_script('return window.IS24.resultList;')
         except JavascriptException:
             logger.warning("Unable to find IS24 variable in window")
+            if "Warum haben wir deine Anfrage blockiert?" in self.driver.page_source:
+                logger.error(
+                    "IS24 bot detection has identified our script as a bot - we've been blocked"
+                )
             return []
         return self.get_entries_from_json(result_json)
 

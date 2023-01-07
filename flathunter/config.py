@@ -2,6 +2,7 @@
 import os
 from typing import Optional
 
+import json
 import yaml
 from dotenv import load_dotenv
 
@@ -55,6 +56,15 @@ class Env:
     FLATHUNTER_TELEGRAM_RECEIVER_IDS = _read_env("FLATHUNTER_TELEGRAM_RECEIVER_IDS")
     FLATHUNTER_MATTERMOST_WEBHOOK_URL = _read_env("FLATHUNTER_MATTERMOST_WEBHOOK_URL")
 
+
+def elide(string):
+    """Obfuscate the value of a string for debug purposes"""
+    if string is None or len(string) == 0:
+        return None
+    if len(string) < 6:
+        return "x" * len(string)
+    blanks = "x" * (len(string)-6)
+    return f"{string[0:3]}{blanks}{string[-3:]}"
 
 class YamlConfig: # pylint: disable=too-many-public-methods
     """Generic config object constructed from nested dictionaries"""
@@ -254,6 +264,21 @@ Preis: {price}
     def use_proxy(self):
         """Check if proxy is configured"""
         return "use_proxy_list" in self.config and self.config["use_proxy_list"]
+
+    def __repr__(self):
+        return json.dumps({
+            "captcha_enabled": self.captcha_enabled(),
+            "captcha_driver_arguments": self.captcha_driver_arguments(),
+            "captcha_solver": type(self._get_captcha_solver()).__name__,
+            "imagetyperz_token": elide(self._get_imagetyperz_token()),
+            "twocaptcha_key": elide(self._get_twocaptcha_key()),
+            "mattermost_webhook_url": self.mattermost_webhook_url(),
+            "notifiers": self.notifiers(),
+            "telegram_receiver_ids": self.telegram_receiver_ids(),
+            "telegram_bot_token": elide(self.telegram_bot_token()),
+            "target_urls": self.target_urls(),
+            "use_proxy": self.use_proxy(),
+        })
 
 class CaptchaEnvironmentConfig():
     """Mixin to add environment-variable captcha support to config object"""

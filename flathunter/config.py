@@ -2,8 +2,8 @@
 import os
 from typing import Optional
 
-import yaml
 import json
+import yaml
 from dotenv import load_dotenv
 
 from flathunter.captcha.captcha_solver import CaptchaSolver
@@ -58,6 +58,7 @@ class Env:
 
 
 def elide(string):
+    """Obfuscate the value of a string for debug purposes"""
     if string is None or len(string) == 0:
         return None
     if len(string) < 6:

@@ -1,7 +1,7 @@
 import unittest
 from functools import reduce
 from flathunter.crawl_immobiliare import CrawlImmobiliare
-from utils.config import StringConfig
+from test.utils.config import StringConfig
 
 
 class ImmobiliareCrawlerTest(unittest.TestCase):

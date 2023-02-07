@@ -5,9 +5,9 @@ from flathunter.crawl_immowelt import CrawlImmowelt
 from flathunter.hunter import Hunter
 from flathunter.idmaintainer import IdMaintainer
 from flathunter.processor import ProcessorChain
-from dummy_crawler import DummyCrawler
-from test_util import count
-from utils.config import StringConfig
+from test.dummy_crawler import DummyCrawler
+from test.test_util import count
+from test.utils.config import StringConfig
 
 class ProcessorTest(unittest.TestCase):
 

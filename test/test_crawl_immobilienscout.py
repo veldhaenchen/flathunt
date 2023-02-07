@@ -7,7 +7,7 @@ import re
 
 from flathunter.crawl_immobilienscout import CrawlImmobilienscout
 from flathunter.captcha.captcha_solver import CaptchaBalanceEmpty
-from utils.config import StringConfigWithCaptchas
+from test.utils.config import StringConfigWithCaptchas
 
 DUMMY_CONFIG = """
 urls:

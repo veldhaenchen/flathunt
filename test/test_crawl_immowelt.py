@@ -1,8 +1,8 @@
 import pytest
 
 from flathunter.crawl_immowelt import CrawlImmowelt
-from test_util import count
-from utils.config import StringConfig
+from test.test_util import count
+from test.utils.config import StringConfig
 
 DUMMY_CONFIG = """
 urls:

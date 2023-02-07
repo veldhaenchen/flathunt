@@ -80,12 +80,6 @@ $ python flathunt.py
 $ pipenv run python flathunt.py
 ```
 
-For development purposes, you need to install the flathunter module in your current environment. Simply run:
-
-```sh
-$ pip install -e .
-```
-
 ### Installation on Linux
 (tested on CentOS Stream)
 

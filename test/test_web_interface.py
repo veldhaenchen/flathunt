@@ -10,8 +10,8 @@ from flathunter.web import app
 from flathunter.web_hunter import WebHunter
 from flathunter.idmaintainer import IdMaintainer
 
-from dummy_crawler import DummyCrawler
-from utils.config import StringConfig
+from test.dummy_crawler import DummyCrawler
+from test.utils.config import StringConfig
 
 DUMMY_CONFIG = """
 notifiers:

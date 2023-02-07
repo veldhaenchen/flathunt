@@ -8,6 +8,7 @@ from flathunter.config import YamlConfig
 from flathunter.filter import Filter
 from flathunter.processor import ProcessorChain
 from flathunter.captcha.captcha_solver import CaptchaUnsolvableError
+from flathunter.exceptions import ConfigException
 
 class Hunter:
     """Basic methods for crawling and processing / filtering exposes"""
@@ -15,7 +16,8 @@ class Hunter:
     def __init__(self, config: YamlConfig, id_watch):
         self.config = config
         if not isinstance(self.config, YamlConfig):
-            raise Exception("Invalid config for hunter - should be a 'Config' object")
+            raise ConfigException(
+                "Invalid config for hunter - should be a 'Config' object")
         self.id_watch = id_watch
 
     def crawl_for_exposes(self, max_pages=None):

@@ -379,11 +379,11 @@
         },
         "firebase-admin": {
             "hashes": [
-                "sha256:1f903d8c9e353af8027c3c237696d98f8e77ad4e38025528be0c522dee037317",
-                "sha256:7de3fc7b8bf7722cd8d127f7162d060c7ffd270e69794bcec2cc1d571fb80b45"
+                "sha256:3daa806d16a35d83a809a70a325f973ba9dc242601fe69cd68e6f54a6ffdcd57",
+                "sha256:52e13e393c9d3dc6237f2c376b8e55aacdaaeebe455c0b7e8cfbf35b6491e19d"
             ],
             "index": "pypi",
-            "version": "==6.0.1"
+            "version": "==6.1.0"
         },
         "flask": {
             "hashes": [

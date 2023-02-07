@@ -4,9 +4,9 @@ import re
 import requests_mock
 from flathunter.hunter import Hunter
 from flathunter.idmaintainer import IdMaintainer
-from dummy_crawler import DummyCrawler
-from test_util import count
-from utils.config import StringConfig
+from test.dummy_crawler import DummyCrawler
+from test.test_util import count
+from test.utils.config import StringConfig
 
 class GMapsDurationProcessorTest(unittest.TestCase):
 

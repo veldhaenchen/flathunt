@@ -2,8 +2,8 @@ import json
 import unittest
 
 from requests_mock import Mocker
-from utils.request_matcher import RequestCounter
-from utils.config import StringConfig
+from test.utils.request_matcher import RequestCounter
+from test.utils.config import StringConfig
 
 from flathunter.sender_telegram import SenderTelegram
 

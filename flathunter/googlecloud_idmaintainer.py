@@ -7,6 +7,7 @@ from firebase_admin import firestore
 
 from flathunter.logging import logger
 from flathunter.config import Config
+from flathunter.exceptions import PersistenceException
 
 class GoogleCloudIdMaintainer:
     """Storage back-end - implementation of IdMaintainer API"""
@@ -14,7 +15,8 @@ class GoogleCloudIdMaintainer:
     def __init__(self):
         project_id = Config().google_cloud_project_id()
         if project_id is None:
-            raise Exception("Need to project a google_cloud_project_id in config.yaml")
+            raise PersistenceException(
+                "Need to project a google_cloud_project_id in config.yaml")
         firebase_admin.initialize_app(credentials.ApplicationDefault(), {
             'projectId': project_id
         })

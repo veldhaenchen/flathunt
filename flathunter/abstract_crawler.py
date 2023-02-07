@@ -16,6 +16,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from flathunter import proxies
 from flathunter.captcha.captcha_solver import CaptchaUnsolvableError
 from flathunter.logging import logger
+from flathunter.exceptions import ProxyException
 
 class Crawler:
     """Defines the Crawler interface"""
@@ -113,7 +114,7 @@ class Crawler:
                     logger.error("Some error occurred. Trying new proxy...")
 
         if not resp:
-            raise Exception("An error occurred while fetching proxies or content")
+            raise ProxyException("An error occurred while fetching proxies or content")
 
         return BeautifulSoup(resp.content, 'html.parser')
 
@@ -203,7 +204,7 @@ class Crawler:
                     f'document.getElementById("g-recaptcha-response").innerHTML="{captcha_result}";'
                 )
 
-                # TODO: Below function call can be different depending on the websites
+                #  Below function call can be different depending on the websites
                 #  implementation. It is responsible for sending the promise that we
                 #  get from recaptcha_answer. For now, if it breaks, it is required to
                 #  reverse engineer it by hand. Not sure if there is a way to automate it.

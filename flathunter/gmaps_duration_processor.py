@@ -42,7 +42,7 @@ class GMapsDurationProcessor(Processor):
         """Get the distance"""
         # get timestamp for next monday at 9:00:00 o'clock
         now = datetime.datetime.today().replace(hour=9, minute=0, second=0)
-        next_monday = now + datetime.timedelta(days=(7 - now.weekday()))
+        next_monday = now + datetime.timedelta(days=7 - now.weekday())
         arrival_time = str(int(time.mktime(next_monday.timetuple())))
 
         # decode from unicode and url encode addresses

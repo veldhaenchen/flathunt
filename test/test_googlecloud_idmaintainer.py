@@ -7,9 +7,9 @@ from flathunter.googlecloud_idmaintainer import GoogleCloudIdMaintainer
 from flathunter.hunter import Hunter
 from flathunter.web_hunter import WebHunter
 from flathunter.filter import Filter
-from dummy_crawler import DummyCrawler
-from test_util import count
-from utils.config import StringConfig
+from test.dummy_crawler import DummyCrawler
+from test.test_util import count
+from test.utils.config import StringConfig
 
 class MockGoogleCloudIdMaintainer(GoogleCloudIdMaintainer):
 

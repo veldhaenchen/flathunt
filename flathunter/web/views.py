@@ -102,7 +102,7 @@ def index():
                            last_run=hunter.get_last_run_time(), bot_name=bot_name, domain=domain,
                            login_url=generate_dummy_login_url(),
                            filters=form_values,
-                           notifications_enabled=(not notifications_muted_for_user()))
+                           notifications_enabled=not notifications_muted_for_user())
 
 @app.route('/about')
 def about():

@@ -18,6 +18,7 @@ from flathunter.crawl_wggesucht import CrawlWgGesucht
 from flathunter.crawler_subito import CrawlSubito
 from flathunter.filter import Filter
 from flathunter.logging import logger
+from flathunter.exceptions import ConfigException
 
 load_dotenv()
 
@@ -255,7 +256,7 @@ Preis: {price}
         solver = self._get_captcha_solver()
         if solver is not None:
             return solver
-        raise Exception("No captcha solver configured properly.")
+        raise ConfigException("No captcha solver configured properly.")
 
     def captcha_driver_arguments(self):
         """The list of driver arguments for Selenium / Webdriver"""
@@ -313,12 +314,12 @@ class Config(CaptchaEnvironmentConfig,YamlConfig):
 
     def __init__(self, filename=None):
         if filename is None and Env.FLATHUNTER_TARGET_URLS is None:
-            raise Exception(
+            raise ConfigException(
                 "Config file loaction must be specified, or FLATHUNTER_TARGET_URLS must be set")
         if filename is not None:
             logger.info("Using config path %s", filename)
             if not os.path.exists(filename):
-                raise Exception("No config file found at location %s")
+                raise ConfigException("No config file found at location %s")
             with open(filename, encoding="utf-8") as file:
                 config = yaml.safe_load(file)
         else:

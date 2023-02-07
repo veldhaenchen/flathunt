@@ -7,6 +7,7 @@ from flathunter.logging import logger
 from flathunter.sender_apprise import SenderApprise
 from flathunter.sender_mattermost import SenderMattermost
 from flathunter.sender_telegram import SenderTelegram
+from flathunter.exceptions import HeartbeatException
 
 
 def interval2counter(interval: str) -> Union[None, int]:
@@ -19,7 +20,8 @@ def interval2counter(interval: str) -> Union[None, int]:
         return 144
     if interval.lower() == 'week':
         return 1008
-    raise Exception("No valid heartbeat instruction received - no heartbeat messages will be sent.")
+    raise HeartbeatException(
+        "No valid heartbeat instruction received - no heartbeat messages will be sent.")
 
 
 class Heartbeat:

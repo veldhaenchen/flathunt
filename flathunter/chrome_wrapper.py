@@ -3,7 +3,7 @@ binary is, to attach the correct selenium chromedriver, and to set
 the correct version number"""
 import re
 import subprocess
-import undetected_chromedriver.v2 as uc
+import undetected_chromedriver as uc
 
 from flathunter.logging import logger
 

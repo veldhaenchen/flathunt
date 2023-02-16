@@ -63,6 +63,8 @@ Start by installing all dependencies inside a virtual environment using ```pipen
 $ pipenv install
 ```
 
+(Note that the `Pipfile.lock` shipped with the project is built on a Linux x86 system and installs packages from [Pypi](https://pypi.python.org/). If you are installing on a different platform with a different package repository, you may need to update the source URL in the Pipfile to point to your python package repository, and install using `pipenv install --skip-lock` - see [#314](https://github.com/flathunters/flathunter/issues/314))
+
 Once the dependencies are installed, as well as every time you come back to the project in a new shell, run:
 
 ```sh

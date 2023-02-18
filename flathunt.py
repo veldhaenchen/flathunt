@@ -41,6 +41,13 @@ def get_diff_in_secs(time_a, time_b):
     return a_secs - b_secs
 
 
+def wait_during_period(time_from, time_till):
+    """Waits for the end of the pause period if necessary."""
+    if is_current_time_between(time_from, time_till):
+        logger.info("Paused loop. Waiting till %s.", time_till)
+        time.sleep(get_diff_in_secs(datetime.now().time(), time_till) + 1)
+
+
 def launch_flat_hunt(config, heartbeat=None):
     """Starts the crawler / notification loop"""
     id_watch = IdMaintainer(f'{config.database_location()}/processed_ids.db')
@@ -48,18 +55,14 @@ def launch_flat_hunt(config, heartbeat=None):
     time_from = dtime.fromisoformat(config.loop_pause_from())
     time_till = dtime.fromisoformat(config.loop_pause_till())
 
-    if is_current_time_between(time_from, time_till):
-        logger.info("Paused loop. Waiting till %s.", time_till)
-        time.sleep(get_diff_in_secs(datetime.now().time(), time_till) + 1)
+    wait_during_period(time_from, time_till)
 
     hunter = Hunter(config, id_watch)
     hunter.hunt_flats()
     counter = 0
 
     while config.loop_is_active():
-        if is_current_time_between(time_from, time_till):
-            logger.info("Paused loop. Waiting till %s.", time_till)
-            time.sleep(get_diff_in_secs(datetime.now().time(), time_till) + 1)
+        wait_during_period(time_from, time_till)
 
         counter += 1
         counter = heartbeat.send_heartbeat(counter)

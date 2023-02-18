@@ -8,27 +8,18 @@ import argparse
 import os
 import time
 from datetime import time as dtime
-from datetime import datetime
 
 from flathunter.logging import logger, configure_logging
 from flathunter.idmaintainer import IdMaintainer
 from flathunter.hunter import Hunter
 from flathunter.config import Config, Env
 from flathunter.heartbeat import Heartbeat
-from flathunter.utils.time_utils import is_current_time_between, get_diff_in_secs
 
 __author__ = "Jan Harrie"
 __version__ = "1.0"
 __maintainer__ = "Nody"
 __email__ = "harrymcfly@protonmail.com"
 __status__ = "Production"
-
-
-def wait_during_period(time_from, time_till):
-    """Waits for the end of the pause period if necessary."""
-    if is_current_time_between(time_from, time_till):
-        logger.info("Paused loop. Waiting till %s.", time_till)
-        time.sleep(get_diff_in_secs(datetime.now().time(), time_till) + 1)
 
 
 def launch_flat_hunt(config, heartbeat=None):

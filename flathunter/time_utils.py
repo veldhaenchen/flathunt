@@ -1,5 +1,8 @@
 """Utilities for dealing with times."""
+from time import sleep
 from datetime import datetime
+
+from flathunter.logging import logger
 
 
 def is_current_time_between(time_from, time_till):
@@ -8,8 +11,8 @@ def is_current_time_between(time_from, time_till):
         return False
     current_time = datetime.now().time()
     if time_from < time_till:
-        return time_from <= current_time <= time_till
-    return current_time >= time_from or current_time <= time_till
+        return time_from <= current_time < time_till
+    return current_time >= time_from or current_time < time_till
 
 
 def get_diff_in_secs(time_a, time_b):
@@ -19,3 +22,10 @@ def get_diff_in_secs(time_a, time_b):
     if a_secs < b_secs:
         return b_secs - a_secs
     return a_secs - b_secs
+
+
+def wait_during_period(time_from, time_till):
+    """Waits for the end of the pause period if necessary."""
+    if is_current_time_between(time_from, time_till):
+        logger.info("Paused loop. Waiting till %s.", time_till)
+        sleep(get_diff_in_secs(datetime.now().time(), time_till))

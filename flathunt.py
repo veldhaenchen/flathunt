@@ -14,6 +14,7 @@ from flathunter.idmaintainer import IdMaintainer
 from flathunter.hunter import Hunter
 from flathunter.config import Config, Env
 from flathunter.heartbeat import Heartbeat
+from flathunter.time_utils import wait_during_period
 
 __author__ = "Jan Harrie"
 __version__ = "1.0"

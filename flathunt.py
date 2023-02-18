@@ -7,6 +7,8 @@
 import argparse
 import os
 import time
+from datetime import time as dtime
+from datetime import datetime
 
 from flathunter.logging import logger, configure_logging
 from flathunter.idmaintainer import IdMaintainer
@@ -20,16 +22,45 @@ __maintainer__ = "Nody"
 __email__ = "harrymcfly@protonmail.com"
 __status__ = "Production"
 
+def is_current_time_between(time_from, time_till):
+    if time_from == time_till:
+        return False
+    current_time = datetime.now().time()
+    if time_from < time_till:
+        return current_time >= time_from and current_time <= time_till
+    else:
+        return current_time >= time_from or current_time <= time_till
+
+
+def get_diff_in_secs(a, b):
+    a_secs = (a.hour * 60 + a.minute) * 60 + a.second
+    b_secs = (b.hour * 60 + b.minute) * 60 + b.second
+    if a_secs < b_secs:
+        return b_secs - a_secs
+    else:
+        return a_secs - b_secs
+
 
 def launch_flat_hunt(config, heartbeat=None):
     """Starts the crawler / notification loop"""
     id_watch = IdMaintainer(f'{config.database_location()}/processed_ids.db')
+
+    time_from = dtime.fromisoformat(config.loop_pause_from())
+    time_till = dtime.fromisoformat(config.loop_pause_till())
+
+    if is_current_time_between(time_from, time_till):
+        logger.info(f"Paused loop. Waiting till {time_till}.")
+        time.sleep(get_diff_in_secs(datetime.now().time(), time_till) + 1)
 
     hunter = Hunter(config, id_watch)
     hunter.hunt_flats()
     counter = 0
 
     while config.loop_is_active():
+        if is_current_time_between(time_from, time_till):
+            logger.info(f"Paused loop. Waiting till {time_till}.")
+            time.sleep(get_diff_in_secs(datetime.now().time(), time_till) + 1)
+
         counter += 1
         counter = heartbeat.send_heartbeat(counter)
         time.sleep(config.loop_period_seconds())

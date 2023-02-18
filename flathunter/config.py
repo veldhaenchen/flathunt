@@ -42,6 +42,8 @@ class Env:
     FLATHUNTER_GOOGLE_CLOUD_PROJECT_ID = _read_env("FLATHUNTER_GOOGLE_CLOUD_PROJECT_ID")
     FLATHUNTER_VERBOSE_LOG = _read_env("FLATHUNTER_VERBOSE_LOG")
     FLATHUNTER_LOOP_PERIOD_SECONDS = _read_env("FLATHUNTER_LOOP_PERIOD_SECONDS")
+    FLATHUNTER_LOOP_PAUSE_FROM = _read_env("FLATHUNTER_LOOP_PAUSE_FROM")
+    FLATHUNTER_LOOP_PAUSE_TILL = _read_env("FLATHUNTER_LOOP_PAUSE_TILL")
     FLATHUNTER_MESSAGE_FORMAT = _read_env("FLATHUNTER_MESSAGE_FORMAT")
 
     # Website setup
@@ -182,6 +184,14 @@ Preis: {price}
     def loop_period_seconds(self):
         """Number of seconds to wait between crawls when looping"""
         return self._read_yaml_path('loop.sleeping_time', 60 * 10)
+
+    def loop_pause_from(self):
+        """Start time of loop pause"""
+        return self._read_yaml_path('loop.pause.from', "00:00")
+
+    def loop_pause_till(self):
+        """End time of loop pause"""
+        return self._read_yaml_path('loop.pause.till', "00:00")
 
     def has_website_config(self):
         """True if the flathunter website configuration is present"""
@@ -351,6 +361,16 @@ class Config(CaptchaEnvironmentConfig,YamlConfig):
         if Env.FLATHUNTER_LOOP_PERIOD_SECONDS is not None:
             return int(Env.FLATHUNTER_LOOP_PERIOD_SECONDS)
         return super().loop_period_seconds()
+
+    def loop_pause_from(self):
+        if Env.FLATHUNTER_LOOP_PAUSE_FROM is not None:
+            return str(Env.FLATHUNTER_LOOP_PAUSE_FROM)
+        return super().loop_pause_from()
+
+    def loop_pause_till(self):
+        if Env.FLATHUNTER_LOOP_PAUSE_TILL is not None:
+            return str(Env.FLATHUNTER_LOOP_PAUSE_TILL)
+        return super().loop_pause_till()
 
     def has_website_config(self):
         if Env.FLATHUNTER_WEBSITE_SESSION_KEY is not None:

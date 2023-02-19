@@ -8,37 +8,19 @@ import argparse
 import os
 import time
 from datetime import time as dtime
-from datetime import datetime
 
 from flathunter.logging import logger, configure_logging
 from flathunter.idmaintainer import IdMaintainer
 from flathunter.hunter import Hunter
 from flathunter.config import Config, Env
 from flathunter.heartbeat import Heartbeat
+from flathunter.time_utils import wait_during_period
 
 __author__ = "Jan Harrie"
 __version__ = "1.0"
 __maintainer__ = "Nody"
 __email__ = "harrymcfly@protonmail.com"
 __status__ = "Production"
-
-def is_current_time_between(time_from, time_till):
-    """Returns True if current time is in the given time span."""
-    if time_from == time_till:
-        return False
-    current_time = datetime.now().time()
-    if time_from < time_till:
-        return time_from <= current_time <= time_till
-    return current_time >= time_from or current_time <= time_till
-
-
-def get_diff_in_secs(time_a, time_b):
-    """Convert time to seconds since midnight and return the absolute difference."""
-    a_secs = (time_a.hour * 60 + time_a.minute) * 60 + time_a.second
-    b_secs = (time_b.hour * 60 + time_b.minute) * 60 + time_b.second
-    if a_secs < b_secs:
-        return b_secs - a_secs
-    return a_secs - b_secs
 
 
 def launch_flat_hunt(config, heartbeat=None):
@@ -48,18 +30,14 @@ def launch_flat_hunt(config, heartbeat=None):
     time_from = dtime.fromisoformat(config.loop_pause_from())
     time_till = dtime.fromisoformat(config.loop_pause_till())
 
-    if is_current_time_between(time_from, time_till):
-        logger.info("Paused loop. Waiting till %s.", time_till)
-        time.sleep(get_diff_in_secs(datetime.now().time(), time_till) + 1)
+    wait_during_period(time_from, time_till)
 
     hunter = Hunter(config, id_watch)
     hunter.hunt_flats()
     counter = 0
 
     while config.loop_is_active():
-        if is_current_time_between(time_from, time_till):
-            logger.info("Paused loop. Waiting till %s.", time_till)
-            time.sleep(get_diff_in_secs(datetime.now().time(), time_till) + 1)
+        wait_during_period(time_from, time_till)
 
         counter += 1
         counter = heartbeat.send_heartbeat(counter)

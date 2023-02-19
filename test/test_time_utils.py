@@ -4,14 +4,15 @@ import datetime
 from datetime import time
 from datetime import datetime as dt
 
-from flathunter.time_utils import is_current_time_between, get_diff_in_secs, wait_during_period
+from flathunter.time_utils import is_current_time_between, get_time_span_in_secs, wait_during_period
 
 
 class TimeUtilsTest(unittest.TestCase):
 
     def test_diff(self):
-        self.assertEqual(get_diff_in_secs(time.fromisoformat("11:42:23"), time.fromisoformat("12:42:23")), 3600)
-        self.assertEqual(get_diff_in_secs(time.fromisoformat("12:42:23"), time.fromisoformat("11:42:23")), 3600)
+        self.assertEqual(get_time_span_in_secs(time.fromisoformat("11:42:23"), time.fromisoformat("12:42:23")), 3600)
+        self.assertEqual(get_time_span_in_secs(time.fromisoformat("12:42:23"), time.fromisoformat("11:42:23")), 82800)
+        self.assertEqual(get_time_span_in_secs(time.fromisoformat("22:42:23"), time.fromisoformat("08:42:23")), 36000)
 
     @mock.patch("flathunter.time_utils.datetime", side_effect=lambda *args, **kw: datetime(*args, **kw))
     def test_is_current_time_between(self, mock_datetime):

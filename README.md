@@ -196,15 +196,35 @@ $ FLASK_APP=flathunter.web flask run
 
 ### Docker
 
+You can either use just Docker or Docker Compose to run the app containerized. We recommend Docker Compose for easier configuration.
+
+#### With Docker Compose
+
+1. Configure your `config.yaml` file (see [Configuration](#configuration)) or adjust the environment variables in the `docker-compose.yaml` file (see [Environment Configuration](#environment-configuration)). You can also combine both options, but in this case the environment variables have priority.
+2. To build the image, run inside the project's root directory:
+
+```sh
+docker-compose build
+```
+
+3. To run the docker container, run inside the project's root directory:
+
+```sh
+docker-compose up
+```
+
+#### With plain Docker
+
 First build the image inside the project's root directory:
+
 ```sh
 $ docker build -t flathunter .
 ```
 
-**When running a container using the image, a config file needs to be mounted on the container at ```/config.yaml``` or configuration has to be supplied using environment variables.** The example below provides the file ```config.yaml``` off the current working directory:
+**When running a container using the image, a config file needs to be mounted on the container at `/config.yaml` or configuration has to be supplied using environment variables.** The example below provides the file `config.yaml` off the current working directory:
 
 ```sh
-$ docker run --mount type=bind,source=$PWD/config.yaml,target=/config.yaml flathunter
+$ docker run --mount type=bind,source=$PWD/config.yaml,target=/config.yaml flathunter python flathunt.py -c /config.yaml
 ```
 
 #### Environment Configuration

@@ -25,5 +25,3 @@ RUN pip install -r requirements.txt
 
 # Copy all other files, including source files
 COPY . .
-
-CMD [ "python", "flathunt.py", "-c", "/config.yaml" ]

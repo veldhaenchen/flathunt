@@ -1,6 +1,6 @@
 """Wrap configuration options as an object"""
 import os
-from typing import Optional
+from typing import Optional, Dict, Any
 
 import json
 import yaml
@@ -131,10 +131,15 @@ Preis: {price}
         """Resolve a dotted variable path in nested dictionaries"""
         config = self.config
         parts = path.split('.')
-        while len(parts) > 1:
+        while len(parts) > 1 and config is not None:
             config = config.get(parts[0], {})
             parts = parts[1:]
-        return config.get(parts[0], default_value)
+        if config is None:
+            return default_value
+        res = config.get(parts[0], default_value)
+        if res is None:
+            return default_value
+        return res
 
     def set_searchers(self, searchers):
         """Update the active search plugins"""
@@ -241,11 +246,15 @@ Preis: {price}
         """Webhook for sending Mattermost messages"""
         return self._read_yaml_path('mattermost.webhook_url', None)
 
+    def apprise_urls(self):
+        """Notification URLs for Apprise"""
+        return self._read_yaml_path('apprise', [])
+
     def _get_imagetyperz_token(self):
         """API Token for Imagetyperz"""
         return self._read_yaml_path("captcha.imagetyperz.token", "")
 
-    def _get_twocaptcha_key(self):
+    def get_twocaptcha_key(self):
         """API Token for 2captcha"""
         return self._read_yaml_path("captcha.2captcha.api_key", "")
 
@@ -255,7 +264,7 @@ Preis: {price}
         if imagetyperz_token:
             return ImageTyperzSolver(imagetyperz_token)
 
-        twocaptcha_api_key = self._get_twocaptcha_key()
+        twocaptcha_api_key = self.get_twocaptcha_key()
         if twocaptcha_api_key:
             return TwoCaptchaSolver(twocaptcha_api_key)
 
@@ -276,13 +285,16 @@ Preis: {price}
         """Check if proxy is configured"""
         return "use_proxy_list" in self.config and self.config["use_proxy_list"]
 
+    def set_keys(self, dict_keys: Dict[str, Any]):
+        self.config.update(dict_keys)
+
     def __repr__(self):
         return json.dumps({
             "captcha_enabled": self.captcha_enabled(),
             "captcha_driver_arguments": self.captcha_driver_arguments(),
             "captcha_solver": type(self._get_captcha_solver()).__name__,
             "imagetyperz_token": elide(self._get_imagetyperz_token()),
-            "twocaptcha_key": elide(self._get_twocaptcha_key()),
+            "twocaptcha_key": elide(self.get_twocaptcha_key()),
             "mattermost_webhook_url": self.mattermost_webhook_url(),
             "notifiers": self.notifiers(),
             "telegram_receiver_ids": self.telegram_receiver_ids(),
@@ -299,10 +311,10 @@ class CaptchaEnvironmentConfig():
             return Env.FLATHUNTER_IMAGETYPERZ_TOKEN
         return super()._get_imagetyperz_token() # pylint: disable=no-member
 
-    def _get_twocaptcha_key(self):
+    def get_twocaptcha_key(self):
         if Env.FLATHUNTER_2CAPTCHA_KEY is not None:
             return Env.FLATHUNTER_2CAPTCHA_KEY
-        return super()._get_twocaptcha_key() # pylint: disable=no-member
+        return super().get_twocaptcha_key() # pylint: disable=no-member
 
     def captcha_driver_arguments(self):
         """The list of driver arguments for Selenium / Webdriver"""

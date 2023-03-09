@@ -30,6 +30,7 @@ apprise = "*"
 python-dotenv = "*"
 undetected-chromedriver = "*"
 prompt-toolkit = "*"
+"ruamel.yaml" = "*"
 
 [dev-packages]
 

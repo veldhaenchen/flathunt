@@ -71,7 +71,17 @@ Once the dependencies are installed, as well as every time you come back to the 
 $ pipenv shell
 ```
 
-to launch a Python environment with the dependencies that your project requires. **Now that you are inside the virtual environment, you can start the actual program:**
+to launch a Python environment with the dependencies that your project requires. **Now that you are inside the virtual environment, all commands you run in the shell will run with the required dependencies available**
+
+Before you run the program for the first time, you need to generate a configuration file. There is an example
+file shipped with the project (`config.yaml.dist`), but you can also use the configuration wizard to generate
+a configuration for simple projects:
+
+```sh
+$ python config_wizard.py
+```
+
+The wizard will create a new `config.yaml` file in the current working directory that you can use to run Flathunter:
 
 ```sh
 $ python flathunt.py
@@ -119,7 +129,14 @@ $ chcon -R -t bin_t /home/flathunter/.local/bin/pipenv
 
 ### Configuration
 
-Before running the project for the first time, copy `config.yaml.dist` to `config.yaml`. The `urls` and `telegram` sections of the config file must be configured according to your requirements before the project will run. 
+Before running the project for the first time, you need to create a valid configuration file. You can
+look at `config.yaml.dist` to see an example config - copying that to `config.yaml` and editing the `urls`
+and `telegram` sections will allow you to run Flathunter. Alternatively, you can use the configuration wizard
+to generate a basic configuration:
+
+```sh
+$ python config_wizard.py
+```
 
 #### URLs
 

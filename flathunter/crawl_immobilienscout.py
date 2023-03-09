@@ -9,11 +9,12 @@ from flathunter.abstract_crawler import Crawler
 from flathunter.logging import logger
 from flathunter.chrome_wrapper import get_chrome_driver
 
+STATIC_URL_PATTERN = re.compile(r'https://www\.immobilienscout24\.de')
 
 class CrawlImmobilienscout(Crawler):
     """Implementation of Crawler interface for ImmobilienScout"""
 
-    URL_PATTERN = re.compile(r'https://www\.immobilienscout24\.de')
+    URL_PATTERN = STATIC_URL_PATTERN
 
     JSON_PATH_PARSER_ENTRIES = parse("$..['resultlist.realEstate']")
     JSON_PATH_PARSER_IMAGES = parse("$..galleryAttachments..['@href']")
@@ -32,12 +33,18 @@ class CrawlImmobilienscout(Crawler):
         self.afterlogin_string = None
 
         if config.captcha_enabled():
-            driver_arguments = config.captcha_driver_arguments()
-
             self.checkbox = config.get_captcha_checkbox()
             self.afterlogin_string = config.get_captcha_afterlogin_string()
-            if self.captcha_solver:
-                self.driver = get_chrome_driver(driver_arguments)
+
+    def get_driver(self):
+        """Lazy method to fetch the driver as required at runtime"""
+        if self.driver is not None:
+            return self.driver
+        if not (self.config.captcha_enabled() and self.captcha_solver):
+            return None
+        driver_arguments = self.config.captcha_driver_arguments()
+        self.driver = get_chrome_driver(driver_arguments)
+        return self.driver
 
     def get_results(self, search_url, max_pages=None):
         """Loads the exposes from the ImmoScout site, starting at the provided URL"""
@@ -54,10 +61,10 @@ class CrawlImmobilienscout(Crawler):
 
         # load first page to get number of entries
         page_no = 1
-        soup = self.get_page(search_url, self.driver, page_no)
+        soup = self.get_page(search_url, self.get_driver(), page_no)
 
         # If we are using Selenium, just parse the results from the JSON in the page response
-        if self.driver is not None:
+        if self.get_driver() is not None:
             return self.get_entries_from_javascript()
 
         try:
@@ -79,7 +86,7 @@ class CrawlImmobilienscout(Crawler):
                 '(Next page) Number of entries: %d / Number of results: %d',
                 len(entries), no_of_results)
             page_no += 1
-            soup = self.get_page(search_url, self.driver, page_no)
+            soup = self.get_page(search_url, self.get_driver(), page_no)
             cur_entry = self.extract_data(soup)
             if isinstance(cur_entry, list):
                 break
@@ -89,10 +96,10 @@ class CrawlImmobilienscout(Crawler):
     def get_entries_from_javascript(self):
         """Get entries from JavaScript"""
         try:
-            result_json = self.driver.execute_script('return window.IS24.resultList;')
+            result_json = self.get_driver().execute_script('return window.IS24.resultList;')
         except JavascriptException:
             logger.warning("Unable to find IS24 variable in window")
-            if "Warum haben wir deine Anfrage blockiert?" in self.driver.page_source:
+            if "Warum haben wir deine Anfrage blockiert?" in self.get_driver().page_source:
                 logger.error(
                     "IS24 bot detection has identified our script as a bot - we've been blocked"
                 )

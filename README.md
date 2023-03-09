@@ -71,7 +71,7 @@ Once the dependencies are installed, as well as every time you come back to the 
 $ pipenv shell
 ```
 
-to launch a Python environment with the dependencies that your project requires. **Now that you are inside the virtual environment - all commands you run in the shell will run with the required libraries available**
+to launch a Python environment with the dependencies that your project requires. **Now that you are inside the virtual environment, all commands you run in the shell will run with the required dependencies available**
 
 Before you run the program for the first time, you need to generate a configuration file. There is an example
 file shipped with the project (`config.yaml.dist`), but you can also use the configuration wizard to generate

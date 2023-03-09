@@ -206,6 +206,7 @@ def configure_captcha(urls: List[str], config: Config) -> Optional[Dict[str, Any
     print("Your search configuration includes URLs from ImmobilienScout24\n"
     "To crawl ImmoScout, we need to browse the site with a real Chrome browser instance\n"
     "and solve the Captcha that shows up on the ImmoScout site.\n")
+    print("You WILL NEED TO INSTALL google-chrome / chromium to solve Captchas\n")
     print("We recommend using 2captcha (https://2captcha.com/) as your captcha-solving\n"
     "service. You will need an account there with some credit on it.\n"
     "IMPORTANT NOTICE: Buying captcha credit does not guarantee that Flathunter will be\n"

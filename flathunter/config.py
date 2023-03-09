@@ -286,6 +286,7 @@ Preis: {price}
         return "use_proxy_list" in self.config and self.config["use_proxy_list"]
 
     def set_keys(self, dict_keys: Dict[str, Any]):
+        """Update the config keys based on the content of the dictionary passed"""
         self.config.update(dict_keys)
 
     def __repr__(self):
@@ -312,6 +313,7 @@ class CaptchaEnvironmentConfig():
         return super()._get_imagetyperz_token() # pylint: disable=no-member
 
     def get_twocaptcha_key(self):
+        """Return the currently configured 2captcha API key"""
         if Env.FLATHUNTER_2CAPTCHA_KEY is not None:
             return Env.FLATHUNTER_2CAPTCHA_KEY
         return super().get_twocaptcha_key() # pylint: disable=no-member

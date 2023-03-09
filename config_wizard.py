@@ -9,28 +9,30 @@ from enum import Enum
 from functools import reduce
 
 from ruamel.yaml import YAML
-from prompt_toolkit.shortcuts import message_dialog, input_dialog,\
-    radiolist_dialog, clear, button_dialog
+from prompt_toolkit.shortcuts import message_dialog, radiolist_dialog, clear, button_dialog
 from prompt_toolkit import prompt
 from prompt_toolkit.document import Document
 from prompt_toolkit.validation import Validator, ValidationError
 
 from flathunter.config import Config, YamlConfig
-import flathunter.crawl_immobilienscout as crawl_immobilienscout
+from flathunter import crawl_immobilienscout
 
 class ConfigurationAborted(Exception):
+    """Exception to indicate the user has aborted the configuration"""
     def __str__(self):
         return "Configuration Aborted"
 
 class ConfigurationError(Exception):
-    pass
+    """Exception to indicate that the configuration failed (programming error)"""
 
 class Notifier(Enum):
+    """Class for the different types of notifier"""
     TELEGRAM = "telegram"
     MATTERMOST = "mattermost"
     APPRISE = "apprise"
 
 def welcome():
+    """Display the welcome dialog"""
     message_dialog(
         title="Flathunter Configuration Wizard",
         text="Welcome to the Flathunter Configuration Wizard\n\n"
@@ -41,11 +43,14 @@ def welcome():
     ).run()
 
 class UrlsValidator(Validator):
+    """Validate that URLs entered in the URL entry screen are crawled by one of the
+    configured crawlers"""
     def __init__(self, urls, config):
         self.urls = urls
         self.config = config
 
     def validate(self, document: Document):
+        """Runs when Enter is pressed at the URL Entry prompt"""
         if len(document.text) == 0:
             if len(self.urls) == 0:
                 raise ValidationError(cursor_position=0, message="Supply at least one URL")
@@ -53,10 +58,12 @@ class UrlsValidator(Validator):
         for searcher in self.config.searchers():
             if re.search(searcher.URL_PATTERN, document.text):
                 return
-        raise ValidationError(cursor_position=len(document.text), message="URL did not match any configured scraper")
+        raise ValidationError(cursor_position=len(document.text),
+            message="URL did not match any configured scraper")
 
 
 def gather_urls(config: Config) -> List[str]:
+    """Get a list of URLs from the user for crawling"""
     urls = config.target_urls()
     result = ""
     first_run = True
@@ -80,6 +87,7 @@ def gather_urls(config: Config) -> List[str]:
     return urls
 
 def select_notifier(config: Config) -> str:
+    """Select which notifier to use"""
     if len(config.notifiers()) > 0:
         default = config.notifiers()[0]
     else:
@@ -96,6 +104,7 @@ def select_notifier(config: Config) -> str:
     ).run()
 
 def get_bot_token(config: Config) -> str:
+    """Ask the user for the Telegram Bot token"""
     clear()
     print("Telegram Bot Token\n")
     print("To send Telegram messages, we need a Telegram Bot Token. You can follow\n"
@@ -112,6 +121,7 @@ def get_bot_token(config: Config) -> str:
     return result
 
 def get_receiver_id(config: Config) -> str:
+    """Ask the user for the target Telegram User ID for the Telegram notifications"""
     clear()
     print("Telegram Receiver ID\n")
     print("Your Telegram Bot needs to know which user to send the notifications to.\n"
@@ -128,6 +138,7 @@ def get_receiver_id(config: Config) -> str:
     return result
 
 def configure_telegram(config: Config) -> Dict[str, Any]:
+    """Ask the user for details required for the Telegram configuration"""
     bot_token = get_bot_token(config)
     receiver_id = get_receiver_id(config)
     return {
@@ -138,6 +149,7 @@ def configure_telegram(config: Config) -> Dict[str, Any]:
     }
 
 def configure_mattermost(config: Config) -> Dict[str, Any]:
+    """Ask the user for the mattermost webhook URL"""
     clear()
     print("Mattermost Webhook URL\n")
     print("To receive messages over Mattermost, Flathunter will need the Webhook URL\n"
@@ -156,12 +168,13 @@ def configure_mattermost(config: Config) -> Dict[str, Any]:
     }
 
 def configure_apprise(config: Config) -> Dict[str, Any]:
+    """Ask the user for the apprise notification URL"""
     clear()
     print("Apprise notification URL\n")
     print("To receive messages using Apprise, you need to supply a notification URL in the\n"
     "apprise format, e.g. 'gotifys://...' or 'mailto://...'\n")
     if len(config.apprise_urls()) > 0:
-        apprise_url = prompt("Enter Apprise notification URL: ", config.apprise_urls()[0])
+        apprise_url = prompt("Enter Apprise notification URL: ", default=config.apprise_urls()[0])
     else:
         apprise_url = prompt("Enter Apprise notification URL: ")
 
@@ -172,6 +185,7 @@ def configure_apprise(config: Config) -> Dict[str, Any]:
     }
 
 def configure_notifier(notifier: str, config) -> Dict[str, Any]:
+    """Configure the selected / active notifier"""
     if notifier == Notifier.TELEGRAM.value:
         return configure_telegram(config)
     if notifier == Notifier.MATTERMOST.value:
@@ -181,6 +195,7 @@ def configure_notifier(notifier: str, config) -> Dict[str, Any]:
     raise ConfigurationError("Invalid Notifier Selection")
 
 def configure_captcha(urls: List[str], config: Config) -> Optional[Dict[str, Any]]:
+    """Configure the captcha solver, where required"""
     is_immoscout = reduce(lambda a,b: a or b,
         [ re.search(crawl_immobilienscout.STATIC_URL_PATTERN, url) for url in urls ],
         False)
@@ -221,22 +236,25 @@ def configure_captcha(urls: List[str], config: Config) -> Optional[Dict[str, Any
     }
 
 def load_config(existing):
+    """Load the existing (or default) config from disk"""
     yaml = YAML()
     source_file = "config.yaml.dist"
     if existing:
         source_file = "config.yaml"
-    with open(source_file, "r") as dist_config:
+    with open(source_file, "r", encoding="utf-8") as dist_config:
         config = yaml.load(dist_config)
     return YamlConfig(config)
 
 def save_config(config: Dict):
+    """Save the configuration as 'config.yaml'"""
     clear()
     yaml = YAML()
-    with open("config.yaml", "w") as config_file:
+    with open("config.yaml", "w", encoding="utf-8") as config_file:
         yaml.dump(config, config_file)
     print("Configuration saved to 'config.yaml' - you're all set!")
 
 def check_existing():
+    """Check to see if a configuration file already exists, prompt if so"""
     if not os.path.exists("config.yaml"):
         return False
     result = button_dialog(
@@ -251,6 +269,7 @@ def check_existing():
 
 
 def main():
+    """Run the configuration wizard"""
     try:
         welcome()
         existing = check_existing()

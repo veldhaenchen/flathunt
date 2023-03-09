@@ -35,7 +35,7 @@ class CrawlImmobilienscout(Crawler):
         if config.captcha_enabled():
             self.checkbox = config.get_captcha_checkbox()
             self.afterlogin_string = config.get_captcha_afterlogin_string()
-    
+
     def get_driver(self):
         """Lazy method to fetch the driver as required at runtime"""
         if self.driver is not None:

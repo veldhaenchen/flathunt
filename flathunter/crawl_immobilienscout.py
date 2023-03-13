@@ -31,7 +31,8 @@ class CrawlImmobilienscout(Crawler):
         self.driver = None
         self.checkbox = None
         self.afterlogin_string = None
-
+        if "immoscout_cookie" in self.config:
+            self.set_cookie()
         if config.captcha_enabled():
             self.checkbox = config.get_captcha_checkbox()
             self.afterlogin_string = config.get_captcha_afterlogin_string()
@@ -147,13 +148,17 @@ class CrawlImmobilienscout(Crawler):
             'rooms': str(entry.get("numberOfRooms", ''))
         }
 
+    def set_cookie(self):
+        """Sets request header cookie parameter to identify as a logged in user"""
+        self.HEADERS['Cookie'] = f'reese84:${self.config["immoscout_cookie"]}'
+
     def get_page(self, search_url, driver=None, page_no=None):
         """Applies a page number to a formatted search URL and fetches the exposes at that page"""
         return self.get_soup_from_url(
             search_url.format(page_no),
             driver=driver,
             checkbox=self.checkbox,
-            afterlogin_string=self.afterlogin_string
+            afterlogin_string=self.afterlogin_string,
         )
 
     def get_expose_details(self, expose):

@@ -191,3 +191,10 @@ apprise:
 # For websites like idealista.it, there are anti-crawler measures that can be
 # circumvented using proxies.
 # use_proxy_list: True
+
+# If you are having bot detection issues with immobilienscout24,
+# you can set the cookie that you get from your logged in account
+# Go to the immobilienscout24.de website, log in, and then in the developer tools
+# (F12) go to the "Network" tab, then "Cookies" and copy the value of the
+# "reese84" cookie.
+immoscout_cookie: ""

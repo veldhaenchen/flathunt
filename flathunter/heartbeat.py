@@ -26,31 +26,31 @@ def interval2counter(interval: str) -> Union[None, int]:
 
 class Heartbeat:
     """Will inform the user on regular intervals whether the bot is still alive"""
-    __notifier: Notifier
-    __interval: int
-    __config: Config
+    notifier: Notifier
+    interval: int
 
     def __init__(self, config: Config, interval: str):
-        self.config = config
-        notifiers = self.config.notifiers()
+        notifiers = config.notifiers()
 
         if 'mattermost' in notifiers:
-            self.__notifier = SenderMattermost(config)
+            self.notifier = SenderMattermost(config)
         elif 'telegram' in notifiers:
-            self.__notifier = SenderTelegram(config)
+            self.notifier = SenderTelegram(config)
         elif 'apprise' in notifiers:
-            self.__notifier = SenderApprise(config)
+            self.notifier = SenderApprise(config)
+        else:
+            raise HeartbeatException("No notifier configured - check 'notifiers' config section!")
 
-        self.__interval = interval2counter(interval)
+        self.interval = interval2counter(interval)
 
     def send_heartbeat(self, counter) -> int:
         """Send a new heartbeat message"""
-        if not self.__notifier or not self.__interval:  # interval is disabled
+        if not self.notifier or not self.interval:  # interval is disabled
             return counter
         # it's time for a new heartbeat message and reset counter
-        if counter % self.__interval == 0:
+        if counter % self.interval == 0:
             logger.info('Sending heartbeat message.')
-            self.__notifier.notify(
+            self.notifier.notify(
                 'Beep Boop. This is a heartbeat message. '
                 'Your bot is searching actively for flats.'
             )

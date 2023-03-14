@@ -1,5 +1,6 @@
 import json
 import unittest
+import datetime
 
 from requests_mock import Mocker
 from test.utils.request_matcher import RequestCounter
@@ -93,3 +94,22 @@ class SenderTelegramTest(unittest.TestCase):
 
         self.assertEqual(2, counter.i)  # images is being sent in two messages.
         self.assertTrue(exposed == dummy_expose)
+
+    @Mocker()
+    def test_stampede_protection(self, m: Mocker):
+        c = StringConfig(string=json.dumps(
+            {"telegram": {"bot_token": "dummy_token", "receiver_ids": [1234567]}}
+        ))
+
+        sender = SenderTelegram(config=c)
+        mock_response = '''{
+            "description": "Warning: Too Many Requests",
+            "parameters": {
+                "retry_after": 2
+            }
+        }'''
+        m.post('https://api.telegram.org/botdummy_token/sendMessage', text=mock_response, status_code=429)
+        before = datetime.datetime.now()
+        self.assertEqual(None, sender.notify("result"), "Expected no message to be sent")
+        after = datetime.datetime.now()
+        self.assertEqual(2, (after - before).seconds)

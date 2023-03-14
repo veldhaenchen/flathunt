@@ -19,11 +19,6 @@ class UserDeactivatedException(ValueException):
     A small class that defines a UserDeactivated Exception.
     """
 
-class StampedeProtectionException(ValueException):
-    """
-    A small class that defines a StampedeProtection Exception.
-    """
-
 class HeartbeatException(ValueException):
     """
     A small class that defines a Heartbeat Exception.

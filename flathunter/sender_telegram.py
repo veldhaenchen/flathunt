@@ -11,7 +11,6 @@ from flathunter.abstract_processor import Processor
 from flathunter.config import Config
 from flathunter.exceptions import BotBlockedException
 from flathunter.exceptions import UserDeactivatedException
-from flathunter.exceptions import StampedeProtectionException
 from flathunter.logging import logger
 from flathunter.utils.list import chunk_list
 
@@ -153,12 +152,9 @@ class SenderTelegram(Processor, Notifier):
                 raise UserDeactivatedException(f"User {chat_id} has been deactivated")
         if response.status_code == 429:
             if "Too Many Requests" in data.get("description", ""):
-                backoff = data.get("parameters", {}).get("retry_after", None)
-                if backoff is not None:
-                    time.sleep(min(backoff, 30))
-                    raise StampedeProtectionException(
-                        f"Too many messages too fast - backoff {backoff} seconds"
-                    )
+                backoff = data.get("parameters", {}).get("retry_after", 30)
+                time.sleep(min(backoff, 30))
+                return None
 
     def __get_images(self, expose: typing.Dict) -> typing.List[str]:
         return expose.get("images", [])

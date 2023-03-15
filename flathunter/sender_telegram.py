@@ -154,6 +154,7 @@ class SenderTelegram(Processor, Notifier):
                 backoff = data.get("parameters", {}).get("retry_after", 30)
                 time.sleep(min(backoff, 30))
                 return None
+        return None
 
     def __get_images(self, expose: Dict) -> List[str]:
         return expose.get("images", [])

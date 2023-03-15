@@ -302,29 +302,37 @@ Preis: {price}
         return (self.config.get("filters", {}) or {}).get(key, None)
 
     def excluded_titles(self):
+        """Return the configured list of titles to exclude"""
         if "excluded_titles" in self.config:
             return self.config["excluded_titles"]
         return self._get_filter_config("excluded_titles") or []
 
     def min_price(self):
+        """Return the configured minimum price"""
         return self._get_filter_config("min_price")
 
     def max_price(self):
+        """Return the configured maximum price"""
         return self._get_filter_config("max_price")
 
     def min_size(self):
+        """Return the configured minimum size"""
         return self._get_filter_config("min_size")
 
     def max_size(self):
+        """Return the configured maximum size"""
         return self._get_filter_config("max_size")
 
     def min_rooms(self):
+        """Return the configured minimum number of rooms"""
         return self._get_filter_config("min_rooms")
 
     def max_rooms(self):
+        """Return the configured maximum number of rooms"""
         return self._get_filter_config("max_rooms")
 
     def max_price_per_square(self):
+        """Return the configured maximum price per square meter"""
         return self._get_filter_config("max_price_per_square")
 
     def __repr__(self):
@@ -369,7 +377,7 @@ class CaptchaEnvironmentConfig():
             ]
         return super().captcha_driver_arguments() # pylint: disable=no-member
 
-class Config(CaptchaEnvironmentConfig,YamlConfig):
+class Config(CaptchaEnvironmentConfig,YamlConfig): # pylint: disable=too-many-public-methods
     """Class to represent flathunter configuration, built from a file, supporting
     environment variable overrides
     """

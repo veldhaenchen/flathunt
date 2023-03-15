@@ -6,7 +6,6 @@ import json
 
 from flathunter.logging import logger
 from flathunter.abstract_processor import Processor
-from flathunter.filter import AlreadySeenFilter
 
 __author__ = "Nody"
 __version__ = "0.1"

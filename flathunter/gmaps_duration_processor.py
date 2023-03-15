@@ -1,7 +1,7 @@
 """Calculate Google-Maps distances between specific locations and the target flat"""
 import datetime
 import time
-import urllib
+from urllib.parse import quote_plus
 import requests
 
 from flathunter.logging import logger
@@ -46,8 +46,8 @@ class GMapsDurationProcessor(Processor):
         arrival_time = str(int(time.mktime(next_monday.timetuple())))
 
         # decode from unicode and url encode addresses
-        address = urllib.parse.quote_plus(address.strip().encode('utf8'))
-        dest = urllib.parse.quote_plus(dest.strip().encode('utf8'))
+        address = quote_plus(address.strip().encode('utf8'))
+        dest = quote_plus(dest.strip().encode('utf8'))
         logger.debug("Got address: %s", address)
 
         # get google maps config stuff

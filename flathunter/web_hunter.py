@@ -1,4 +1,5 @@
 """Flathunter implementation for website"""
+from flathunter.config import YamlConfig
 from flathunter.logging import logger
 from flathunter.hunter import Hunter
 from flathunter.filter import Filter
@@ -33,7 +34,7 @@ class WebHunter(Hunter):
         for (user_id, settings) in self.id_watch.get_user_settings():
             if 'mute_notifications' in settings:
                 continue
-            filter_set = Filter.builder().read_config(settings).build()
+            filter_set = Filter.builder().read_config(YamlConfig(settings)).build()
             try:
                 processor_chain = ProcessorChain.builder(self.config) \
                                                 .apply_filter(filter_set) \

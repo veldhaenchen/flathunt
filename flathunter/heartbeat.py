@@ -1,5 +1,5 @@
 """Providing heartbeat messages"""
-from typing import Union
+from typing import Optional
 
 from flathunter.abstract_notifier import Notifier
 from flathunter.config import Config
@@ -10,7 +10,7 @@ from flathunter.sender_telegram import SenderTelegram
 from flathunter.exceptions import HeartbeatException
 
 
-def interval2counter(interval: str) -> Union[None, int]:
+def interval2counter(interval: str) -> Optional[int]:
     """Transform the string interval to sleeper counter frequencies"""
     if interval is None:
         return None
@@ -27,7 +27,7 @@ def interval2counter(interval: str) -> Union[None, int]:
 class Heartbeat:
     """Will inform the user on regular intervals whether the bot is still alive"""
     notifier: Notifier
-    interval: int
+    interval: Optional[int]
 
     def __init__(self, config: Config, interval: str):
         notifiers = config.notifiers()

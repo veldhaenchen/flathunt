@@ -59,6 +59,15 @@ class Env:
     FLATHUNTER_TELEGRAM_RECEIVER_IDS = _read_env("FLATHUNTER_TELEGRAM_RECEIVER_IDS")
     FLATHUNTER_MATTERMOST_WEBHOOK_URL = _read_env("FLATHUNTER_MATTERMOST_WEBHOOK_URL")
 
+    # Filters
+    FLATHUNTER_FILTER_EXCLUDED_TITLES = _read_env("FLATHUNTER_FILTER_EXCLUDED_TITLES")
+    FLATHUNTER_FILTER_MIN_PRICE = _read_env("FLATHUNTER_FILTER_MIN_PRICE")
+    FLATHUNTER_FILTER_MAX_PRICE = _read_env("FLATHUNTER_FILTER_MAX_PRICE")
+    FLATHUNTER_FILTER_MIN_SIZE = _read_env("FLATHUNTER_FILTER_MIN_SIZE")
+    FLATHUNTER_FILTER_MAX_SIZE = _read_env("FLATHUNTER_FILTER_MAX_SIZE")
+    FLATHUNTER_FILTER_MIN_ROOMS = _read_env("FLATHUNTER_FILTER_MIN_ROOMS")
+    FLATHUNTER_FILTER_MAX_ROOMS = _read_env("FLATHUNTER_FILTER_MAX_ROOMS")
+    FLATHUNTER_FILTER_MAX_PRICE_PER_SQUARE = _read_env("FLATHUNTER_FILTER_MAX_PRICE_PER_SQUARE")
 
 def elide(string):
     """Obfuscate the value of a string for debug purposes"""
@@ -152,7 +161,7 @@ Preis: {price}
     def get_filter(self):
         """Read the configured filter"""
         builder = Filter.builder()
-        builder.read_config(self.config)
+        builder.read_config(self)
         return builder.build()
 
     def captcha_enabled(self):
@@ -289,6 +298,35 @@ Preis: {price}
         """Update the config keys based on the content of the dictionary passed"""
         self.config.update(dict_keys)
 
+    def _get_filter_config(self, key: str) -> Optional[Any]:
+        return (self.config.get("filters", {}) or {}).get(key, None)
+
+    def excluded_titles(self):
+        if "excluded_titles" in self.config:
+            return self.config["excluded_titles"]
+        return self._get_filter_config("excluded_titles") or []
+
+    def min_price(self):
+        return self._get_filter_config("min_price")
+
+    def max_price(self):
+        return self._get_filter_config("max_price")
+
+    def min_size(self):
+        return self._get_filter_config("min_size")
+
+    def max_size(self):
+        return self._get_filter_config("max_size")
+
+    def min_rooms(self):
+        return self._get_filter_config("min_rooms")
+
+    def max_rooms(self):
+        return self._get_filter_config("max_rooms")
+
+    def max_price_per_square(self):
+        return self._get_filter_config("max_price_per_square")
+
     def __repr__(self):
         return json.dumps({
             "captcha_enabled": self.captcha_enabled(),
@@ -327,7 +365,7 @@ class CaptchaEnvironmentConfig():
                 "--disable-gpu",
                 "--remote-debugging-port=9222",
                 "--disable-dev-shm-usage",
-                "window-size=1024,768"
+                "--window-size=1024,768"
             ]
         return super().captcha_driver_arguments() # pylint: disable=no-member
 
@@ -440,3 +478,43 @@ class Config(CaptchaEnvironmentConfig,YamlConfig):
         if Env.FLATHUNTER_MATTERMOST_WEBHOOK_URL is not None:
             return Env.FLATHUNTER_MATTERMOST_WEBHOOK_URL
         return super().mattermost_webhook_url()
+
+    def excluded_titles(self):
+        if Env.FLATHUNTER_FILTER_EXCLUDED_TITLES is not None:
+            return Env.FLATHUNTER_FILTER_EXCLUDED_TITLES.split(";")
+        return super().excluded_titles()
+
+    def min_price(self):
+        if Env.FLATHUNTER_FILTER_MIN_PRICE is not None:
+            return int(Env.FLATHUNTER_FILTER_MIN_PRICE)
+        return super().min_price()
+
+    def max_price(self):
+        if Env.FLATHUNTER_FILTER_MAX_PRICE is not None:
+            return int(Env.FLATHUNTER_FILTER_MAX_PRICE)
+        return super().max_price()
+
+    def min_size(self):
+        if Env.FLATHUNTER_FILTER_MIN_SIZE is not None:
+            return int(Env.FLATHUNTER_FILTER_MIN_SIZE)
+        return super().min_size()
+
+    def max_size(self):
+        if Env.FLATHUNTER_FILTER_MAX_SIZE is not None:
+            return int(Env.FLATHUNTER_FILTER_MAX_SIZE)
+        return super().max_size()
+
+    def min_rooms(self):
+        if Env.FLATHUNTER_FILTER_MIN_ROOMS is not None:
+            return int(Env.FLATHUNTER_FILTER_MIN_ROOMS)
+        return super().min_rooms()
+
+    def max_rooms(self):
+        if Env.FLATHUNTER_FILTER_MAX_ROOMS is not None:
+            return int(Env.FLATHUNTER_FILTER_MAX_ROOMS)
+        return super().max_rooms()
+
+    def max_price_per_square(self):
+        if Env.FLATHUNTER_FILTER_MAX_PRICE_PER_SQUARE is not None:
+            return int(Env.FLATHUNTER_FILTER_MAX_PRICE_PER_SQUARE)
+        return super().max_price_per_square()

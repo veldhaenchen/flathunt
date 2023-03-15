@@ -25,7 +25,8 @@ urls:
   - https://www.immowelt.de/liste/berlin/wohnungen/mieten?roomi=2&prima=1500&wflmi=70&sort=createdate%2Bdesc
 
 excluded_titles:
-
+  - Title
+  - Another
 """
 
     FILTERS_CONFIG = """

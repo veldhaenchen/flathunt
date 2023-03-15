@@ -1,8 +1,7 @@
 """Functions and classes related to sending Telegram messages"""
 import json
 import time
-import typing
-from typing import Union
+from typing import List, Dict, Optional
 
 import requests
 
@@ -41,9 +40,9 @@ class SenderTelegram(Processor, Notifier):
         return expose
 
     def __broadcast(self,
-                    receivers: typing.List[int],
+                    receivers: List[int],
                     message: str,
-                    images: Union[None, typing.List[str]] = None) -> None:
+                    images: Optional[List[str]] = None) -> None:
         """
         Broadcast given message to the given receiver ids
         :param receivers: list of user/group ids
@@ -67,7 +66,7 @@ class SenderTelegram(Processor, Notifier):
         """
         self.__broadcast(self.receiver_ids, message, None)
 
-    def __send_text(self, chat_id: int, message: str) -> typing.Dict:
+    def __send_text(self, chat_id: int, message: str) -> Dict:
         """
         Send bot text message, the message may contain a simple
         heartbeat message or an apartment information
@@ -95,7 +94,7 @@ class SenderTelegram(Processor, Notifier):
 
         return response.json().get('result', {})
 
-    def __send_images(self, chat_id: int, msg: Union[None, typing.Dict], images: typing.List[str]):
+    def __send_images(self, chat_id: int, msg: Dict, images: List[str]):
         """
         Send image to given user id (receiver).
         If msg is not None, it will send the images as a response to given message
@@ -156,10 +155,10 @@ class SenderTelegram(Processor, Notifier):
                 time.sleep(min(backoff, 30))
                 return None
 
-    def __get_images(self, expose: typing.Dict) -> typing.List[str]:
+    def __get_images(self, expose: Dict) -> List[str]:
         return expose.get("images", [])
 
-    def __get_text_message(self, expose: typing.Dict) -> str:
+    def __get_text_message(self, expose: Dict) -> str:
         """
         Build text message based on the exposed data
         :param expose: dictionary

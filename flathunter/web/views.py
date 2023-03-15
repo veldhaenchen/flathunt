@@ -10,6 +10,7 @@ from flask_api import status
 from flathunter.web import app, log
 from flathunter.web.util import sanitize_float
 from flathunter.filter import FilterBuilder
+from flathunter.config import YamlConfig
 
 class AuthenticationError(Exception):
     """Wrapper for authentication exceptions"""
@@ -71,7 +72,7 @@ def filter_for_user():
     """Load the filter for the current user"""
     if filter_values_for_user() is None:
         return None
-    return FilterBuilder().read_config({'filters': filter_values_for_user()}).build()
+    return FilterBuilder().read_config(YamlConfig({'filters': filter_values_for_user()})).build()
 
 def form_filter_values():
     """Extract the filter settings from the submitted form"""

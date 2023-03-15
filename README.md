@@ -263,6 +263,14 @@ To make deployment with docker easier, most of the important configuration optio
  - FLATHUNTER_2CAPTCHA_KEY - the API key for 2captcha
  - FLATHUNTER_IMAGETYPERZ_TOKEN - the API token for ImageTyperz
  - FLATHUNTER_HEADLESS_BROWSER - set to any value to configure Google Chrome to be launched in headless mode (necessary for Docker installations)
+ - FLATHUNTER_FILTER_EXCLUDED_TITLES - a semicolon-separated list of words to filter out from matches
+ - FLATHUNTER_FILTER_MIN_PRICE - the minimum price (integer euros)
+ - FLATHUNTER_FILTER_MAX_PRICE - the maximum price (integer euros)
+ - FLATHUNTER_FILTER_MIN_SIZE - the minimum size (integer square meters)
+ - FLATHUNTER_FILTER_MAX_SIZE - the maximum size (integer square meters)
+ - FLATHUNTER_FILTER_MIN_ROOMS - the minimum number of rooms (integer)
+ - FLATHUNTER_FILTER_MAX_ROOMS - the maximum number of rooms (integer)
+ - FLATHUNTER_FILTER_MAX_PRICE_PER_SQUARE - the maximum price per square meter (integer euros)
 
 ### Google Cloud Deployment
 

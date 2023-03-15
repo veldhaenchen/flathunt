@@ -31,6 +31,7 @@ python-dotenv = "*"
 undetected-chromedriver = "*"
 prompt-toolkit = "*"
 "ruamel.yaml" = "*"
+pyright = "*"
 
 [dev-packages]
 

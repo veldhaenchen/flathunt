@@ -1,8 +1,15 @@
 """Module with implementations of standard expose filters"""
 from functools import reduce
 import re
+from abc import ABC, ABCMeta
+from typing import List, Any
 
-from flathunter.idmaintainer import AlreadySeenFilter
+class AbstractFilter(ABC):
+    """Abstract base class for filters"""
+
+    def is_interesting(self, _expose):
+        """Return True if an expose should be included in the output, False otherwise"""
+        return True
 
 class ExposeHelper:
     """Helper functions for extracting data from expose text"""
@@ -31,7 +38,20 @@ class ExposeHelper:
             return None
         return float(rooms_match[0].replace(",", "."))
 
-class MaxPriceFilter:
+class AlreadySeenFilter(AbstractFilter):
+    """Filter exposes that have already been processed"""
+
+    def __init__(self, id_watch):
+        self.id_watch = id_watch
+
+    def is_interesting(self, expose):
+        """Returns true if an expose should be kept in the pipeline"""
+        if not self.id_watch.is_processed(expose['id']):
+            self.id_watch.mark_processed(expose['id'])
+            return True
+        return False
+
+class MaxPriceFilter(AbstractFilter):
     """Exclude exposes above a given price"""
 
     def __init__(self, max_price):
@@ -44,7 +64,7 @@ class MaxPriceFilter:
             return True
         return price <= self.max_price
 
-class MinPriceFilter:
+class MinPriceFilter(AbstractFilter):
     """Exclude exposes below a given price"""
 
     def __init__(self, min_price):
@@ -57,7 +77,7 @@ class MinPriceFilter:
             return True
         return price >= self.min_price
 
-class MaxSizeFilter:
+class MaxSizeFilter(AbstractFilter):
     """Exclude exposes above a given size"""
 
     def __init__(self, max_size):
@@ -70,7 +90,7 @@ class MaxSizeFilter:
             return True
         return size <= self.max_size
 
-class MinSizeFilter:
+class MinSizeFilter(AbstractFilter):
     """Exclude exposes below a given size"""
 
     def __init__(self, min_size):
@@ -83,7 +103,7 @@ class MinSizeFilter:
             return True
         return size >= self.min_size
 
-class MaxRoomsFilter:
+class MaxRoomsFilter(AbstractFilter):
     """Exclude exposes above a given number of rooms"""
 
     def __init__(self, max_rooms):
@@ -96,7 +116,7 @@ class MaxRoomsFilter:
             return True
         return rooms <= self.max_rooms
 
-class MinRoomsFilter:
+class MinRoomsFilter(AbstractFilter):
     """Exclude exposes below a given number of rooms"""
 
     def __init__(self, min_rooms):
@@ -109,7 +129,7 @@ class MinRoomsFilter:
             return True
         return rooms >= self.min_rooms
 
-class TitleFilter:
+class TitleFilter(AbstractFilter):
     """Exclude exposes whose titles match the provided terms"""
 
     def __init__(self, filtered_titles):
@@ -124,7 +144,7 @@ class TitleFilter:
             return True
         return False
 
-class PPSFilter:
+class PPSFilter(AbstractFilter):
     """Exclude exposes above a given price per square"""
 
     def __init__(self, max_pps):
@@ -139,54 +159,29 @@ class PPSFilter:
         pps = price / size
         return pps <= self.max_pps
 
-class PredicateFilter:
-    """Include only those exposes satisfying the predicate"""
-
-    def __init__(self, predicate):
-        self.predicate = predicate
-
-    def is_interesting(self, expose):
-        """True if predicate is satisfied"""
-        return self.predicate(expose)
-
 class FilterBuilder:
     """Construct a filter chain"""
+    filters: List[AbstractFilter]
 
     def __init__(self):
         self.filters = []
 
+    def _append_filter_if_not_empty(self, filter_class: ABCMeta, filter_config: Any):
+        """Appends a filter to the list if its configuration is set"""
+        if not filter_config:
+            return
+        self.filters.append(filter_class(filter_config))
+
     def read_config(self, config):
         """Adds filters from a config dictionary"""
-        if "excluded_titles" in config:
-            self.filters.append(TitleFilter(config["excluded_titles"]))
-        if "filters" in config and config["filters"] is not None:
-            filters_config = config["filters"]
-            if "excluded_titles" in filters_config:
-                self.filters.append(TitleFilter(filters_config["excluded_titles"]))
-            if "min_price" in filters_config:
-                self.filters.append(MinPriceFilter(filters_config["min_price"]))
-            if "max_price" in filters_config:
-                self.filters.append(MaxPriceFilter(filters_config["max_price"]))
-            if "min_size" in filters_config:
-                self.filters.append(MinSizeFilter(filters_config["min_size"]))
-            if "max_size" in filters_config:
-                self.filters.append(MaxSizeFilter(filters_config["max_size"]))
-            if "min_rooms" in filters_config:
-                self.filters.append(MinRoomsFilter(filters_config["min_rooms"]))
-            if "max_rooms" in filters_config:
-                self.filters.append(MaxRoomsFilter(filters_config["max_rooms"]))
-            if "max_price_per_square" in filters_config:
-                self.filters.append(PPSFilter(filters_config["max_price_per_square"]))
-        return self
-
-    def max_size_filter(self, size):
-        """Adds a max size filter"""
-        self.filters.append(MaxSizeFilter(size))
-        return self
-
-    def predicate_filter(self, predicate):
-        """Adds a predicate filter"""
-        self.filters.append(PredicateFilter(predicate))
+        self._append_filter_if_not_empty(TitleFilter, config.excluded_titles())
+        self._append_filter_if_not_empty(MinPriceFilter, config.min_price())
+        self._append_filter_if_not_empty(MaxPriceFilter, config.max_price())
+        self._append_filter_if_not_empty(MinSizeFilter, config.min_size())
+        self._append_filter_if_not_empty(MaxSizeFilter, config.max_size())
+        self._append_filter_if_not_empty(MinRoomsFilter, config.min_rooms())
+        self._append_filter_if_not_empty(MaxRoomsFilter, config.max_rooms())
+        self._append_filter_if_not_empty(PPSFilter, config.max_price_per_square())
         return self
 
     def filter_already_seen(self, id_watch):
@@ -201,7 +196,9 @@ class FilterBuilder:
 class Filter:
     """Abstract filter object"""
 
-    def __init__(self, filters):
+    filters: List[AbstractFilter]
+
+    def __init__(self, filters: List[AbstractFilter]):
         self.filters = filters
 
     def is_interesting_expose(self, expose):

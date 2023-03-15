@@ -2,7 +2,7 @@
 import re
 import numbers
 
-def sanitize_float(float_string):
+def sanitize_float(float_string: str):
     """Turn a number string into a valid float"""
     if isinstance(float_string, numbers.Number):
         return float(float_string)

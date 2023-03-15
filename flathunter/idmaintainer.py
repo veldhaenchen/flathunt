@@ -25,19 +25,6 @@ class SaveAllExposesProcessor(Processor):
         self.id_watch.save_expose(expose)
         return expose
 
-class AlreadySeenFilter:
-    """Filter exposes that have already been processed"""
-
-    def __init__(self, id_watch):
-        self.id_watch = id_watch
-
-    def is_interesting(self, expose):
-        """Returns true if an expose should be kept in the pipeline"""
-        if not self.id_watch.is_processed(expose['id']):
-            self.id_watch.mark_processed(expose['id'])
-            return True
-        return False
-
 class IdMaintainer:
     """SQLite back-end for the database"""
 

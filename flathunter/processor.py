@@ -1,5 +1,6 @@
 """Utility classes for building chains for processors"""
 from functools import reduce
+from typing import List
 
 from flathunter.default_processors import AddressResolver
 from flathunter.default_processors import Filter
@@ -10,9 +11,11 @@ from flathunter.sender_apprise import SenderApprise
 from flathunter.sender_telegram import SenderTelegram
 from flathunter.gmaps_duration_processor import GMapsDurationProcessor
 from flathunter.idmaintainer import SaveAllExposesProcessor
+from flathunter.abstract_processor import Processor
 
 class ProcessorChainBuilder:
     """Builder pattern for building chains of processors"""
+    processors: List[Processor]
 
     def __init__(self, config):
         self.processors = []
@@ -68,6 +71,7 @@ class ProcessorChainBuilder:
 
 class ProcessorChain:
     """Class to hold a chain of processors"""
+    processors: List[Processor]
 
     def __init__(self, processors):
         self.processors = processors

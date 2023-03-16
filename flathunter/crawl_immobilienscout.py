@@ -1,15 +1,32 @@
 """Expose crawler for ImmobilienScout"""
+from typing import Optional
 import datetime
 import re
 
+from bs4 import BeautifulSoup, Tag
 from jsonpath_ng import parse
 from selenium.common.exceptions import JavascriptException
+from selenium.webdriver import Chrome
 
 from flathunter.abstract_crawler import Crawler
 from flathunter.logging import logger
 from flathunter.chrome_wrapper import get_chrome_driver
+from flathunter.exceptions import DriverLoadException
 
 STATIC_URL_PATTERN = re.compile(r'https://www\.immobilienscout24\.de')
+
+def get_result_count(soup: BeautifulSoup) -> int:
+    def is_result_count_element(element) -> bool:
+        if not isinstance(element, Tag):
+            return False
+        if not element.has_attr('data-is24-qa'):
+            return False
+        return element.attrs['data-is24-qa'] == 'resultlist-resultCount'
+
+    count_element = soup.find(lambda e: is_result_count_element(e))
+    if not isinstance(count_element, Tag):
+        return 0
+    return int(count_element.text.replace('.', ''))
 
 class CrawlImmobilienscout(Crawler):
     """Implementation of Crawler interface for ImmobilienScout"""
@@ -29,14 +46,14 @@ class CrawlImmobilienscout(Crawler):
 
         self.config = config
         self.driver = None
-        self.checkbox = None
+        self.checkbox = False
         self.afterlogin_string = None
 
         if config.captcha_enabled():
             self.checkbox = config.get_captcha_checkbox()
             self.afterlogin_string = config.get_captcha_afterlogin_string()
 
-    def get_driver(self):
+    def get_driver(self) -> Optional[Chrome]:
         """Lazy method to fetch the driver as required at runtime"""
         if self.driver is not None:
             return self.driver
@@ -45,6 +62,12 @@ class CrawlImmobilienscout(Crawler):
         driver_arguments = self.config.captcha_driver_arguments()
         self.driver = get_chrome_driver(driver_arguments)
         return self.driver
+
+    def get_driver_force(self) -> Chrome:
+        res = self.get_driver()
+        if res is None:
+            raise DriverLoadException("Unable to load chrome driver when expected")
+        return res
 
     def get_results(self, search_url, max_pages=None):
         """Loads the exposes from the ImmoScout site, starting at the provided URL"""
@@ -67,14 +90,7 @@ class CrawlImmobilienscout(Crawler):
         if self.get_driver() is not None:
             return self.get_entries_from_javascript()
 
-        try:
-            no_of_results = int(
-                soup.find_all(lambda e: e.has_attr('data-is24-qa') and \
-                                        e['data-is24-qa'] == 'resultlist-resultCount')[0] \
-                    .text.replace('.', ''))
-        except IndexError:
-            logger.error('Index error occurred')
-            no_of_results = 0
+        no_of_results = get_result_count(soup)
 
         # get data from first page
         entries = self.extract_data(soup)
@@ -96,10 +112,10 @@ class CrawlImmobilienscout(Crawler):
     def get_entries_from_javascript(self):
         """Get entries from JavaScript"""
         try:
-            result_json = self.get_driver().execute_script('return window.IS24.resultList;')
+            result_json = self.get_driver_force().execute_script('return window.IS24.resultList;')
         except JavascriptException:
             logger.warning("Unable to find IS24 variable in window")
-            if "Warum haben wir deine Anfrage blockiert?" in self.get_driver().page_source:
+            if "Warum haben wir deine Anfrage blockiert?" in self.get_driver_force().page_source:
                 logger.error(
                     "IS24 bot detection has identified our script as a bot - we've been blocked"
                 )
@@ -179,6 +195,7 @@ class CrawlImmobilienscout(Crawler):
         ) if results_list else []
         expose_ids = []
         expose_urls = []
+        expose_id = 0
         for link in title_elements:
             expose_id = int(link.get('href').split('/')[-1].replace('.html', ''))
             expose_ids.append(expose_id)

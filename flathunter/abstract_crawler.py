@@ -1,4 +1,5 @@
 """Interface for webcrawlers. Crawler implementations should subclass this"""
+from abc import ABC
 import re
 from time import sleep
 from typing import Optional, Any
@@ -10,6 +11,7 @@ from bs4 import BeautifulSoup
 from random_user_agent.params import HardwareType, Popularity
 from random_user_agent.user_agent import UserAgent
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.webdriver import Chrome
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -19,10 +21,10 @@ from flathunter.captcha.captcha_solver import CaptchaUnsolvableError
 from flathunter.logging import logger
 from flathunter.exceptions import ProxyException
 
-class Crawler:
+class Crawler(ABC):
     """Defines the Crawler interface"""
 
-    URL_PATTERN = None
+    URL_PATTERN: re.Pattern
 
     user_agent_rotator = UserAgent(popularity=[Popularity.COMMON.value],
                                    hardware_types=[HardwareType.COMPUTER.value])
@@ -58,7 +60,7 @@ class Crawler:
         return self.get_soup_from_url(search_url)
 
     @backoff.on_exception(wait_gen=backoff.constant,
-                          exception=selenium.common.exceptions.TimeoutException,
+                          exception=TimeoutException,
                           max_tries=3)
     def get_soup_from_url(
         self,
@@ -238,17 +240,17 @@ class Crawler:
                 WebDriverWait(driver, 120).until(
                     EC.visibility_of_element_located((By.CLASS_NAME, "recaptcha-checkbox-checked"))
                 )
-            except selenium.common.exceptions.TimeoutException:
+            except TimeoutException:
                 logger.warning("Selenium.Timeoutexception when waiting for captcha to appear")
         else:
             xpath_string = f"//*[contains(text(), '{afterlogin_string}')]"
             try:
                 WebDriverWait(driver, 120) \
                     .until(EC.visibility_of_element_located((By.XPATH, xpath_string)))
-            except selenium.common.exceptions.TimeoutException:
+            except TimeoutException:
                 logger.warning("Selenium.Timeoutexception when waiting for captcha to disappear")
 
-    def _wait_for_iframe(self, driver: selenium.webdriver.Chrome):
+    def _wait_for_iframe(self, driver: Chrome):
         """Wait for iFrame to appear"""
         try:
             iframe = WebDriverWait(driver, 10).until(EC.visibility_of_element_located(
@@ -261,7 +263,7 @@ class Crawler:
             logger.info("Timeout waiting for iframe element - no captcha verification necessary?")
             return None
 
-    def _wait_until_iframe_disappears(self, driver: selenium.webdriver.Chrome):
+    def _wait_until_iframe_disappears(self, driver: Chrome):
         """Wait for iFrame to disappear"""
         try:
             WebDriverWait(driver, 10).until(EC.invisibility_of_element(

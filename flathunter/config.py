@@ -168,7 +168,7 @@ Preis: {price}
         """Check if captcha is configured"""
         return self._get_captcha_solver() is not None
 
-    def get_captcha_checkbox(self):
+    def get_captcha_checkbox(self) -> bool:
         """Check if captcha checkbox support is needed"""
         return self._read_yaml_path('captcha.checkbox', False)
 
@@ -350,7 +350,7 @@ Preis: {price}
             "use_proxy": self.use_proxy(),
         })
 
-class CaptchaEnvironmentConfig():
+class CaptchaEnvironmentConfig(YamlConfig):
     """Mixin to add environment-variable captcha support to config object"""
 
     def _get_imagetyperz_token(self):
@@ -377,7 +377,7 @@ class CaptchaEnvironmentConfig():
             ]
         return super().captcha_driver_arguments() # pylint: disable=no-member
 
-class Config(CaptchaEnvironmentConfig,YamlConfig): # pylint: disable=too-many-public-methods
+class Config(CaptchaEnvironmentConfig): # pylint: disable=too-many-public-methods
     """Class to represent flathunter configuration, built from a file, supporting
     environment variable overrides
     """

@@ -2,6 +2,8 @@
 import re
 import datetime
 
+from bs4 import Tag
+
 from flathunter.logging import logger
 from flathunter.abstract_crawler import Crawler
 
@@ -77,10 +79,12 @@ class CrawlEbayKleinanzeigen(Crawler):
             address = address.replace('\n', ' ').replace('\r', '')
             address = " ".join(address.split())
 
-            try:
-                rooms = re.match(r'(\d+)', tags[1].text)[1]
-            except (IndexError, TypeError):
-                rooms = ""
+            rooms = ""
+            if len(tags) > 1:
+                rooms_match = re.match(r'(\d+)', tags[1].text)
+                if rooms_match is not None:
+                    rooms = rooms_match[1]
+
             try:
                 size = tags[0].text
             except (IndexError, TypeError):
@@ -105,14 +109,13 @@ class CrawlEbayKleinanzeigen(Crawler):
     def load_address(self, url):
         """Extract address from expose itself"""
         expose_soup = self.get_page(url)
-        try:
-            street_raw = expose_soup.find(id="street-address").text
-        except AttributeError:
-            street_raw = ""
-        try:
-            address_raw = expose_soup.find(id="viewad-locality").text
-        except AttributeError:
-            address_raw = ""
-        address = address_raw.strip().replace("\n", "") + " " + street_raw.strip()
+        street_raw = ""
+        street_el = expose_soup.find(id="street-address")
+        if isinstance(street_el, Tag):
+            street_raw = street_el.text
+        address_raw = ""
+        address_el = expose_soup.find(id="viewad-locality")
+        if isinstance(address_el, Tag):
+            address_raw = address_el.text
 
-        return address
+        return address_raw.strip().replace("\n", "") + " " + street_raw.strip()

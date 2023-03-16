@@ -1,6 +1,7 @@
 import pytest
 import datetime
 import re
+from typing import Dict
 from mockfirestore import MockFirestore
 
 from flathunter.googlecloud_idmaintainer import GoogleCloudIdMaintainer
@@ -80,6 +81,13 @@ def test_exposes_are_returned_with_limit(id_watch):
     expose = saved[0]
     assert expose['title'] is not None
 
+def compare_int_less_equal(expose: Dict, key: str, comparison: int) -> bool:
+    value = expose.get(key, str(comparison + 1))
+    match = re.match(r'\d+', value)
+    if match is None:
+        return False
+    return int(match[0]) <= comparison
+
 def test_exposes_are_returned_filtered(id_watch):
     config = StringConfig(string=CONFIG_WITH_FILTERS)
     config.set_searchers([DummyCrawler()])
@@ -90,7 +98,7 @@ def test_exposes_are_returned_filtered(id_watch):
     saved = id_watch.get_recent_exposes(10, filter_set=filter)
     assert len(saved) == 10
     for expose in saved:
-        assert int(re.match(r'\d+', expose['size'])[0]) <= 70
+        assert compare_int_less_equal(expose, 'size', 70)
 
 def test_filters_for_user_are_saved(id_watch):
     filter = { 'fish': 'cat' }

@@ -2,7 +2,7 @@
 from typing import Optional
 
 from flathunter.abstract_notifier import Notifier
-from flathunter.config import Config
+from flathunter.config import YamlConfig
 from flathunter.logging import logger
 from flathunter.sender_apprise import SenderApprise
 from flathunter.sender_mattermost import SenderMattermost
@@ -29,7 +29,7 @@ class Heartbeat:
     notifier: Notifier
     interval: Optional[int]
 
-    def __init__(self, config: Config, interval: str):
+    def __init__(self, config: YamlConfig, interval: str):
         notifiers = config.notifiers()
 
         if 'mattermost' in notifiers:

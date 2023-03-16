@@ -18,7 +18,6 @@ mock-firestore = "*"
 pytest-mock = "*"
 pytest = "*"
 pylint = "*"
-selenium = "*"
 random-user-agent = "*"
 jsonpath-ng = "*"
 backoff = "*"
@@ -32,6 +31,8 @@ undetected-chromedriver = "*"
 prompt-toolkit = "*"
 "ruamel.yaml" = "*"
 pyright = "*"
+types-beautifulsoup4 = "*"
+selenium = "*"
 
 [dev-packages]
 

@@ -94,9 +94,9 @@ class ConfigWizardTest(unittest.TestCase):
             "https://www.immobilienscout24.de/Suche/de/berlin/berlin/wohnung-mieten?sorting=2"
         ]
         res = config_wizard.configure_captcha(urls, self.config)
-        self.assertEqual(res["captcha"]["2captcha"]["api_key"], "12345")
+        self.assertEqual((res or {}).get("captcha", {}).get("2captcha", {}).get("api_key"), "12345")
 
-    def test_configure_captcha(self):
+    def test_configure_captcha_is_none(self):
         urls = [
             "https://www.wg-gesucht.de/wohnungen-in-Berlin.8.2.1.0.html"
         ]

@@ -38,3 +38,9 @@ class ConfigException(ValueException):
     """
     Exception indicating a problem with the configuration
     """
+
+class DriverLoadException(Exception):
+    """
+    Exception indicating a probable programming error. We expected to load a
+    chrome driver, but didn't find one
+    """

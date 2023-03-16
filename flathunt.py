@@ -23,7 +23,7 @@ __email__ = "harrymcfly@protonmail.com"
 __status__ = "Production"
 
 
-def launch_flat_hunt(config, heartbeat=None):
+def launch_flat_hunt(config, heartbeat: Heartbeat):
     """Starts the crawler / notification loop"""
     id_watch = IdMaintainer(f'{config.database_location()}/processed_ids.db')
 

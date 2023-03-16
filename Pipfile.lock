@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "7a7182b3504f16ca61768ba7cc042067f026489751efff57938d7b10dd145e3c"
+            "sha256": "86d3875ac56496e0a7a58816d9551ec7e2e83afe48e63ba8916e11d2b6970667"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -1007,7 +1007,7 @@
                 "sha256:0e8cda3d5a634d9895b75c573c9352c16486cb75deb0e078b5fda34db4243165",
                 "sha256:de34e52d6c9c6fcd704192f09767cb561bb4ee64e70eede20b0834d841f0be4d"
             ],
-            "markers": "python_version >= '3.6'",
+            "markers": "python_version >= '3.11'",
             "version": "==1.22.2"
         },
         "protobuf": {
@@ -1327,6 +1327,21 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==0.10.0"
+        },
+        "types-beautifulsoup4": {
+            "hashes": [
+                "sha256:49ada75863d0d89fc4ad29f064d75c022cb2ad389e17271f0517f8fb34080715",
+                "sha256:ecca610052c5418a9a2ade28a0c1995ca0b90c8450a70de8dc26a118de2aca56"
+            ],
+            "index": "pypi",
+            "version": "==4.11.6.7"
+        },
+        "types-html5lib": {
+            "hashes": [
+                "sha256:267c58f59977bde713e6077b5ec944e6e44140eb51f859990284cf4e37e17ef9",
+                "sha256:c70bb3c65e061bc1f32bcf0edbb89ebdd5917aee7cc5557f68078ea105069184"
+            ],
+            "version": "==1.1.11.12"
         },
         "undetected-chromedriver": {
             "hashes": [

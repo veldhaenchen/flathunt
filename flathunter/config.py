@@ -23,7 +23,7 @@ from flathunter.exceptions import ConfigException
 load_dotenv()
 
 
-def _read_env(key, fallback=None):
+def _read_env(key: str, fallback: Optional[str]=None) -> Optional[str]:
     """ read the given key from environment"""
     return os.environ.get(key, fallback)
 
@@ -168,7 +168,7 @@ Preis: {price}
         """Check if captcha is configured"""
         return self._get_captcha_solver() is not None
 
-    def get_captcha_checkbox(self):
+    def get_captcha_checkbox(self) -> bool:
         """Check if captcha checkbox support is needed"""
         return self._read_yaml_path('captcha.checkbox', False)
 
@@ -238,7 +238,7 @@ Preis: {price}
         """List of currently-active notifiers"""
         return self._read_yaml_path('notifiers', [])
 
-    def telegram_bot_token(self):
+    def telegram_bot_token(self) -> Optional[str]:
         """API Token to authenticate to the Telegram bot"""
         return self._read_yaml_path('telegram.bot_token', None)
 
@@ -350,7 +350,7 @@ Preis: {price}
             "use_proxy": self.use_proxy(),
         })
 
-class CaptchaEnvironmentConfig():
+class CaptchaEnvironmentConfig(YamlConfig):
     """Mixin to add environment-variable captcha support to config object"""
 
     def _get_imagetyperz_token(self):
@@ -377,7 +377,7 @@ class CaptchaEnvironmentConfig():
             ]
         return super().captcha_driver_arguments() # pylint: disable=no-member
 
-class Config(CaptchaEnvironmentConfig,YamlConfig): # pylint: disable=too-many-public-methods
+class Config(CaptchaEnvironmentConfig): # pylint: disable=too-many-public-methods
     """Class to represent flathunter configuration, built from a file, supporting
     environment variable overrides
     """
@@ -467,7 +467,7 @@ class Config(CaptchaEnvironmentConfig,YamlConfig): # pylint: disable=too-many-pu
             return Env.FLATHUNTER_NOTIFIERS.split(",")
         return super().notifiers()
 
-    def telegram_bot_token(self):
+    def telegram_bot_token(self) -> Optional[str]:
         if Env.FLATHUNTER_TELEGRAM_BOT_TOKEN is not None:
             return Env.FLATHUNTER_TELEGRAM_BOT_TOKEN
         return super().telegram_bot_token()

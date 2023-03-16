@@ -12,12 +12,12 @@ CHROME_VERSION_REGEXP = re.compile(r'.* (\d+\.\d+\.\d+\.\d+)( .*)?')
 def get_command_output(args):
     """Run a command and return the first line of stdout"""
     try:
-        stdout = subprocess.Popen(args,
+        with subprocess.Popen(args,
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                    universal_newlines=True).stdout
-        if stdout is None:
-            return None
-        return stdout.readline()
+                    universal_newlines=True) as process:
+            if process.stdout is None:
+                return None
+            return process.stdout.readline()
     except FileNotFoundError:
         return None
 

@@ -10,9 +10,11 @@ from flathunter.abstract_crawler import Crawler
 from flathunter.string_utils import remove_prefix
 
 def get_title(title_row: Tag) -> str:
+    """Parse the title from the expose title element"""
     return title_row.text.strip()
 
 def get_url(title_row: Tag) -> Optional[str]:
+    """Parse the expose URL from the expose title element"""
     a_element = title_row.find('a')
     if not isinstance(a_element, Tag) \
         or not a_element.has_attr('href') \
@@ -21,6 +23,7 @@ def get_url(title_row: Tag) -> Optional[str]:
     return 'https://www.wg-gesucht.de/' + remove_prefix(a_element.attrs['href'], "/")
 
 def extract_href_style(row: Tag) -> Optional[str]:
+    """Extract the style attribute from a image div"""
     div = row.find('div', {"class": "card_image"})
     if not isinstance(div, Tag):
         return None
@@ -33,6 +36,7 @@ def extract_href_style(row: Tag) -> Optional[str]:
     return style
 
 def get_image_url(row: Tag) -> Optional[str]:
+    """Parse the image url from the expose"""
     href_style = extract_href_style(row)
     if href_style is None:
         return None
@@ -42,6 +46,7 @@ def get_image_url(row: Tag) -> Optional[str]:
     return image_match[1]
 
 def get_rooms(row: Tag) -> int:
+    """Parse the number of rooms from the expose"""
     details_el = row.find("div", {"class": "col-xs-11"})
     if not isinstance(details_el, Tag):
         return 0
@@ -53,24 +58,28 @@ def get_rooms(row: Tag) -> int:
     return int(rooms_tmp[0][:1]) if rooms_tmp else 0
 
 def get_price(numbers_row: Tag) -> Optional[str]:
+    """Parse the price from the expose"""
     price_el = numbers_row.find("div", {"class": "col-xs-3"})
     if not isinstance(price_el, Tag):
         return None
     return price_el.text.strip()
 
 def get_dates(numbers_row: Tag) -> List[str]:
+    """Parse the advert dates from the expose"""
     date_el = numbers_row.find("div", {"class": "text-center"})
     if not isinstance(date_el, Tag):
         return []
     return re.findall(r'\d{2}.\d{2}.\d{4}', date_el.text)
 
 def get_size(numbers_row: Tag) -> List[str]:
+    """Parse the room size from the expose"""
     size_el = numbers_row.find("div", {"class": "text-right"})
     if not isinstance(size_el, Tag):
         return []
     return re.findall(r'\d{1,4}\sm²', size_el.text)
 
 def parse_expose_element_to_details(row: Tag, crawler: str) -> Optional[Dict]:
+    """Parse an Expose soup element to an Expose details dictionary"""
     title_row = row.find('h3', {"class": "truncate_title"})
     if title_row is None or not isinstance(title_row, Tag):
         logger.warning("No title found - skipping")
@@ -119,12 +128,13 @@ def parse_expose_element_to_details(row: Tag, crawler: str) -> Optional[Dict]:
         details['from'] = dates[0]
     return details
 
-def liste_attribute_filter(e: Tag | str) -> bool:
-    if not isinstance(e, Tag):
+def liste_attribute_filter(element: Tag | str) -> bool:
+    """Return true for elements whose 'id' attribute starts with 'liste-'"""
+    if not isinstance(element, Tag):
         return False
-    if "id" not in e.attrs:
+    if "id" not in element.attrs:
         return False
-    return e.attrs["id"].startswith('liste-')
+    return element.attrs["id"].startswith('liste-')
 
 class CrawlWgGesucht(Crawler):
     """Implementation of Crawler interface for WgGesucht"""
@@ -140,8 +150,7 @@ class CrawlWgGesucht(Crawler):
         """Extracts all exposes from a provided Soup object"""
         entries = []
 
-        findings = soup.find_all(
-            lambda e: liste_attribute_filter(e))
+        findings = soup.find_all(liste_attribute_filter)
         existing_findings = [
           e for e in findings
           if isinstance(e, Tag) and e.has_attr('class') and not 'display-none' in e['class']

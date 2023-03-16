@@ -16,6 +16,7 @@ from flathunter.exceptions import DriverLoadException
 STATIC_URL_PATTERN = re.compile(r'https://www\.immobilienscout24\.de')
 
 def get_result_count(soup: BeautifulSoup) -> int:
+    """Scrape the result count from the returned page"""
     def is_result_count_element(element) -> bool:
         if not isinstance(element, Tag):
             return False
@@ -23,7 +24,7 @@ def get_result_count(soup: BeautifulSoup) -> int:
             return False
         return element.attrs['data-is24-qa'] == 'resultlist-resultCount'
 
-    count_element = soup.find(lambda e: is_result_count_element(e))
+    count_element = soup.find(is_result_count_element)
     if not isinstance(count_element, Tag):
         return 0
     return int(count_element.text.replace('.', ''))
@@ -64,6 +65,7 @@ class CrawlImmobilienscout(Crawler):
         return self.driver
 
     def get_driver_force(self) -> Chrome:
+        """Fetch the driver, and throw an exception if it is not configured or available"""
         res = self.get_driver()
         if res is None:
             raise DriverLoadException("Unable to load chrome driver when expected")

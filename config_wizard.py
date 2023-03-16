@@ -14,7 +14,7 @@ from prompt_toolkit import prompt
 from prompt_toolkit.document import Document
 from prompt_toolkit.validation import Validator, ValidationError
 
-from flathunter.config import Config, YamlConfig
+from flathunter.config import YamlConfig
 from flathunter import crawl_immobilienscout
 
 class ConfigurationAborted(Exception):
@@ -104,6 +104,7 @@ def select_notifier(config: YamlConfig) -> str:
     ).run()
 
 def prompt_with_default(prompt_string: str, default_value: Optional[str]) -> str:
+    """Prompt the user for input, providing an optional default value"""
     if default_value is None:
         return prompt(prompt_string)
     return prompt(prompt_string, default = default_value)

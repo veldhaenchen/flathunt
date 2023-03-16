@@ -1,3 +1,4 @@
+"""String utility functions"""
 from typing import TypeVar
 
 T = TypeVar('T', str, None)

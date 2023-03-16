@@ -6,7 +6,6 @@ from typing import Optional, Any
 
 import backoff
 import requests
-import selenium
 from bs4 import BeautifulSoup
 from random_user_agent.params import HardwareType, Popularity
 from random_user_agent.user_agent import UserAgent

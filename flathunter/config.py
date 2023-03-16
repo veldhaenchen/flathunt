@@ -23,7 +23,7 @@ from flathunter.exceptions import ConfigException
 load_dotenv()
 
 
-def _read_env(key, fallback=None):
+def _read_env(key: str, fallback: Optional[str]=None) -> Optional[str]:
     """ read the given key from environment"""
     return os.environ.get(key, fallback)
 
@@ -238,7 +238,7 @@ Preis: {price}
         """List of currently-active notifiers"""
         return self._read_yaml_path('notifiers', [])
 
-    def telegram_bot_token(self):
+    def telegram_bot_token(self) -> Optional[str]:
         """API Token to authenticate to the Telegram bot"""
         return self._read_yaml_path('telegram.bot_token', None)
 
@@ -467,7 +467,7 @@ class Config(CaptchaEnvironmentConfig,YamlConfig): # pylint: disable=too-many-pu
             return Env.FLATHUNTER_NOTIFIERS.split(",")
         return super().notifiers()
 
-    def telegram_bot_token(self):
+    def telegram_bot_token(self) -> Optional[str]:
         if Env.FLATHUNTER_TELEGRAM_BOT_TOKEN is not None:
             return Env.FLATHUNTER_TELEGRAM_BOT_TOKEN
         return super().telegram_bot_token()

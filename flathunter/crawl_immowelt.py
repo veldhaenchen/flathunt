@@ -3,6 +3,8 @@ import re
 import datetime
 import hashlib
 
+from bs4 import BeautifulSoup, Tag
+
 from flathunter.logging import logger
 from flathunter.abstract_crawler import Crawler
 
@@ -19,38 +21,40 @@ class CrawlImmowelt(Crawler):
         """Loads additional details for an expose by processing the expose detail URL"""
         soup = self.get_page(expose['url'])
         date = datetime.datetime.now().strftime("%2d.%2m.%Y")
+        expose['from'] = date
 
         immo_div = soup.find("app-estate-object-informations")
-        if immo_div is not None:
-            immo_div = soup.find("div", {"class": "equipment ng-star-inserted"})
-            if immo_div is not None:
-                details = immo_div.find_all("p")
+        if not isinstance(immo_div, Tag):
+            return expose
+        immo_div = soup.find("div", {"class": "equipment ng-star-inserted"})
+        if not isinstance(immo_div, Tag):
+            return expose
 
-                for detail in details:
-                    if detail.text.strip() == "Bezug":
-                        date = detail.findNext("p").text.strip()
-                        no_exact_date_given = re.match(
-                          r'.*sofort.*|.*Nach Vereinbarung.*',
-                          date,
-                          re.MULTILINE|re.DOTALL|re.IGNORECASE
-                        )
-                        if no_exact_date_given:
-                            date = datetime.datetime.now().strftime("%2d.%2m.%Y")
-                        break
+        details = immo_div.find_all("p")
+        for detail in details:
+            if detail.text.strip() == "Bezug":
+                date = detail.findNext("p").text.strip()
+                no_exact_date_given = re.match(
+                    r'.*sofort.*|.*Nach Vereinbarung.*',
+                    date,
+                    re.MULTILINE|re.DOTALL|re.IGNORECASE
+                )
+                if no_exact_date_given:
+                    date = datetime.datetime.now().strftime("%2d.%2m.%Y")
+                break
         expose['from'] = date
         return expose
 
     # pylint: disable=too-many-locals
-    def extract_data(self, soup):
+    def extract_data(self, soup: BeautifulSoup):
         """Extracts all exposes from a provided Soup object"""
         entries = []
-        soup = soup.find("main")
+        soup_res = soup.find("main")
+        if not isinstance(soup_res, Tag):
+            return []
 
-        try:
-            title_elements = soup.find_all("h2")
-        except AttributeError:
-            return entries
-        expose_ids = soup.find_all("a", id=True)
+        title_elements = soup_res.find_all("h2")
+        expose_ids = soup_res.find_all("a", id=True)
 
         for idx, title_el in enumerate(title_elements):
             try:

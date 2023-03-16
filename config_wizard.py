@@ -62,7 +62,7 @@ class UrlsValidator(Validator):
             message="URL did not match any configured scraper")
 
 
-def gather_urls(config: Config) -> List[str]:
+def gather_urls(config: YamlConfig) -> List[str]:
     """Get a list of URLs from the user for crawling"""
     urls = config.target_urls()
     result = ""
@@ -86,7 +86,7 @@ def gather_urls(config: Config) -> List[str]:
         first_run = False
     return urls
 
-def select_notifier(config: Config) -> str:
+def select_notifier(config: YamlConfig) -> str:
     """Select which notifier to use"""
     if len(config.notifiers()) > 0:
         default = config.notifiers()[0]
@@ -103,7 +103,12 @@ def select_notifier(config: Config) -> str:
         default=default
     ).run()
 
-def get_bot_token(config: Config) -> str:
+def prompt_with_default(prompt_string: str, default_value: Optional[str]) -> str:
+    if default_value is None:
+        return prompt(prompt_string)
+    return prompt(prompt_string, default = default_value)
+
+def get_bot_token(config: YamlConfig) -> str:
     """Ask the user for the Telegram Bot token"""
     clear()
     print("Telegram Bot Token\n")
@@ -111,16 +116,12 @@ def get_bot_token(config: Config) -> str:
         "the instructions here to track down 'The BotFather' and generate your token:\n"
         "https://medium.com/geekculture/generate-telegram-token-for-bot-api-d26faf9bf064\n")
 
-    if config.telegram_bot_token() is not None:
-        result = prompt("Enter Bot Token: ", default = config.telegram_bot_token())
-    else:
-        result = prompt("Enter Bot Token: ")
-
+    result = prompt_with_default("Enter Bot Token: ", config.telegram_bot_token())
     if result is None or len(result) == 0:
         raise ConfigurationAborted()
     return result
 
-def get_receiver_id(config: Config) -> str:
+def get_receiver_id(config: YamlConfig) -> str:
     """Ask the user for the target Telegram User ID for the Telegram notifications"""
     clear()
     print("Telegram Receiver ID\n")
@@ -128,16 +129,16 @@ def get_receiver_id(config: Config) -> str:
         "This will normally be the User ID associated with your Telegram Account.\n"
         "To work out your User ID, start a chat with the @userinfobot:\n"
         "https://telegram.me/userinfobot\n")
+    current_receiver_id = None
     if len(config.telegram_receiver_ids()) > 0:
-        result = prompt("Enter Receiver ID: ", default = config.telegram_receiver_ids()[0])
-    else:
-        result = prompt("Enter Receiver ID: ")
+        current_receiver_id = str(config.telegram_receiver_ids()[0])
+    result = prompt_with_default("Enter Receiver ID: ", current_receiver_id)
 
     if len(result) == 0:
         raise ConfigurationAborted()
     return result
 
-def configure_telegram(config: Config) -> Dict[str, Any]:
+def configure_telegram(config: YamlConfig) -> Dict[str, Any]:
     """Ask the user for details required for the Telegram configuration"""
     bot_token = get_bot_token(config)
     receiver_id = get_receiver_id(config)
@@ -148,17 +149,14 @@ def configure_telegram(config: Config) -> Dict[str, Any]:
         }
     }
 
-def configure_mattermost(config: Config) -> Dict[str, Any]:
+def configure_mattermost(config: YamlConfig) -> Dict[str, Any]:
     """Ask the user for the mattermost webhook URL"""
     clear()
     print("Mattermost Webhook URL\n")
     print("To receive messages over Mattermost, Flathunter will need the Webhook URL\n"
     "of your Mattermost server.\n")
-    if config.mattermost_webhook_url() is not None:
-        webhook_url = prompt("Enter Webhook URL: ", default=config.mattermost_webhook_url())
-    else:
-        webhook_url = prompt("Enter Webhook URL: ")
 
+    webhook_url = prompt_with_default("Enter Webhook URL: ", config.mattermost_webhook_url())
     if len(webhook_url) == 0:
         raise ConfigurationAborted()
     return {
@@ -167,7 +165,7 @@ def configure_mattermost(config: Config) -> Dict[str, Any]:
         }
     }
 
-def configure_apprise(config: Config) -> Dict[str, Any]:
+def configure_apprise(config: YamlConfig) -> Dict[str, Any]:
     """Ask the user for the apprise notification URL"""
     clear()
     print("Apprise notification URL\n")
@@ -194,7 +192,7 @@ def configure_notifier(notifier: str, config) -> Dict[str, Any]:
         return configure_apprise(config)
     raise ConfigurationError("Invalid Notifier Selection")
 
-def configure_captcha(urls: List[str], config: Config) -> Optional[Dict[str, Any]]:
+def configure_captcha(urls: List[str], config: YamlConfig) -> Optional[Dict[str, Any]]:
     """Configure the captcha solver, where required"""
     is_immoscout = reduce(lambda a,b: a or b,
         [ re.search(crawl_immobilienscout.STATIC_URL_PATTERN, url) for url in urls ],
@@ -236,7 +234,7 @@ def configure_captcha(urls: List[str], config: Config) -> Optional[Dict[str, Any
         }
     }
 
-def load_config(existing):
+def load_config(existing) -> YamlConfig:
     """Load the existing (or default) config from disk"""
     yaml = YAML()
     source_file = "config.yaml.dist"
@@ -254,7 +252,7 @@ def save_config(config: Dict):
         yaml.dump(config, config_file)
     print("Configuration saved to 'config.yaml' - you're all set!")
 
-def check_existing():
+def check_existing() -> bool:
     """Check to see if a configuration file already exists, prompt if so"""
     if not os.path.exists("config.yaml"):
         return False

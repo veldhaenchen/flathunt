@@ -1,6 +1,7 @@
 """Interface for webcrawlers. Crawler implementations should subclass this"""
 import re
 from time import sleep
+from typing import Optional, Any
 
 import backoff
 import requests
@@ -52,14 +53,19 @@ class Crawler:
         self.HEADERS['User-Agent'] = self.user_agent_rotator.get_random_user_agent()
 
     # pylint: disable=unused-argument
-    def get_page(self, search_url, driver=None, page_no=None):
+    def get_page(self, search_url, driver=None, page_no=None) -> BeautifulSoup:
         """Applies a page number to a formatted search URL and fetches the exposes at that page"""
         return self.get_soup_from_url(search_url)
 
     @backoff.on_exception(wait_gen=backoff.constant,
                           exception=selenium.common.exceptions.TimeoutException,
                           max_tries=3)
-    def get_soup_from_url(self, url, driver=None, checkbox=None, afterlogin_string=None):
+    def get_soup_from_url(
+        self,
+        url: str,
+        driver: Optional[Any]=None,
+        checkbox: bool=False,
+        afterlogin_string: Optional[str]=None) -> BeautifulSoup:
         """Creates a Soup object from the HTML at the provided URL"""
 
         self.rotate_user_agent()
@@ -74,11 +80,11 @@ class Crawler:
             if re.search("initGeetest", driver.page_source):
                 self.resolve_geetest(driver)
             elif re.search("g-recaptcha", driver.page_source):
-                self.resolve_recaptcha(driver, checkbox, afterlogin_string)
+                self.resolve_recaptcha(driver, checkbox, afterlogin_string or "")
             return BeautifulSoup(driver.page_source, 'html.parser')
         return BeautifulSoup(resp.content, 'html.parser')
 
-    def get_soup_with_proxy(self, url):
+    def get_soup_with_proxy(self, url) -> BeautifulSoup:
         """Will try proxies until it's possible to crawl and return a soup"""
         resolved = False
         resp = None

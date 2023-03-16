@@ -32,6 +32,7 @@ undetected-chromedriver = "*"
 prompt-toolkit = "*"
 "ruamel.yaml" = "*"
 pyright = "*"
+types-beautifulsoup4 = "*"
 
 [dev-packages]
 

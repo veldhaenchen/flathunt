@@ -1,6 +1,6 @@
 """Expose crawler for WgGesucht"""
 import re
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 
 import requests
 from bs4 import BeautifulSoup, Tag
@@ -128,7 +128,7 @@ def parse_expose_element_to_details(row: Tag, crawler: str) -> Optional[Dict]:
         details['from'] = dates[0]
     return details
 
-def liste_attribute_filter(element: Tag | str) -> bool:
+def liste_attribute_filter(element: Union[Tag, str]) -> bool:
     """Return true for elements whose 'id' attribute starts with 'liste-'"""
     if not isinstance(element, Tag):
         return False

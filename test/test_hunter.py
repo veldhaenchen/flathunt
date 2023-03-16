@@ -120,7 +120,7 @@ excluded_titles:
 
     def test_invalid_config(self):
         with self.assertRaises(Exception) as context:
-            Hunter(YamlConfig(dict()), IdMaintainer(":memory:"))
+            Hunter(dict(), IdMaintainer(":memory:"))  # type: ignore
 
         self.assertTrue('Invalid config' in str(context.exception))
 

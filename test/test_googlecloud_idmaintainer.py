@@ -86,7 +86,7 @@ def compare_int_less_equal(expose: Dict, key: str, comparison: int) -> bool:
     match = re.match(r'\d+', value)
     if match is None:
         return False
-    return int(match[0]) < comparison
+    return int(match[0]) <= comparison
 
 def test_exposes_are_returned_filtered(id_watch):
     config = StringConfig(string=CONFIG_WITH_FILTERS)

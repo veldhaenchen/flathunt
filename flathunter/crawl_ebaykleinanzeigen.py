@@ -63,7 +63,7 @@ class CrawlEbayKleinanzeigen(Crawler):
             try:
                 price = expose_ids[idx].find(
                     class_="aditem-main--middle--price-shipping--price").text.strip()
-                tags = expose_ids[idx].find_all(class_="simpletag tag-small")
+                tags = expose_ids[idx].find_all(class_="simpletag")
                 address = expose_ids[idx].find("div", {"class": "aditem-main--top--left"})
                 image_element = expose_ids[idx].find("div", {"class": "galleryimage-element"})
             except AttributeError as error:

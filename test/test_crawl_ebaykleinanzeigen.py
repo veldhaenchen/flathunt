@@ -23,7 +23,7 @@ def test_crawler(crawler):
     assert entries[0]['id'] > 0
     assert entries[0]['url'].startswith("https://www.ebay-kleinanzeigen.de/s-anzeige")
     for attr in [ 'title', 'price', 'size', 'rooms', 'address' ]:
-        assert entries[0][attr] is not None
+        assert entries[0][attr]
 
 def test_process_expose_fetches_details(crawler):
     soup = crawler.get_page(TEST_URL)
@@ -35,4 +35,4 @@ def test_process_expose_fetches_details(crawler):
     for expose in updated_entries:
         print(expose)
         for attr in [ 'title', 'price', 'size', 'rooms', 'address', 'from' ]:
-            assert expose[attr] is not None
+            assert expose[attr]

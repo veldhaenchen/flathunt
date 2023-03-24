@@ -164,6 +164,16 @@ to get list of messages the Bot has received. You will see your Chat ID in there
 
 Some sites (including ImmoScout24) implement a Captcha to avoid being crawled by evil web scrapers. Since our crawler is not an evil one, the people at [2Captcha](https://2captcha.com) and [Imagetyperz](https://imagetyperz.com/) provide services that help you solve them. You can head over to one of those services and buy some credit for captcha solving. You will need to install the API key for your captcha-solving account in the `config.yaml`. Check out `config.yaml.dist` to see how to configure `2Captcha` or `Imagetyperz` with Flathunter. **At this time, ImmoScout24 can not be crawled by Flathunter without using 2Captcha/Imagetyperz. Buying captcha solutions does not guarantee that you will get past the ImmoScout24 bot detection (see [#296](https://github.com/flathunters/flathunter/issues/296), [#302](https://github.com/flathunters/flathunter/issues/302))**.
 
+#### ImmoScout24 Cookie Override
+
+You may find that even with the Captcha-solving support, your browser is detected as a bot. In this case, as a short-term fix, you can visit the ImmoScout website with your normal web-browser - actual humans generally pass the bot detection - and copy the `reese84` cookie into your Flathunter config file:
+
+```
+immoscout_cookie: 2:pJP9F...OU4Q=
+```
+
+This should allow you to bypass the bot detection for a short period of time, but you will need periodically to get a new cookie.
+
 #### Proxy
 
 It's common that websites use bots and crawler protections to avoid being flooded with possibly malicious traffic. This can cause some issues when crawling, as we will be presented with a bot-protection page.

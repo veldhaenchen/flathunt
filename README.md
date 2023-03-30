@@ -13,6 +13,10 @@ The rents are too high - you can't find a flat at a reasonable price in a place 
 
 Use this bot to help with your flatsearch - it's a much better use of your time and resources than hitting refresh on a property portal every five minutes. Once you found a place for yourself (lucky you!), consider supporting alternatives like the [Mietshäusersyndikat](https://www.syndikat.org/en/the-joint-venture/). The MHS projects are always [looking for funding](https://www.syndikat.org/en/funding/) (in the form of interest-bearing loans from individuals) - if you have some thousand euros sitting around on your bank account, you can improve the housing situation in Germany and earn some interest on your savings by [lending cash](https://www.syndikat.org/en/direct-loans/) to one of the projects for a year or two.
 
+## If you are not a Python developer / power-user
+
+Setting up this project on your local machine can be a bit complicated if you have no experience with Python. This `README` is detailed, and there is a configuration wizard, but it's not super user-friendly. If you are searching for properties in Berlin, you can use the hosted version at https://flathunter.codders.io . You can login there with your Telegram ID and setup a basic search without downloading the project.
+
 ## Description
 
 Flathunter is a Python application which periodically [scrapes](https://en.wikipedia.org/wiki/Web_scraping) property listings sites, configured by the user, to find new rental real-estate listings, reporting them over messaging services.

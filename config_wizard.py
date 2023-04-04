@@ -15,7 +15,8 @@ from prompt_toolkit.document import Document
 from prompt_toolkit.validation import Validator, ValidationError
 
 from flathunter.config import YamlConfig
-from flathunter import crawl_immobilienscout
+from flathunter.crawler import immobilienscout
+
 
 class ConfigurationAborted(Exception):
     """Exception to indicate the user has aborted the configuration"""
@@ -196,8 +197,8 @@ def configure_notifier(notifier: str, config) -> Dict[str, Any]:
 def configure_captcha(urls: List[str], config: YamlConfig) -> Optional[Dict[str, Any]]:
     """Configure the captcha solver, where required"""
     is_immoscout = reduce(lambda a,b: a or b,
-        [ re.search(crawl_immobilienscout.STATIC_URL_PATTERN, url) for url in urls ],
-        False)
+                          [re.search(immobilienscout.STATIC_URL_PATTERN, url) for url in urls],
+                          False)
     if not is_immoscout:
         return None
     clear()

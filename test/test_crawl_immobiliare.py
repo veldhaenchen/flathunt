@@ -1,6 +1,5 @@
 import unittest
-from functools import reduce
-from flathunter.crawl_immobiliare import CrawlImmobiliare
+from flathunter.crawler.immobiliare import CrawlImmobiliare
 from test.utils.config import StringConfig
 
 

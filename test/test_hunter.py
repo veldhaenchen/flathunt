@@ -1,9 +1,7 @@
 import unittest
-import yaml
 import re
 from typing import Optional, Dict, List
-from flathunter.config import YamlConfig
-from flathunter.crawl_immowelt import CrawlImmowelt
+from flathunter.crawler.immowelt import CrawlImmowelt
 from flathunter.hunter import Hunter 
 from flathunter.idmaintainer import IdMaintainer
 from test.dummy_crawler import DummyCrawler

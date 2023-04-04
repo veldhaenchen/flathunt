@@ -1,11 +1,10 @@
 import pytest
 import json
 import os
-import sys
 import requests_mock
 import re
 
-from flathunter.crawl_immobilienscout import CrawlImmobilienscout
+from flathunter.crawler.immobilienscout import CrawlImmobilienscout
 from flathunter.captcha.captcha_solver import CaptchaBalanceEmpty
 from test.utils.config import StringConfigWithCaptchas
 

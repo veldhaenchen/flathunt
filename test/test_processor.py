@@ -1,7 +1,4 @@
 import unittest
-import yaml
-import re
-from flathunter.crawl_immowelt import CrawlImmowelt
 from flathunter.hunter import Hunter
 from flathunter.idmaintainer import IdMaintainer
 from flathunter.processor import ProcessorChain

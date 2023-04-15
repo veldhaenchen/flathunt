@@ -5,7 +5,7 @@ from test.utils.config import StringConfig
 
 class WgGesuchtCrawlerTest(unittest.TestCase):
 
-    TEST_URL = 'https://www.wg-gesucht.de/wohnungen-in-Berlin.8.2.1.0.html?offer_filter=1&city_id=8&noDeact=1&categories%5B%5D=2&rent_types%5B%5D=0&sMin=70&rMax=1500&rmMin=2&fur=2&sin=2&exc=2&img_only=1'
+    TEST_URL = 'https://www.wg-gesucht.de/wohnungen-in-Berlin.8.2.1.0.html?offer_filter=1&city_id=8&noDeact=1&categories%5B%5D=2&rent_types%5B%5D=0&sMin=70&rMax=3000&rmMin=2&fur=2&sin=2&exc=2&img_only=1'
     DUMMY_CONFIG = """
     urls:
       - https://www.wg-gesucht.de/wohnungen-in-Munchen.90.2.1.0.html

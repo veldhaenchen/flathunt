@@ -25,7 +25,7 @@ else:
     # Load the driver manager from local cache (if chrome_driver_install.py has been run
     os.environ['WDM_LOCAL'] = '1'
     # Use Google Cloud DB if we run on the cloud
-    id_watch = GoogleCloudIdMaintainer()
+    id_watch = GoogleCloudIdMaintainer(config)
 
 configure_logging(config)
 

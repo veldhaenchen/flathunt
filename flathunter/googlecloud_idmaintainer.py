@@ -9,11 +9,12 @@ from flathunter.logging import logger
 from flathunter.config import Config
 from flathunter.exceptions import PersistenceException
 
+
 class GoogleCloudIdMaintainer:
     """Storage back-end - implementation of IdMaintainer API"""
 
-    def __init__(self):
-        project_id = Config().google_cloud_project_id()
+    def __init__(self, config):
+        project_id = config.google_cloud_project_id()
         if project_id is None:
             raise PersistenceException(
                 "Need to project a google_cloud_project_id in config.yaml")
@@ -44,8 +45,8 @@ class GoogleCloudIdMaintainer:
         """Returns all exposes since the supplied datetime"""
         localized_datetime = min_datetime.replace(tzinfo=pytz.UTC)
         res = []
-        for doc in self.database.collection('exposes')\
-                       .order_by('created_sort').limit(10000).stream():
+        for doc in self.database.collection('exposes') \
+                .order_by('created_sort').limit(10000).stream():
             if doc.to_dict()['created_at'] < localized_datetime:
                 break
             res.append(doc.to_dict())
@@ -55,8 +56,8 @@ class GoogleCloudIdMaintainer:
         """Returns recent exposes (no more than 'count'), conforming to
            the provided filter if supplied"""
         res = []
-        for doc in self.database.collection('exposes')\
-                       .order_by('created_sort').limit(100).stream():
+        for doc in self.database.collection('exposes') \
+                .order_by('created_sort').limit(100).stream():
             expose = doc.to_dict()
             if filter_set is None or filter_set.is_interesting_expose(expose):
                 res.append(expose)
@@ -85,9 +86,9 @@ class GoogleCloudIdMaintainer:
     def get_last_run_time(self):
         """Returns the datetime of the last run"""
         # pylint: disable=no-member
-        for doc in self.database.collection('executions')\
-                        .order_by('timestamp', direction=firestore.Query.DESCENDING)\
-                        .limit(1).stream():
+        for doc in self.database.collection('executions') \
+                .order_by('timestamp', direction=firestore.Query.DESCENDING) \
+                .limit(1).stream():
             return doc.to_dict()['timestamp']
 
     def update_last_run_time(self):

@@ -112,6 +112,3 @@ processed_ids.db
 
 # Vscode
 .vscode
-
-# Configuration
-/config.yaml

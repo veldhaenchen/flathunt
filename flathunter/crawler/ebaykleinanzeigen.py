@@ -10,7 +10,7 @@ from flathunter.abstract_crawler import Crawler
 class CrawlEbayKleinanzeigen(Crawler):
     """Implementation of Crawler interface for Ebay Kleinanzeigen"""
 
-    URL_PATTERN = re.compile(r'https://www\.ebay-kleinanzeigen\.de')
+    URL_PATTERN = re.compile(r'https://www\.kleinanzeigen\.de')
     MONTHS = {
         "Januar": "01",
         "Februar": "02",

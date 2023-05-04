@@ -92,7 +92,7 @@ class CrawlEbayKleinanzeigen(Crawler):
             details = {
                 'id': int(expose_ids[idx].get("data-adid")),
                 'image': image,
-                'url': ("https://www.ebay-kleinanzeigen.de" + title_el.get("href")),
+                'url': ("https://www.kleinanzeigen.de" + title_el.get("href")),
                 'title': title_el.text.strip(),
                 'price': price,
                 'size': size,

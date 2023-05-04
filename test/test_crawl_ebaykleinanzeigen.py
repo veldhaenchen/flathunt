@@ -5,10 +5,10 @@ from test.utils.config import StringConfig
 
 DUMMY_CONFIG = """
 urls:
-  - https://www.ebay-kleinanzeigen.de/s-wohnung-mieten/muenchen/anbieter:privat/anzeige:angebote/preis:600:1000
+  - https://www.kleinanzeigen.de/s-wohnung-mieten/muenchen/anbieter:privat/anzeige:angebote/preis:600:1000
     """
 
-TEST_URL = 'https://www.ebay-kleinanzeigen.de/s-wohnung-mieten/berlin/preis:1000:1500/c203l3331+wohnung_mieten.qm_d:70,+wohnung_mieten.zimmer_d:2'
+TEST_URL = 'https://www.kleinanzeigen.de/s-wohnung-mieten/berlin/preis:1000:1500/c203l3331+wohnung_mieten.qm_d:70,+wohnung_mieten.zimmer_d:2'
 
 @pytest.fixture
 def crawler():
@@ -21,7 +21,7 @@ def test_crawler(crawler):
     assert entries is not None
     assert len(entries) > 0
     assert entries[0]['id'] > 0
-    assert entries[0]['url'].startswith("https://www.ebay-kleinanzeigen.de/s-anzeige")
+    assert entries[0]['url'].startswith("https://www.kleinanzeigen.de/s-anzeige")
     for attr in [ 'title', 'price', 'size', 'rooms', 'address' ]:
         assert entries[0][attr]
 

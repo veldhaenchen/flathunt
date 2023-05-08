@@ -72,7 +72,7 @@ def gather_urls(config: YamlConfig) -> List[str]:
         clear()
         print("Enter URLs for Scraping\n")
         print("Flathunter scrapes property portals by fetching content from search URLs\n"
-            "on the websites. Visit ImmoScout, ImmoWelt, eBay-Kleinanzeigen or WG-Gesucht,\n"
+            "on the websites. Visit ImmoScout, ImmoWelt, Kleinanzeigen or WG-Gesucht,\n"
             "make a search for the flat that you are looking for (e.g. pick a city), and\n"
             "copy the URL here. You can add as many URLs as you like.\n\n")
         if len(urls) > 0:

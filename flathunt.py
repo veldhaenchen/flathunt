@@ -78,6 +78,10 @@ def main():
             and not config.get('apprise', {}):
         logger.error("No apprise url configured. Starting like this would be pointless...")
         return
+    if 'slack' in notifiers \
+            and not config.get('slack', {}):
+        logger.error("No Slack webhook url configured. Starting like this would be pointless...")
+        return
 
     if len(config.target_urls()) == 0:
         logger.error("No URLs configured. Starting like this would be pointless...")

@@ -21,7 +21,7 @@ Setting up this project on your local machine can be a bit complicated if you ha
 
 Flathunter is a Python application which periodically [scrapes](https://en.wikipedia.org/wiki/Web_scraping) property listings sites, configured by the user, to find new rental real-estate listings, reporting them over messaging services.
 
-Currently available messaging services are [Telegram](https://telegram.org/), [Mattermost](https://mattermost.com/) and [Apprise](https://github.com/caronc/apprise).
+Currently available messaging services are [Telegram](https://telegram.org/), [Mattermost](https://mattermost.com/), [Apprise](https://github.com/caronc/apprise) and [Slack](https://slack.com/).
 
 ## Table of Contents
 - [Background](#background)
@@ -268,10 +268,11 @@ To make deployment with docker easier, most of the important configuration optio
  - FLATHUNTER_VERBOSE_LOG - set to any value to enable verbose logging
  - FLATHUNTER_LOOP_PERIOD_SECONDS - a number in seconds for the crawling interval
  - FLATHUNTER_MESSAGE_FORMAT - a format string for the notification messages, where `#CR#` will be replaced by newline
- - FLATHUNTER_NOTIFIERS - a comma-separated list of notifiers to enable (e.g. `telegram,mattermost`)
+ - FLATHUNTER_NOTIFIERS - a comma-separated list of notifiers to enable (e.g. `telegram,mattermost,slack`)
  - FLATHUNTER_TELEGRAM_BOT_TOKEN - the token for the Telegram notifier
  - FLATHUNTER_TELEGRAM_RECEIVER_IDS - a comma-separated list of receiver IDs for Telegram notifications
  - FLATHUNTER_MATTERMOST_WEBHOOK_URL - the webhook URL for Mattermost notifications
+ - FLATHUNTER_SLACK_WEBHOOK_URL - the webhook URL for Slack notifications
  - FLATHUNTER_WEBSITE_SESSION_KEY - the secret session key used to secure sessions for the flathunter website deployment
  - FLATHUNTER_WEBSITE_DOMAIN - the public domain of the flathunter website deployment
  - FLATHUNTER_2CAPTCHA_KEY - the API key for 2captcha

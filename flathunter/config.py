@@ -58,6 +58,7 @@ class Env:
         _read_env("FLATHUNTER_TELEGRAM_BOT_NOTIFY_WITH_IMAGES")
     FLATHUNTER_TELEGRAM_RECEIVER_IDS = _read_env("FLATHUNTER_TELEGRAM_RECEIVER_IDS")
     FLATHUNTER_MATTERMOST_WEBHOOK_URL = _read_env("FLATHUNTER_MATTERMOST_WEBHOOK_URL")
+    FLATHUNTER_SLACK_WEBHOOK_URL = _read_env("FLATHUNTER_SLACK_WEBHOOK_URL")
 
     # Filters
     FLATHUNTER_FILTER_EXCLUDED_TITLES = _read_env("FLATHUNTER_FILTER_EXCLUDED_TITLES")
@@ -255,6 +256,10 @@ Preis: {price}
         """Webhook for sending Mattermost messages"""
         return self._read_yaml_path('mattermost.webhook_url', None)
 
+    def slack_webhook_url(self):
+        """Webhook for sending Slack messages"""
+        return self._read_yaml_path('slack.webhook_url', None)
+
     def apprise_urls(self):
         """Notification URLs for Apprise"""
         return self._read_yaml_path('apprise', [])
@@ -344,6 +349,7 @@ Preis: {price}
             "twocaptcha_key": elide(self.get_twocaptcha_key()),
             "mattermost_webhook_url": self.mattermost_webhook_url(),
             "notifiers": self.notifiers(),
+            "slack_webhook_url": self.slack_webhook_url(),
             "telegram_receiver_ids": self.telegram_receiver_ids(),
             "telegram_bot_token": elide(self.telegram_bot_token()),
             "target_urls": self.target_urls(),
@@ -486,6 +492,11 @@ class Config(CaptchaEnvironmentConfig): # pylint: disable=too-many-public-method
         if Env.FLATHUNTER_MATTERMOST_WEBHOOK_URL is not None:
             return Env.FLATHUNTER_MATTERMOST_WEBHOOK_URL
         return super().mattermost_webhook_url()
+
+    def slack_webhook_url(self):
+        if Env.FLATHUNTER_SLACK_WEBHOOK_URL is not None:
+            return Env.FLATHUNTER_SLACK_WEBHOOK_URL
+        return super().slack_webhook_url()
 
     def excluded_titles(self):
         if Env.FLATHUNTER_FILTER_EXCLUDED_TITLES is not None:

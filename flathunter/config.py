@@ -258,7 +258,7 @@ Preis: {price}
 
     def slack_webhook_url(self):
         """Webhook for sending Slack messages"""
-        return self._read_yaml_path('slack.webhook_url', None)
+        return self._read_yaml_path('slack.webhook_url', "")
 
     def apprise_urls(self):
         """Notification URLs for Apprise"""

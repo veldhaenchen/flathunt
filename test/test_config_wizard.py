@@ -91,7 +91,7 @@ class ConfigWizardTest(unittest.TestCase):
     @patch("config_wizard.prompt")
     def test_configure_notifier(self, prompt_mock):
         prompt_mock.side_effect = [
-            "", "", ""
+            "", "", "", ""
         ]
         for notifier in Notifier:
             with pytest.raises(ConfigurationAborted):

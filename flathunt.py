@@ -79,7 +79,7 @@ def main():
         logger.error("No apprise url configured. Starting like this would be pointless...")
         return
     if 'slack' in notifiers \
-            and not config.get('slack', {}):
+            and not config.slack_webhook_url():
         logger.error("No Slack webhook url configured. Starting like this would be pointless...")
         return
 

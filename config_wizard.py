@@ -31,6 +31,7 @@ class Notifier(Enum):
     TELEGRAM = "telegram"
     MATTERMOST = "mattermost"
     APPRISE = "apprise"
+    SLACK = "slack"
 
 def welcome():
     """Display the welcome dialog"""
@@ -98,6 +99,7 @@ def select_notifier(config: YamlConfig) -> str:
             (Notifier.TELEGRAM.value, "Telegram"),
             (Notifier.MATTERMOST.value, "Mattermost"),
             (Notifier.APPRISE.value, "Apprise"),
+            (Notifier.SLACK.value, "Slack"),
         ],
         title="Configure notifications",
         text="Choose a notification platform.",
@@ -184,6 +186,22 @@ def configure_apprise(config: YamlConfig) -> Dict[str, Any]:
         Notifier.APPRISE.value: [ apprise_url ]
     }
 
+def configure_slack(config: YamlConfig) -> Dict[str, Any]:
+    """Ask the user for the Slack webhook URL"""
+    clear()
+    print("Slack Webhook URL\n")
+    print("To receive messages over Slack, Flathunter will need the Webhook URL\n"
+    "of your Slack channel.\n")
+
+    webhook_url = prompt_with_default("Enter Webhook URL: ", config.slack_webhook_url())
+    if len(webhook_url) == 0:
+        raise ConfigurationAborted()
+    return {
+        Notifier.SLACK.value: {
+            "webhook_url": webhook_url
+        }
+    }
+
 def configure_notifier(notifier: str, config) -> Dict[str, Any]:
     """Configure the selected / active notifier"""
     if notifier == Notifier.TELEGRAM.value:
@@ -192,6 +210,8 @@ def configure_notifier(notifier: str, config) -> Dict[str, Any]:
         return configure_mattermost(config)
     if notifier == Notifier.APPRISE.value:
         return configure_apprise(config)
+    if notifier == Notifier.SLACK.value:
+        return configure_slack(config)
     raise ConfigurationError("Invalid Notifier Selection")
 
 def configure_captcha(urls: List[str], config: YamlConfig) -> Optional[Dict[str, Any]]:

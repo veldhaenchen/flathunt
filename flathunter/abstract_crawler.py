@@ -69,11 +69,6 @@ class Crawler(ABC):
         afterlogin_string: Optional[str]=None) -> BeautifulSoup:
         """Creates a Soup object from the HTML at the provided URL"""
 
-        self.rotate_user_agent()
-        resp = requests.get(url, headers=self.HEADERS, timeout=30)
-
-        if resp.status_code not in (200, 405):
-            logger.error("Got response (%i): %s", resp.status_code, resp.content)
         if self.config.use_proxy():
             return self.get_soup_with_proxy(url)
         if driver is not None:
@@ -83,6 +78,12 @@ class Crawler(ABC):
             elif re.search("g-recaptcha", driver.page_source):
                 self.resolve_recaptcha(driver, checkbox, afterlogin_string or "")
             return BeautifulSoup(driver.page_source, 'html.parser')
+        
+        self.rotate_user_agent()
+        resp = requests.get(url, headers=self.HEADERS, timeout=30)
+        if resp.status_code not in (200, 405):
+            logger.error("Got response (%i): %s", resp.status_code, resp.content)
+
         return BeautifulSoup(resp.content, 'html.parser')
 
     def get_soup_with_proxy(self, url) -> BeautifulSoup:

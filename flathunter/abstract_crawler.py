@@ -78,7 +78,7 @@ class Crawler(ABC):
             elif re.search("g-recaptcha", driver.page_source):
                 self.resolve_recaptcha(driver, checkbox, afterlogin_string or "")
             return BeautifulSoup(driver.page_source, 'html.parser')
-        
+
         self.rotate_user_agent()
         resp = requests.get(url, headers=self.HEADERS, timeout=30)
         if resp.status_code not in (200, 405):

@@ -192,7 +192,6 @@ class CrawlWgGesucht(Crawler):
         necessary as we need to reload the page once for all filters to
         be applied correctly on wg-gesucht.
         """
-        self.rotate_user_agent()
         sess = requests.session()
         # First page load to set filters; response is discarded
         sess.get(url, headers=self.HEADERS)

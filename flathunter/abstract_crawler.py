@@ -6,6 +6,7 @@ from typing import Optional, Any
 
 import backoff
 import requests
+# pylint: disable=unused-import
 import requests_random_user_agent
 
 from bs4 import BeautifulSoup

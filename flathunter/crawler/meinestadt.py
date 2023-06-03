@@ -15,9 +15,8 @@ class CrawlMeineStadt(Crawler):
     def __init__(self, config):
         super().__init__(config)
         self.config = config
-        # Quiet a lot of user agents from random_user_agent lib are blocked. This one works.
-        # self.HEADERS['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
 
+    # pylint: disable=too-many-locals
     def extract_data(self, soup):
         """Extracts all exposes from a provided Soup object"""
         entries = []
@@ -52,15 +51,14 @@ class CrawlMeineStadt(Crawler):
                 'url': url,
                 'title': title,
                 'price': price,
-                'size': size[0],
+                'size': size,
                 'rooms': rooms,
                 'address': address
             }
-            id = int(
+            details['id'] = int(
                 hashlib.sha256(str(details).encode(
                     'utf-8')).hexdigest(), 16
             ) % 10**16
-            details['id'] = id
             details['crawler'] = self.get_name()
 
             entries.append(details)

@@ -77,8 +77,11 @@ class Crawler(ABC):
 
         resp = requests.get(url, headers=self.HEADERS, timeout=30)
         if resp.status_code not in (200, 405):
+            user_agent = 'Unknown'
+            if 'User-Agent' in self.HEADERS:
+                user_agent = self.HEADERS['User-Agent']
             logger.error("Got response (%i): %s\n%s",
-                         resp.status_code, resp.content, self.HEADERS['User-Agent'])
+                         resp.status_code, resp.content, user_agent)
 
         return BeautifulSoup(resp.content, 'html.parser')
 

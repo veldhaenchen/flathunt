@@ -650,7 +650,7 @@
                 "sha256:8bef7dde241278824a6d83f44a544709b065191b95b6e50894bdc722fcba0504",
                 "sha256:f84c2818376e66cf843d497486ea8fed8700b340f308f076c6fb1229dff318b6"
             ],
-            "markers": "python_full_version >= '3.8.0'",
+            "markers": "python_version >= '3.8'",
             "version": "==5.12.0"
         },
         "itsdangerous": {
@@ -1101,11 +1101,11 @@
         },
         "pyright": {
             "hashes": [
-                "sha256:262744daa7455f6056f6d6609b6278258e2fd7bd100d8937203516ee71d0eb93",
-                "sha256:f124400a1a72ccc5fd04836e7e48ed235e8f7929bcc42b270a571fb34df17979"
+                "sha256:7259d73287c882f933d8cd88c238ef02336e172171ae95117a963a962a1fed4a",
+                "sha256:bac1baf8567b90f2082ec95b61fc1cb50a68917119212c5608a72210870c6a9a"
             ],
             "index": "pypi",
-            "version": "==1.1.315"
+            "version": "==1.1.316"
         },
         "pysocks": {
             "hashes": [
@@ -1498,7 +1498,7 @@
                 "sha256:935539fa1413afbb9195b24880778422ed620c0fc09670945185cce4d91a8890",
                 "sha256:98c774df2f91b05550078891dee5f0eb0cb797a522c757a2452b9cee5b202330"
             ],
-            "markers": "python_full_version >= '3.8.0'",
+            "markers": "python_version >= '3.8'",
             "version": "==2.3.6"
         },
         "wrapt": {

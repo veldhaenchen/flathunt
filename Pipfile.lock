@@ -378,11 +378,11 @@
         },
         "firebase-admin": {
             "hashes": [
-                "sha256:3daa806d16a35d83a809a70a325f973ba9dc242601fe69cd68e6f54a6ffdcd57",
-                "sha256:52e13e393c9d3dc6237f2c376b8e55aacdaaeebe455c0b7e8cfbf35b6491e19d"
+                "sha256:e3b334d18bbea039f2f3e8a792ad6870d2a7cc79a13ed10659dedd63f5b475e4",
+                "sha256:e3c42351fb6194d7279a6fd9209a947005fb4ee7e9037d19762e6cb3da4a82e1"
             ],
             "index": "pypi",
-            "version": "==6.1.0"
+            "version": "==6.2.0"
         },
         "flask": {
             "hashes": [
@@ -1230,7 +1230,7 @@
                 "sha256:90260d9058e514786967344d0ef75fa8727eed8a7d2e43ce9f4bcf1b536174f7",
                 "sha256:e38464a49c6c85d7f1351b0126661487a7e0a14a50f1675ec50eb34d4f20ef21"
             ],
-            "markers": "python_version >= '3.6' and python_version < '4.0'",
+            "markers": "python_version >= '3.6' and python_version < '4'",
             "version": "==4.9"
         },
         "ruamel.yaml": {

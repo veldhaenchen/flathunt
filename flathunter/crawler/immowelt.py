@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup, Tag
 from flathunter.logging import logger
 from flathunter.abstract_crawler import Crawler
 
-class CrawlImmowelt(Crawler):
+class Immowelt(Crawler):
     """Implementation of Crawler interface for ImmoWelt"""
 
     URL_PATTERN = re.compile(r'https://www\.immowelt\.de')

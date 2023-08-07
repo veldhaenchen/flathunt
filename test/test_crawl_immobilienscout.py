@@ -4,7 +4,7 @@ import os
 import requests_mock
 import re
 
-from flathunter.crawler.immobilienscout import CrawlImmobilienscout
+from flathunter.crawler.immobilienscout import Immobilienscout
 from flathunter.captcha.captcha_solver import CaptchaBalanceEmpty
 from test.utils.config import StringConfigWithCaptchas
 
@@ -20,7 +20,7 @@ test_config = StringConfigWithCaptchas(string=DUMMY_CONFIG)
 
 @pytest.fixture
 def crawler():
-    return CrawlImmobilienscout(test_config)
+    return Immobilienscout(test_config)
 
 def test_parse_exposes_from_json(crawler):
     with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "fixtures", "immo-scout-IS24-object.json")) as fixture:

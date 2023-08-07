@@ -147,7 +147,7 @@ def liste_attribute_filter(element: Union[Tag, str]) -> bool:
     return element.attrs["id"].startswith('liste-')
 
 
-class CrawlWgGesucht(Crawler):
+class WgGesucht(Crawler):
     """Implementation of Crawler interface for WgGesucht"""
 
     URL_PATTERN = re.compile(r'https://www\.wg-gesucht\.de')

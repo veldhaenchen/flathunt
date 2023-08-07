@@ -5,7 +5,7 @@ from flathunter.logging import logger
 from flathunter.abstract_crawler import Crawler
 
 
-class CrawlImmobiliare(Crawler):
+class Immobiliare(Crawler):
     """Implementation of Crawler interface for Immobiliare"""
 
     URL_PATTERN = re.compile(r'https://www\.immobiliare\.it')

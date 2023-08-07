@@ -1,5 +1,5 @@
 import unittest
-from flathunter.crawler.meinestadt import CrawlMeineStadt
+from flathunter.crawler.meinestadt import MeineStadt
 from test.utils.config import StringConfig
 
 
@@ -12,7 +12,7 @@ class MeineStadtCrawlerTest(unittest.TestCase):
     """
 
     def setUp(self):
-        self.crawler = CrawlMeineStadt(StringConfig(string=self.DUMMY_CONFIG))
+        self.crawler = MeineStadt(StringConfig(string=self.DUMMY_CONFIG))
 
     def test(self):
         soup = self.crawler.get_page(self.TEST_URL)

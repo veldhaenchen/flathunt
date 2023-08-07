@@ -1,6 +1,6 @@
 import unittest
 from functools import reduce
-from flathunter.crawler.wggesucht import CrawlWgGesucht
+from flathunter.crawler.wggesucht import WgGesucht
 from test.utils.config import StringConfig
 
 class WgGesuchtCrawlerTest(unittest.TestCase):
@@ -11,7 +11,7 @@ class WgGesuchtCrawlerTest(unittest.TestCase):
       - https://www.wg-gesucht.de/wohnungen-in-Munchen.90.2.1.0.html
         """
     def setUp(self):
-        self.crawler = CrawlWgGesucht(StringConfig(string=self.DUMMY_CONFIG))
+        self.crawler = WgGesucht(StringConfig(string=self.DUMMY_CONFIG))
 
     def test(self):
         soup = self.crawler.get_page(self.TEST_URL)

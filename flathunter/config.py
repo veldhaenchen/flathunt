@@ -9,14 +9,14 @@ from dotenv import load_dotenv
 from flathunter.captcha.captcha_solver import CaptchaSolver
 from flathunter.captcha.imagetyperz_solver import ImageTyperzSolver
 from flathunter.captcha.twocaptcha_solver import TwoCaptchaSolver
-from flathunter.crawler.ebaykleinanzeigen import CrawlEbayKleinanzeigen
-from flathunter.crawler.idealista import CrawlIdealista
-from flathunter.crawler.immobiliare import CrawlImmobiliare
-from flathunter.crawler.immobilienscout import CrawlImmobilienscout
-from flathunter.crawler.immowelt import CrawlImmowelt
-from flathunter.crawler.meinestadt import CrawlMeineStadt
-from flathunter.crawler.wggesucht import CrawlWgGesucht
-from flathunter.crawler.subito import CrawlSubito
+from flathunter.crawler.ebaykleinanzeigen import EbayKleinanzeigen
+from flathunter.crawler.idealista import Idealista
+from flathunter.crawler.immobiliare import Immobiliare
+from flathunter.crawler.immobilienscout import Immobilienscout
+from flathunter.crawler.immowelt import Immowelt
+from flathunter.crawler.meinestadt import MeineStadt
+from flathunter.crawler.wggesucht import WgGesucht
+from flathunter.crawler.subito import Subito
 from flathunter.filter import Filter
 from flathunter.logging import logger
 from flathunter.exceptions import ConfigException
@@ -117,14 +117,14 @@ Preis: {price}
     def init_searchers(self):
         """Initialize search plugins"""
         self.__searchers__ = [
-            CrawlImmobilienscout(self),
-            CrawlWgGesucht(self),
-            CrawlEbayKleinanzeigen(self),
-            CrawlImmowelt(self),
-            CrawlSubito(self),
-            CrawlImmobiliare(self),
-            CrawlIdealista(self),
-            CrawlMeineStadt(self)
+            Immobilienscout(self),
+            WgGesucht(self),
+            EbayKleinanzeigen(self),
+            Immowelt(self),
+            Subito(self),
+            Immobiliare(self),
+            Idealista(self),
+            MeineStadt(self)
         ]
 
     def check_deprecated(self):

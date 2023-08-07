@@ -42,8 +42,8 @@ class Immobiliare(Crawler):
             details_list = row.find(
                 "ul", {"class": "in-realEstateListCard__features"})
 
-            price_li = details_list.find(
-                "li", {"class": "in-realEstateListCard__features--main"})
+            price_li = row.find(
+                "div", {"class": "in-realEstateListCard__priceOnTop"})
 
             price_re = re.match(
                 r".*\s([0-9]+.*)$",

@@ -75,7 +75,10 @@ class Immowelt(Crawler):
             except IndexError:
                 rooms = ""
 
-            url = expose_ids[idx].get("href")
+            try:
+                url = expose_ids[idx].get("href")
+            except IndexError:
+                continue
 
             picture = expose_ids[idx].find("picture")
             image = None

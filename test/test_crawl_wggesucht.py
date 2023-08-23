@@ -1,5 +1,7 @@
+import os
 import unittest
 from functools import reduce
+from bs4 import BeautifulSoup
 from flathunter.crawler.wggesucht import WgGesucht
 from test.utils.config import StringConfig
 
@@ -26,4 +28,10 @@ class WgGesuchtCrawlerTest(unittest.TestCase):
         for attr in [ 'to' ]:
             found = reduce(lambda i, e: attr in e or i, entries, False)
             self.assertTrue(found, "Expected " + attr + " to sometimes be set")
+
+    def test_filter_spotahome_ads(self):
+        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), "fixtures", "wg-gesucht-spotahome.html")) as fixture:
+            soup = BeautifulSoup(fixture, 'html.parser')
+        entries = self.crawler.extract_data(soup)
+        assert len(entries) == 20
 

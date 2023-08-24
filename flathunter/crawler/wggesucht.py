@@ -86,12 +86,22 @@ def get_size(numbers_row: Tag) -> List[str]:
         return []
     return re.findall(r'\d{1,4}\sm²', size_el.text)
 
+def is_verified_company(row: Tag) -> bool:
+    """Filter out ads from 'Verified Companies'"""
+    verified_el = row.find("span", {"class": "label_verified"})
+    if isinstance(verified_el, Tag):
+        return True
+    return False
 
+# pylint: disable=too-many-return-statements
 def parse_expose_element_to_details(row: Tag, crawler: str) -> Optional[Dict]:
     """Parse an Expose soup element to an Expose details dictionary"""
     title_row = row.find('h3', {"class": "truncate_title"})
     if title_row is None or not isinstance(title_row, Tag):
         logger.warning("No title found - skipping")
+        return None
+    if is_verified_company(row):
+        logger.warning("Advert found - skipping")
         return None
     title = get_title(title_row)
     url = get_url(title_row)

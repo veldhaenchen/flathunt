@@ -18,11 +18,11 @@
     "default": {
         "apprise": {
             "hashes": [
-                "sha256:01c9949327d94c11c886bd1ae387ba7f61cdb9d6247b8096686920685e40fb47",
-                "sha256:b7c66513c5456690a298ed887c9016ded42f15e365d16142e728b74f7cffee82"
+                "sha256:3c581141077a101790ede0cab16fa283ad032a9b2f97dc6d3565fb2d91813fd7",
+                "sha256:3ef7d5cb3666c006af87b33c8f0ffa9fe68b69ef6d6a04b2824e6414f798bf54"
             ],
             "index": "pypi",
-            "version": "==1.4.5"
+            "version": "==1.5.0"
         },
         "astroid": {
             "hashes": [
@@ -1022,7 +1022,7 @@
                 "sha256:a49cd903bc0b6ab41f76bf65510439d56ca76f868adf0274e738bfdd096894df",
                 "sha256:fdcd09713cbd42480740d2fe29c990f7fbd885a67efc328aa8be6ee3e9f76a6b"
             ],
-            "markers": "python_version >= '3.6'",
+            "markers": "python_version >= '3.11'",
             "version": "==1.22.3"
         },
         "protobuf": {

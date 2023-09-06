@@ -9,10 +9,10 @@ from flathunter.logging import logger
 from flathunter.exceptions import ChromeNotFound
 
 CHROME_VERSION_REGEXP = re.compile(r'.* (\d+\.\d+\.\d+\.\d+)( .*)?')
-WINDOWS_CHROME_REG_PATH = 'HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon'
+WINDOWS_CHROME_REG_PATH = r'HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon'
 WINDOWS_CHROME_REG_REGEXP = re.compile(r'\s*version\s*REG_SZ\s*(\d+)\..*')
 
-def get_command_output(args):
+def get_command_output(args) -> list[str]:
     """Run a command and return stdout"""
     try:
         with subprocess.Popen(args,
@@ -22,7 +22,7 @@ def get_command_output(args):
                 return []
             return process.stdout.readlines()
     except FileNotFoundError:
-        return None
+        return []
 
 def get_chrome_version() -> int:
     """Determine the correct name for the chrome binary"""
@@ -41,9 +41,11 @@ def get_chrome_version() -> int:
         # on Windows, Chrome doesn't respond to --version, but we can find
         # the version in the registry
         output = get_command_output(['reg', 'query', WINDOWS_CHROME_REG_PATH, '/v', 'version'])
-        version = [p for p in output if WINDOWS_CHROME_REG_REGEXP.match(p)]
-        if version:
-            return int(WINDOWS_CHROME_REG_REGEXP.match(version[0]).group(1))
+        version_line = [p for p in output if WINDOWS_CHROME_REG_REGEXP.match(p)]
+        if version_line:
+            version = WINDOWS_CHROME_REG_REGEXP.match(version_line[0])
+            if version is not None:
+                return int(version.group(1))
     except FileNotFoundError:
         pass
     raise ChromeNotFound()

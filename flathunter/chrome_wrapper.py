@@ -9,16 +9,18 @@ from flathunter.logging import logger
 from flathunter.exceptions import ChromeNotFound
 
 CHROME_VERSION_REGEXP = re.compile(r'.* (\d+\.\d+\.\d+\.\d+)( .*)?')
+WINDOWS_CHROME_REG_PATH = 'HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon'
+WINDOWS_CHROME_REG_REGEXP = re.compile(r'\s*version\s*REG_SZ\s*(\d+)\..*')
 
 def get_command_output(args):
-    """Run a command and return the first line of stdout"""
+    """Run a command and return stdout"""
     try:
         with subprocess.Popen(args,
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                     universal_newlines=True) as process:
             if process.stdout is None:
-                return None
-            return process.stdout.readline()
+                return []
+            return process.stdout.readlines()
     except FileNotFoundError:
         return None
 
@@ -26,15 +28,24 @@ def get_chrome_version() -> int:
     """Determine the correct name for the chrome binary"""
     for binary_name in ['google-chrome', 'chromium', 'chrome']:
         try:
-            version = get_command_output([binary_name, '--version'])
-            if version is None:
+            version_output = get_command_output([binary_name, '--version'])
+            if not version_output:
                 continue
-            match = CHROME_VERSION_REGEXP.match(version)
+            match = CHROME_VERSION_REGEXP.match(version_output[0])
             if match is None:
                 continue
             return int(match.group(1).split('.')[0])
         except FileNotFoundError:
             pass
+    try:
+        # on Windows, Chrome doesn't respond to --version, but we can find
+        # the version in the registry
+        output = get_command_output(['reg', 'query', WINDOWS_CHROME_REG_PATH, '/v', 'version'])
+        version = [p for p in output if WINDOWS_CHROME_REG_REGEXP.match(p)]
+        if version:
+            return int(WINDOWS_CHROME_REG_REGEXP.match(version[0]).group(1))
+    except FileNotFoundError:
+        pass
     raise ChromeNotFound()
 
 def get_chrome_driver(driver_arguments):

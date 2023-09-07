@@ -44,11 +44,10 @@ def get_chrome_version() -> int:
         output = get_command_output(
             ['reg', 'query', WINDOWS_CHROME_REG_PATH, '/v', 'version']
         )
-        version_line = [p for p in output if WINDOWS_CHROME_REG_REGEXP.match(p)]
-        if version_line:
-            version = WINDOWS_CHROME_REG_REGEXP.match(version_line[0])
-            if version is not None:
-                return int(version.group(1))
+        version_matches = (WINDOWS_CHROME_REG_REGEXP.match(l) for l in output)
+        version_matches = [m for m in version_matches if m is not None]
+        if version_matches:
+            return int(version_matches[0].group(1))
     except FileNotFoundError:
         pass
     raise ChromeNotFound()

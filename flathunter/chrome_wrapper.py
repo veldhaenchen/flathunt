@@ -7,12 +7,13 @@ import undetected_chromedriver as uc
 
 from flathunter.logging import logger
 from flathunter.exceptions import ChromeNotFound
+from typing import List
 
 CHROME_VERSION_REGEXP = re.compile(r'.* (\d+\.\d+\.\d+\.\d+)( .*)?')
 WINDOWS_CHROME_REG_PATH = r'HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon'
 WINDOWS_CHROME_REG_REGEXP = re.compile(r'\s*version\s*REG_SZ\s*(\d+)\..*')
 
-def get_command_output(args) -> list[str]:
+def get_command_output(args) -> List[str]:
     """Run a command and return stdout"""
     try:
         with subprocess.Popen(args,
@@ -40,7 +41,9 @@ def get_chrome_version() -> int:
     try:
         # on Windows, Chrome doesn't respond to --version, but we can find
         # the version in the registry
-        output = get_command_output(['reg', 'query', WINDOWS_CHROME_REG_PATH, '/v', 'version'])
+        output = get_command_output(
+            ['reg', 'query', WINDOWS_CHROME_REG_PATH, '/v', 'version']
+        )
         version_line = [p for p in output if WINDOWS_CHROME_REG_REGEXP.match(p)]
         if version_line:
             version = WINDOWS_CHROME_REG_REGEXP.match(version_line[0])

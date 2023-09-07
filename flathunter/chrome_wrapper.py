@@ -3,11 +3,11 @@ binary is, to attach the correct selenium chromedriver, and to set
 the correct version number"""
 import re
 import subprocess
+from typing import List
 import undetected_chromedriver as uc
 
 from flathunter.logging import logger
 from flathunter.exceptions import ChromeNotFound
-from typing import List
 
 CHROME_VERSION_REGEXP = re.compile(r'.* (\d+\.\d+\.\d+\.\d+)( .*)?')
 WINDOWS_CHROME_REG_PATH = r'HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon'

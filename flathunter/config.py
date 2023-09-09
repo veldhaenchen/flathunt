@@ -16,6 +16,7 @@ from flathunter.crawler.immobilienscout import Immobilienscout
 from flathunter.crawler.immowelt import Immowelt
 from flathunter.crawler.meinestadt import MeineStadt
 from flathunter.crawler.wggesucht import WgGesucht
+from flathunter.crawler.vrmimmo import VrmImmo
 from flathunter.crawler.subito import Subito
 from flathunter.filter import Filter
 from flathunter.logging import logger
@@ -124,7 +125,8 @@ Preis: {price}
             Subito(self),
             Immobiliare(self),
             Idealista(self),
-            MeineStadt(self)
+            MeineStadt(self),
+            VrmImmo(self)
         ]
 
     def check_deprecated(self):

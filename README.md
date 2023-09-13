@@ -53,7 +53,7 @@ In Italy on the other hand, [idealista](https://www.idealista.it), [Subito](http
 With ```Flathunter```, instead of visiting the same pages on the same  sites every day, you can set the system up to scan every site, filtering by your search criteria, and notify you when new rental property becomes available that meets your criteria.
 
 ## Prerequisites
-* [Python 3.8+](https://www.python.org/)
+* [Python 3.10+](https://www.python.org/)
 * [pipenv](https://pipenv.pypa.io/en/latest/)
 * [Chromium](https://www.chromium.org/) / [Google Chrome](https://www.google.com/chrome/) (*optional to scan ads on immobilienscout24.de*)
 * [Docker]() (*optional*)

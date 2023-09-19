@@ -340,14 +340,6 @@
             ],
             "version": "==41.0.3"
         },
-        "decorator": {
-            "hashes": [
-                "sha256:637996211036b6385ef91435e4fae22989472f9d571faba8927ba8253acbc330",
-                "sha256:b8c3f85900b9dc423225913c5aace94729fe1fa9763b38939a95226f02d37186"
-            ],
-            "markers": "python_version >= '3.5'",
-            "version": "==5.1.1"
-        },
         "dill": {
             "hashes": [
                 "sha256:76b122c08ef4ce2eedcd4d1abd8e641114bfc6c2867f49f3c41facf65bf19f5e",
@@ -659,12 +651,11 @@
         },
         "jsonpath-ng": {
             "hashes": [
-                "sha256:292a93569d74029ba75ac2dc3d3630fc0e17b2df26119a165fa1d498ca47bf65",
-                "sha256:a273b182a82c1256daab86a313b937059261b5c5f8c4fa3fc38b882b344dd567",
-                "sha256:f75b95dbecb8a0f3b86fd2ead21c2b022c3f5770957492b9b6196ecccfeb10aa"
+                "sha256:5483f8e9d74c39c9abfab554c070ae783c1c8cbadf5df60d561bc705ac68a07e",
+                "sha256:6fd04833412c4b3d9299edf369542f5e67095ca84efa17cbb7f06a34958adc9f"
             ],
             "index": "pypi",
-            "version": "==1.5.3"
+            "version": "==1.6.0"
         },
         "lazy-object-proxy": {
             "hashes": [
@@ -1253,7 +1244,7 @@
                 "sha256:90260d9058e514786967344d0ef75fa8727eed8a7d2e43ce9f4bcf1b536174f7",
                 "sha256:e38464a49c6c85d7f1351b0126661487a7e0a14a50f1675ec50eb34d4f20ef21"
             ],
-            "markers": "python_version >= '3.6'",
+            "markers": "python_version >= '3.6' and python_version < '4.0'",
             "version": "==4.9"
         },
         "ruamel.yaml": {

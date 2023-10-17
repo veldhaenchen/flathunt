@@ -18,12 +18,12 @@
     "default": {
         "apprise": {
             "hashes": [
-                "sha256:3c581141077a101790ede0cab16fa283ad032a9b2f97dc6d3565fb2d91813fd7",
-                "sha256:3ef7d5cb3666c006af87b33c8f0ffa9fe68b69ef6d6a04b2824e6414f798bf54"
+                "sha256:3eefab1c5d7978b0e65c5091d1cdbe9206865dc3cb5d19ca5cfbddb76e8aaffe",
+                "sha256:78dbda7fd749d8f5c0c0307ef3e350cdc9eb33aa018008577b2d0c69b6cd7c71"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.6'",
-            "version": "==1.5.0"
+            "version": "==1.6.0"
         },
         "astroid": {
             "hashes": [

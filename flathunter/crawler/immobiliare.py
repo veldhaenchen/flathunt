@@ -27,10 +27,10 @@ class Immobiliare(Crawler):
             and "in-realEstateResults__carouselAgency" not in l["class"])
 
         for row in items:
-            flat_id = row['id'].replace("link_ad_", "")
-            title_row = row.find('a', {"class": "in-card__title"})
+            title_row = row.find('a', {"class": "in-reListCard__title"})
             title = title_row.text.strip()
             url = title_row['href']
+            flat_id = title_row['href'].split("/")[-2:][0]
 
             image_item = row.find_all('img')
             image = image_item[0]['src'] if image_item else ""
@@ -40,10 +40,10 @@ class Immobiliare(Crawler):
             # 1: number of rooms
             # 2: size of the apartment
             details_list = row.find(
-                "ul", {"class": "in-realEstateListCard__features"})
+                "ul", {"class": "in-reListCard__features"})
 
             price_li = row.find(
-                "div", {"class": "in-realEstateListCard__priceOnTop"})
+                "div", {"class": "in-reListCardPrice"})
 
             price_re = re.match(
                 r".*\s([0-9]+.*)$",

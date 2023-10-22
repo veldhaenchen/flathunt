@@ -11,7 +11,6 @@ lxml = "*"
 coverage = "*"
 requests-mock = "*"
 Flask = ">=3"
-Flask-API = "*"
 werkzeug = ">=3"
 firebase-admin = "*"
 mock-firestore = "*"
@@ -33,6 +32,7 @@ pyright = "*"
 types-beautifulsoup4 = "*"
 selenium = "*"
 gunicorn = "21.2.0"
+flask-api = {editable = true, ref = "bugfix/159/remove-werkzeug-deprecated-calls", git = "git+https://github.com/codders/flask-api.git"}
 
 [dev-packages]
 

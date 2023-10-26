@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from flathunter.captcha.captcha_solver import CaptchaSolver
 from flathunter.captcha.imagetyperz_solver import ImageTyperzSolver
 from flathunter.captcha.twocaptcha_solver import TwoCaptchaSolver
-from flathunter.crawler.ebaykleinanzeigen import EbayKleinanzeigen
+from flathunter.crawler.kleinanzeigen import Kleinanzeigen
 from flathunter.crawler.idealista import Idealista
 from flathunter.crawler.immobiliare import Immobiliare
 from flathunter.crawler.immobilienscout import Immobilienscout
@@ -120,7 +120,7 @@ Preis: {price}
         self.__searchers__ = [
             Immobilienscout(self),
             WgGesucht(self),
-            EbayKleinanzeigen(self),
+            Kleinanzeigen(self),
             Immowelt(self),
             Subito(self),
             Immobiliare(self),

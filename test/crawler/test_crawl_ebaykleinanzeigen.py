@@ -1,6 +1,6 @@
 import pytest
 
-from flathunter.crawler.ebaykleinanzeigen import EbayKleinanzeigen
+from flathunter.crawler.kleinanzeigen import Kleinanzeigen
 from test.utils.config import StringConfig
 
 DUMMY_CONFIG = """
@@ -12,7 +12,7 @@ TEST_URL = 'https://www.kleinanzeigen.de/s-wohnung-mieten/berlin/preis:1000:1500
 
 @pytest.fixture
 def crawler():
-    return EbayKleinanzeigen(StringConfig(string=DUMMY_CONFIG))
+    return Kleinanzeigen(StringConfig(string=DUMMY_CONFIG))
 
 def test_crawler(crawler):
     soup = crawler.get_page(TEST_URL)

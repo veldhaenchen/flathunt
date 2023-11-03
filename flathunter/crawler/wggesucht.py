@@ -21,7 +21,7 @@ def get_url(title_row: Tag) -> Optional[str]:
             or not a_element.has_attr('href') \
             or not isinstance(a_element.attrs['href'], str):
         return None
-    return 'https://www.wg-gesucht.de/' + a_element.attrs['href'].removeprefix()
+    return 'https://www.wg-gesucht.de/' + a_element.attrs['href'].removeprefix("/")
 
 
 def extract_href_style(row: Tag) -> Optional[str]:

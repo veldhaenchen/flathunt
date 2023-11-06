@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup, Tag
 
 from flathunter.logging import logger
 from flathunter.abstract_crawler import Crawler
-from flathunter.string_utils import remove_prefix
 
 
 def get_title(title_row: Tag) -> str:
@@ -22,7 +21,7 @@ def get_url(title_row: Tag) -> Optional[str]:
             or not a_element.has_attr('href') \
             or not isinstance(a_element.attrs['href'], str):
         return None
-    return 'https://www.wg-gesucht.de/' + remove_prefix(a_element.attrs['href'], "/")
+    return 'https://www.wg-gesucht.de/' + a_element.attrs['href'].removeprefix("/")
 
 
 def extract_href_style(row: Tag) -> Optional[str]:

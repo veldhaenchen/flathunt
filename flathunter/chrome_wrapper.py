@@ -4,6 +4,7 @@ the correct version number"""
 import re
 import subprocess
 from typing import List
+from sys import platform
 import undetected_chromedriver as uc
 
 from flathunter.logging import logger
@@ -27,7 +28,8 @@ def get_command_output(args) -> List[str]:
 
 def get_chrome_version() -> int:
     """Determine the correct name for the chrome binary"""
-    for binary_name in ['google-chrome', 'chromium', 'chrome']:
+    for binary_name in ['google-chrome', 'chromium', 'chrome',
+                        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome']:
         try:
             version_output = get_command_output([binary_name, '--version'])
             if not version_output:
@@ -56,6 +58,8 @@ def get_chrome_driver(driver_arguments):
     """Configure Chrome WebDriver"""
     logger.info('Initializing Chrome WebDriver for crawler...')
     chrome_options = uc.ChromeOptions() # pylint: disable=no-member
+    if platform == "darwin":
+        chrome_options.add_argument("--headless")
     if driver_arguments is not None:
         for driver_argument in driver_arguments:
             chrome_options.add_argument(driver_argument)

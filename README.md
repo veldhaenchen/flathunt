@@ -55,7 +55,7 @@ With ```Flathunter```, instead of visiting the same pages on the same  sites eve
 ## Prerequisites
 * [Python 3.10+](https://www.python.org/)
 * [pipenv](https://pipenv.pypa.io/en/latest/)
-* [Chromium](https://www.chromium.org/) / [Google Chrome](https://www.google.com/chrome/) (*optional to scan ads on immobilienscout24.de*)
+* [Chromium](https://www.chromium.org/) / [Google Chrome](https://www.google.com/chrome/) (*optional to scan ads on immobilienscout24.de and Kleinanzeigen*)
 * [Docker]() (*optional*)
 * [GCloud CLI]() (*optional*)
 
@@ -163,6 +163,10 @@ $ curl https://api.telegram.org/bot[BOT-TOKEN]/getUpdates
 ```
 
 to get list of messages the Bot has received. You will see your Chat ID in there.
+
+#### Bot Detection
+
+Some sites (including Kleinanzeigen and ImmoScout24) implement bot detection to prevent scripts from scraping their sites. Flathunter includes support for running a headless Chrome browser to simulate human requests to the websites. **For crawling Kleinanzeigen and ImmoScout24, you will need to install Google Chrome**
 
 #### Captchas
 

@@ -2,8 +2,8 @@
 import os
 
 from flathunter.argument_parser import parse
-from flathunter.idmaintainer import IdMaintainer
-from flathunter.googlecloud_idmaintainer import GoogleCloudIdMaintainer
+from database.idmaintainer import IdMaintainer
+from database.googlecloud_idmaintainer import GoogleCloudIdMaintainer
 from flathunter.web_hunter import WebHunter
 from flathunter.config import Config
 from flathunter.logging import configure_logging

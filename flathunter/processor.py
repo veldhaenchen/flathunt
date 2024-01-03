@@ -11,7 +11,7 @@ from flathunter.sender_apprise import SenderApprise
 from flathunter.sender_telegram import SenderTelegram
 from flathunter.sender_slack import SenderSlack
 from flathunter.gmaps_duration_processor import GMapsDurationProcessor
-from flathunter.idmaintainer import SaveAllExposesProcessor
+from database.idmaintainer import SaveAllExposesProcessor
 from flathunter.abstract_processor import Processor
 
 class ProcessorChainBuilder:

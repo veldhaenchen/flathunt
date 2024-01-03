@@ -3,7 +3,7 @@ import re
 from typing import Optional, Dict, List
 from flathunter.crawler.immowelt import Immowelt
 from flathunter.hunter import Hunter 
-from flathunter.idmaintainer import IdMaintainer
+from database.idmaintainer import IdMaintainer
 from test.dummy_crawler import DummyCrawler
 from test.test_util import count
 from test.utils.config import StringConfig

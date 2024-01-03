@@ -21,7 +21,7 @@ __pycache__/
 /Pipfile.lock
 
 # Don't upload the database
-processed_ids.db
+database/data/processed_ids.db
 
 # Don't upload chromedriver
 chromedriver/

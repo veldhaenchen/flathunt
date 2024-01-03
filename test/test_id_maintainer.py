@@ -3,7 +3,7 @@ import datetime
 import re
 from typing import Dict
 
-from flathunter.idmaintainer import IdMaintainer
+from database.idmaintainer import IdMaintainer
 from flathunter.hunter import Hunter
 from flathunter.web_hunter import WebHunter
 from flathunter.filter import Filter

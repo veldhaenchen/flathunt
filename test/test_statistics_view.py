@@ -1,14 +1,9 @@
 import pytest
 import tempfile
-import yaml
-import json
-import requests_mock
-
-from flask import session
 
 from flathunter.web import app
 from flathunter.web_hunter import WebHunter
-from flathunter.idmaintainer import IdMaintainer
+from database.idmaintainer import IdMaintainer
 
 from test.dummy_crawler import DummyCrawler
 from test.utils.config import StringConfig

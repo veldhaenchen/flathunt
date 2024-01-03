@@ -9,7 +9,7 @@ from datetime import time as dtime
 
 from flathunter.argument_parser import parse
 from flathunter.logging import logger, configure_logging
-from flathunter.idmaintainer import IdMaintainer
+from database.idmaintainer import IdMaintainer
 from flathunter.hunter import Hunter
 from flathunter.config import Config
 from flathunter.heartbeat import Heartbeat

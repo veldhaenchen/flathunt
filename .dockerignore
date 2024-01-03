@@ -102,7 +102,7 @@ ENV/
 .webkit_cache/
 
 # Database
-processed_ids.db
+database/data/processed_ids.db
 
 # IDEs
 .idea/

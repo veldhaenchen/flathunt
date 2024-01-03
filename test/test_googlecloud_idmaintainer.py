@@ -4,7 +4,7 @@ import re
 from typing import Dict
 from mockfirestore import MockFirestore
 
-from flathunter.googlecloud_idmaintainer import GoogleCloudIdMaintainer
+from database.googlecloud_idmaintainer import GoogleCloudIdMaintainer
 from flathunter.hunter import Hunter
 from flathunter.web_hunter import WebHunter
 from flathunter.filter import Filter

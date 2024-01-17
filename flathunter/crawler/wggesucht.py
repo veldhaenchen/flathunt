@@ -148,12 +148,14 @@ def parse_expose_element_to_details(row: Tag, crawler: str) -> Optional[Dict]:
 
 
 def liste_attribute_filter(element: Union[Tag, str]) -> bool:
-    """Return true for elements whose 'id' attribute starts with 'liste-'"""
+    """Return true for elements whose 'id' attribute starts with 'liste-' and are contained in a parent with an 'id' attribute of 'main_column'"""
     if not isinstance(element, Tag):
         return False
     if "id" not in element.attrs:
         return False
-    return element.attrs["id"].startswith('liste-')
+    if "id" not in element.parent.attrs:
+        return False
+    return element.attrs["id"].startswith('liste-') and element.parent.attrs["id"].startswith('main_column')
 
 
 class WgGesucht(Crawler):

@@ -36,7 +36,7 @@ class Immobilienscout(Crawler):
 
     JSON_PATH_PARSER_ENTRIES = parse("$..['resultlist.realEstate']")
     JSON_PATH_PARSER_IMAGES = parse("$..galleryAttachments..attachment[?'@xsi.type'=='common:Picture']"
-                                    "..['@href']")
+                                    "..['@href'].`sub(/(.*\\\\.jpe?g).*/, \\\\1)`")
 
     RESULT_LIMIT = 50
 
@@ -146,10 +146,7 @@ class Immobilienscout(Crawler):
         #
         # After: https://pictures.immobilienscout24.de/listings/$$IMAGE_ID$$.jpg
 
-        images = [
-            image.value[:image.value.find(".jpg") + 4]
-                for image in self.JSON_PATH_PARSER_IMAGES.find(entry)
-            ]
+        images = [image.value for image in self.JSON_PATH_PARSER_IMAGES.find(entry)]
 
         object_id: int = int(entry.get("@id", 0))
         return {

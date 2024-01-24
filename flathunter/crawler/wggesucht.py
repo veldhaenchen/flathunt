@@ -148,16 +148,12 @@ def parse_expose_element_to_details(row: Tag, crawler: str) -> Optional[Dict]:
 
 
 def liste_attribute_filter(element: Union[Tag, str]) -> bool:
-    """Return true for elements whose 'id' attribute starts with 'liste-' 
-    and are not contained in the 'premium_user_extra_list' container"""
+    """Return true for elements whose 'id' attribute starts with 'liste-'"""
     if not isinstance(element, Tag):
         return False
-    if not element.attrs or "id" not in element.attrs:
+    if "id" not in element.attrs:
         return False
-    if not element.parent or not element.parent.attrs or "class" not in element.parent.attrs:
-        return False
-    return element.attrs["id"].startswith('liste-') and \
-        'premium_user_extra_list' not in element.parent.attrs["class"]
+    return element.attrs["id"].startswith('liste-')
 
 
 class WgGesucht(Crawler):
@@ -179,6 +175,7 @@ class WgGesucht(Crawler):
             e for e in findings
             if isinstance(e, Tag) and e.has_attr('class') and not 'display-none' in e['class']
         ]
+
         for row in existing_findings:
             details = parse_expose_element_to_details(row, self.get_name())
             if details is None:

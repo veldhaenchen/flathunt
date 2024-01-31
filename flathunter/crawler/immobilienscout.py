@@ -4,7 +4,7 @@ import datetime
 import re
 
 from bs4 import BeautifulSoup, Tag
-from jsonpath_ng import parse
+from jsonpath_ng.ext import parse
 from selenium.common.exceptions import JavascriptException
 from selenium.webdriver import Chrome
 
@@ -35,7 +35,9 @@ class Immobilienscout(Crawler):
     URL_PATTERN = STATIC_URL_PATTERN
 
     JSON_PATH_PARSER_ENTRIES = parse("$..['resultlist.realEstate']")
-    JSON_PATH_PARSER_IMAGES = parse("$..galleryAttachments..['@href']")
+    JSON_PATH_PARSER_IMAGES = parse("$..galleryAttachments"
+                                    "..attachment[?'@xsi.type'=='common:Picture']"
+                                    "..['@href'].`sub(/(.*\\\\.jpe?g).*/, \\\\1)`")
 
     RESULT_LIMIT = 50
 
@@ -145,10 +147,7 @@ class Immobilienscout(Crawler):
         #
         # After: https://pictures.immobilienscout24.de/listings/$$IMAGE_ID$$.jpg
 
-        images = [
-            image.value[:image.value.find(".jpg") + 4]
-                for image in self.JSON_PATH_PARSER_IMAGES.find(entry)
-            ]
+        images = [image.value for image in self.JSON_PATH_PARSER_IMAGES.find(entry)]
 
         object_id: int = int(entry.get("@id", 0))
         return {
